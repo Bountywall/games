@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BountyWall — Dice Arena</title>
+  <link rel="icon" type="image/x-icon" href="/bounty.ico"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --off-white:#f4f7fd;
+      --blue-50:#eff5ff;--blue-100:#dbeafe;--blue-200:#bfdbfe;
+      --blue-400:#60a5fa;--blue-600:#2563eb;--blue-700:#1d4ed8;
+      --ink:#0d1b2e;--ink-mid:#3d5168;--ink-light:#8fa3bb;
+      --border:#d6e4f7;--border-dark:#b8d0ed;
+      --green:#059669;--green-bg:#ecfdf5;--green-border:#a7f3d0;
+      --red:#dc2626;--red-bg:#fef2f2;--red-border:#fca5a5;
+      --gold:#d97706;--gold-bg:#fffbeb;--gold-border:#fde68a;
+      --xrp:#00a8ff;--xrp-bg:rgba(0,168,255,0.08);--xrp-border:rgba(0,168,255,0.2);
+      --mono:'DM Mono',monospace;--serif:'Instrument Serif',serif;--sans:'DM Sans',sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--off-white);color:var(--ink);font-family:var(--sans);min-height:100vh;}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle,#c3d9f5 1px,transparent 1px);background-size:28px 28px;opacity:0.4;pointer-events:none;z-index:0;}
+    body::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue-700),var(--xrp),var(--blue-700));z-index:200;}
+
+    /* ── HEADER ── */
+    header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.94);
+      backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+      padding:0 20px;height:56px;display:flex;align-items:center;
+      justify-content:space-between;gap:12px;}
+    .logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;}
+    .logo-svg{width:28px;height:28px;flex-shrink:0;}
+    .logo-sub{font-family:var(--mono);font-size:10px;color:var(--xrp);
+      background:var(--xrp-bg);border:1px solid var(--xrp-border);
+      border-radius:4px;padding:1px 7px;}
+
+    /* Slim balance chip */
+    .hbal{display:none;align-items:center;gap:6px;}
+    .hbal.show{display:flex;}
+    .hbal-chip{display:flex;align-items:center;gap:5px;
+      background:white;border:1px solid var(--border-dark);
+      border-radius:20px;padding:4px 10px 4px 8px;
+      box-shadow:0 1px 4px rgba(30,58,95,0.06);}
+    .xrp-logo{width:15px;height:15px;flex-shrink:0;}
+    .hbal-amount{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink);}
+    .hbal-tag{font-family:var(--mono);font-size:9px;color:var(--xrp);}
+    .hbal-wallet-btn{width:28px;height:28px;border-radius:50%;
+      border:1px solid var(--border-dark);background:white;color:var(--ink-mid);
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      transition:all 0.15s;flex-shrink:0;padding:0;}
+    .hbal-wallet-btn:hover{border-color:var(--blue-400);background:var(--blue-50);color:var(--blue-600);}
+
+    .header-right{display:flex;align-items:center;gap:7px;flex-shrink:0;}
+    .user-chip{display:flex;align-items:center;gap:5px;background:var(--blue-50);
+      border:1px solid var(--blue-200);border-radius:20px;padding:4px 10px;
+      font-family:var(--mono);font-size:10px;color:var(--blue-600);}
+    .user-chip img{width:18px;height:18px;border-radius:50%;}
+    .btn-signout{background:none;border:1px solid var(--border-dark);color:var(--ink-light);
+      border-radius:6px;padding:4px 9px;font-family:var(--mono);font-size:9px;
+      cursor:pointer;transition:all 0.12s;}
+    .btn-signout:hover{border-color:var(--red);color:var(--red);}
+
+    /* ── MAIN ── */
+    main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:36px 24px 80px;}
+
+    /* ── LOGIN ── */
+    #loginScreen{display:none;flex-direction:column;align-items:center;
+      justify-content:center;min-height:65vh;text-align:center;padding:40px 20px;}
+    #loginScreen.active{display:flex;}
+    .login-eyebrow{display:inline-flex;align-items:center;gap:8px;
+      font-family:var(--mono);font-size:10px;color:var(--green);
+      background:var(--green-bg);border:1px solid var(--green-border);
+      border-radius:20px;padding:4px 14px;margin-bottom:20px;}
+    .login-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--green);
+      animation:glow 2s ease-in-out infinite;}
+    @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,0.5);}50%{box-shadow:0 0 0 5px rgba(5,150,105,0);}}
+    .login-title{font-family:var(--serif);font-size:clamp(28px,5vw,48px);
+      color:var(--ink);margin-bottom:10px;line-height:1.1;}
+    .login-title em{font-style:italic;color:var(--blue-600);}
+    .login-sub{font-family:var(--mono);font-size:11.5px;color:var(--ink-light);
+      line-height:1.9;margin-bottom:32px;max-width:400px;}
+    .login-feats{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;}
+    .login-feat{font-family:var(--mono);font-size:10px;color:var(--ink-light);
+      display:flex;align-items:center;gap:5px;}
+    .login-feat::before{content:'✦';color:var(--blue-400);}
+    .btn-google{display:flex;align-items:center;gap:12px;background:white;
+      border:1.5px solid var(--border-dark);color:var(--ink);padding:14px 32px;
+      border-radius:10px;font-family:var(--sans);font-size:15px;font-weight:700;
+      cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.07);transition:all 0.15s;}
+    .btn-google:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.1);border-color:var(--blue-400);}
+    .btn-google:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+    /* ── GAME CONTENT ── */
+    #gameContent{display:none;}
+    #gameContent.active{display:block;}
+    .section-label{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);
+      text-transform:uppercase;letter-spacing:1.8px;margin-bottom:12px;
+      display:flex;align-items:center;gap:10px;}
+    .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    /* ── CREATE CARD ── */
+    .create-card{background:white;border:1px solid var(--border);border-radius:14px;
+      padding:24px 28px;margin-bottom:28px;box-shadow:0 2px 14px rgba(30,58,95,0.06);}
+    .create-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;}
+    .input-group{display:flex;flex-direction:column;gap:6px;flex:1;min-width:140px;}
+    .input-label{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);
+      text-transform:uppercase;letter-spacing:1.2px;}
+    .stake-input{background:var(--blue-50);border:1.5px solid var(--border);
+      border-radius:8px;padding:11px 14px;font-family:var(--mono);font-size:17px;
+      color:var(--ink);outline:none;transition:border-color 0.15s;width:100%;}
+    .stake-input:focus{border-color:var(--blue-400);}
+    .stake-hint{font-family:var(--mono);font-size:10px;color:var(--ink-light);margin-top:4px;}
+    .btn-create{background:linear-gradient(135deg,var(--blue-700),var(--blue-600));
+      color:white;border:none;padding:12px 28px;border-radius:9px;
+      font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;
+      transition:all 0.15s;white-space:nowrap;
+      box-shadow:0 4px 16px rgba(29,78,216,0.25);}
+    .btn-create:hover{filter:brightness(1.08);transform:translateY(-1px);}
+    .btn-create:disabled{opacity:0.35;cursor:not-allowed;transform:none;filter:none;}
+
+    /* ── LOBBY ── */
+    .lobby{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
+    .lobby-empty{background:white;border:1px solid var(--border);border-radius:12px;
+      padding:48px;text-align:center;font-family:var(--mono);font-size:12px;
+      color:var(--ink-light);line-height:2;}
+    .game-card{background:white;border:1px solid var(--border);border-radius:13px;
+      padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+      box-shadow:0 2px 10px rgba(30,58,95,0.05);transition:all 0.15s;}
+    .game-card:hover{box-shadow:0 4px 20px rgba(30,58,95,0.1);border-color:var(--border-dark);}
+    .game-card.my-game{border-color:var(--blue-200);background:var(--blue-50);}
+    .game-card.active-game{border-color:var(--gold-border);background:var(--gold-bg);}
+    .game-avatar{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);object-fit:cover;flex-shrink:0;}
+    .game-avatar-ph{width:38px;height:38px;border-radius:50%;background:var(--blue-100);
+      border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
+      font-family:var(--serif);font-size:15px;color:var(--blue-600);flex-shrink:0;}
+    .game-info{flex:1;min-width:0;}
+    .game-creator{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);}
+    .game-meta{font-family:var(--mono);font-size:10px;color:var(--ink-light);margin-top:3px;}
+    .game-stake-val{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--blue-700);}
+    .game-stake-label{font-family:var(--mono);font-size:9px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;}
+    .game-actions{display:flex;gap:8px;align-items:center;}
+    .sbadge{font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.8px;}
+    .badge-wait{background:var(--blue-50);color:var(--blue-600);border:1px solid var(--blue-200);}
+    .badge-act{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);}
+    .badge-mine{background:var(--xrp-bg);color:var(--xrp);border:1px solid var(--xrp-border);}
+    .btn-join{background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:white;
+      border:none;padding:9px 20px;border-radius:8px;font-family:var(--sans);
+      font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;
+      box-shadow:0 2px 10px rgba(29,78,216,0.2);}
+    .btn-join:hover{filter:brightness(1.08);transform:translateY(-1px);}
+    .btn-cancel{background:none;border:1px solid var(--border-dark);color:var(--ink-light);
+      padding:8px 16px;border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.12s;}
+    .btn-cancel:hover{border-color:var(--red);color:var(--red);}
+    .btn-play{background:linear-gradient(135deg,var(--gold),#f59e0b);color:white;border:none;
+      padding:9px 20px;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+    .btn-play:hover{filter:brightness(1.08);transform:translateY(-1px);}
+
+    /* ── ACTIVE BANNER ── */
+    .active-banner{background:var(--gold-bg);border:1px solid var(--gold-border);
+      border-radius:12px;padding:14px 20px;margin-bottom:20px;display:none;align-items:center;gap:12px;}
+    .active-banner.show{display:flex;}
+    .banner-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);
+      animation:blink 1.2s ease-in-out infinite;flex-shrink:0;}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+    .banner-text{font-family:var(--mono);font-size:11px;color:var(--gold);flex:1;}
+
+    /* ── MODALS ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(13,27,46,0.6);
+      backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;
+      justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s;}
+    .modal-overlay.open{opacity:1;pointer-events:all;}
+
+    /* WALLET MODAL */
+    .wallet-modal{background:white;border:1px solid var(--border);border-radius:16px;
+      padding:28px 32px;max-width:440px;width:95%;
+      box-shadow:0 20px 56px rgba(13,27,46,0.18);
+      transform:translateY(16px);transition:transform 0.22s;}
+    .modal-overlay.open .wallet-modal{transform:translateY(0);}
+    .modal-title{font-family:var(--serif);font-size:22px;color:var(--ink);margin-bottom:20px;}
+    .wallet-tabs{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+    .wtab{flex:1;padding:10px;font-family:var(--mono);font-size:11px;text-align:center;
+      cursor:pointer;border:none;background:white;color:var(--ink-light);
+      transition:all 0.12s;letter-spacing:1px;text-transform:uppercase;}
+    .wtab.active{background:var(--ink);color:white;}
+    .wtab-content{display:none;}
+    .wtab-content.active{display:block;}
+    .wfield{margin-bottom:16px;}
+    .wlabel{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);
+      text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;display:block;}
+    .wvalue{background:var(--blue-50);border:1px solid var(--border);
+      border-radius:7px;padding:11px 14px;font-family:var(--mono);font-size:12px;
+      color:var(--ink);word-break:break-all;line-height:1.6;}
+    .winput{width:100%;background:var(--blue-50);border:1.5px solid var(--border);
+      border-radius:7px;padding:11px 14px;font-family:var(--mono);font-size:13px;
+      color:var(--ink);outline:none;transition:border-color 0.15s;}
+    .winput:focus{border-color:var(--blue-400);}
+    .winput.werr{border-color:var(--red);background:var(--red-bg);}
+    .wnote{font-family:var(--mono);font-size:10px;color:var(--ink-light);line-height:1.7;margin-bottom:14px;}
+    .wnote.warn{color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:6px;padding:8px 12px;}
+    .btn-waction{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue-700),var(--blue-600));
+      color:white;border:none;border-radius:9px;font-family:var(--sans);font-size:14px;
+      font-weight:700;cursor:pointer;transition:all 0.15s;}
+    .btn-waction:hover{filter:brightness(1.08);}
+    .btn-waction:disabled{opacity:0.35;cursor:not-allowed;filter:none;}
+    .wcopy{display:inline-flex;align-items:center;gap:5px;margin-top:6px;
+      font-family:var(--mono);font-size:10px;color:var(--blue-600);
+      background:var(--blue-50);border:1px solid var(--blue-200);
+      border-radius:4px;padding:4px 10px;cursor:pointer;transition:all 0.12s;}
+    .wcopy:hover{background:var(--blue-100);}
+    .wstatus{font-family:var(--mono);font-size:11px;text-align:center;
+      margin-top:10px;min-height:16px;color:var(--ink-light);line-height:1.6;}
+    .wstatus.ok{color:var(--green);}
+    .wstatus.err{color:var(--red);}
+
+    /* BATTLE MODAL */
+    .battle-modal{background:white;border:1px solid var(--border);border-radius:18px;
+      padding:32px;max-width:540px;width:95%;
+      box-shadow:0 24px 64px rgba(13,27,46,0.18);
+      transform:translateY(16px);transition:transform 0.22s;}
+    .modal-overlay.open .battle-modal{transform:translateY(0);}
+    .battle-title{font-family:var(--serif);font-size:26px;color:var(--ink);text-align:center;margin-bottom:4px;}
+    .battle-sub{font-family:var(--mono);font-size:11px;color:var(--ink-light);text-align:center;margin-bottom:26px;}
+    .players-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:24px;}
+    .player-side{text-align:center;}
+    .player-side-name{font-family:var(--sans);font-size:13px;font-weight:700;margin-bottom:3px;}
+    .p1c{color:var(--blue-600);}
+    .p2c{color:var(--red);}
+    .vs-txt{font-family:var(--serif);font-size:20px;color:var(--ink-light);text-align:center;}
+    .dice-area{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
+    .dice-side{display:flex;flex-direction:column;align-items:center;gap:10px;}
+    .dice-side-lbl{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1.5px;}
+    .dice-pair{display:flex;gap:8px;justify-content:center;}
+    .die{width:60px;height:60px;background:white;border:2px solid var(--border);
+      border-radius:12px;display:flex;align-items:center;justify-content:center;
+      font-size:28px;box-shadow:0 4px 12px rgba(30,58,95,0.1);transition:transform 0.1s;}
+    .die.p1die{border-color:var(--blue-200);}
+    .die.p2die{border-color:var(--red-border);}
+    .die.rolling{animation:droll 0.8s ease;}
+    @keyframes droll{0%{transform:rotate(0) scale(1);}15%{transform:rotate(-20deg) scale(1.1);}30%{transform:rotate(15deg) scale(0.95);}45%{transform:rotate(-10deg) scale(1.08);}60%{transform:rotate(8deg) scale(0.97);}75%{transform:rotate(-5deg) scale(1.03);}90%{transform:rotate(3deg) scale(0.99);}100%{transform:rotate(0) scale(1);}}
+    .dtotal{font-family:var(--mono);font-size:26px;font-weight:500;color:var(--ink);text-align:center;}
+    .dtotal.twin{color:var(--green);}
+    .dtotal.tlose{color:var(--red);}
+    .battle-result{text-align:center;padding:16px;border-radius:12px;margin-bottom:20px;display:none;}
+    .battle-result.win{background:var(--green-bg);border:1px solid var(--green-border);}
+    .battle-result.lose{background:var(--red-bg);border:1px solid var(--red-border);}
+    .res-title{font-family:var(--serif);font-size:26px;margin-bottom:5px;}
+    .res-title.win{color:var(--green);}
+    .res-title.lose{color:var(--red);}
+    .res-detail{font-family:var(--mono);font-size:11px;color:var(--ink-light);line-height:1.8;}
+    .battle-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+    .btn-close-battle{background:none;border:1.5px solid var(--border-dark);color:var(--ink-mid);
+      padding:13px 28px;border-radius:10px;font-family:var(--sans);font-size:14px;
+      font-weight:600;cursor:pointer;transition:all 0.15s;}
+    .btn-close-battle:hover{border-color:var(--blue-400);color:var(--blue-600);}
+    .bstatus{font-family:var(--mono);font-size:11px;color:var(--ink-light);
+      text-align:center;margin-top:12px;min-height:16px;line-height:1.6;}
+    /* rolling indicator */
+    .rolling-indicator{display:none;flex-direction:column;align-items:center;gap:8px;padding:8px 0;}
+    .rolling-indicator.show{display:flex;}
+    .roll-spinner{width:32px;height:32px;border:2px solid var(--border);
+      border-top-color:var(--blue-600);border-radius:50%;
+      animation:spin 0.7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .roll-lbl{font-family:var(--mono);font-size:11px;color:var(--ink-light);}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(14px);
+      background:var(--ink);color:white;font-family:var(--mono);font-size:12px;
+      padding:11px 22px;border-radius:8px;opacity:0;transition:all 0.2s;z-index:1000;
+      pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    .toast.ok{background:var(--green);}
+    .toast.err{background:var(--red);}
+
+    @media(max-width:680px){
+      header{padding:0 14px;gap:8px;}
+      .hbal-chip{padding:5px 10px;}
+      main{padding:20px 14px 60px;}
+      .dice-area{grid-template-columns:1fr;}
+      .battle-modal{padding:22px 16px;}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <a class="logo" href="https://bountywall.com">
+    <!-- BountyWall B logo -->
+    <svg class="logo-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#2488FF" d="M478.609,300.522v-33.39h-33.391v-66.784h33.391V66.783h-33.391v-33.39h-33.391V0H0v100.174h33.39v311.652H0V512h445.217v-33.39h33.391v-33.391H512V300.522H478.609z M345.043,378.435H166.957v-44.522h178.087V378.435z M345.043,155.826H166.957v-33.391h178.087V155.826z"/>
+      <polygon fill="#005ECE" points="478.609,300.522 478.609,267.132 445.217,267.132 445.217,200.348 478.609,200.348 478.609,66.783 445.217,66.783 445.217,33.392 411.826,33.392 411.826,0 256,0 256,122.435 345.043,122.435 345.043,155.826 256,155.826 256,333.913 345.043,333.913 345.043,378.435 256,378.435 256,512 445.217,512 445.217,478.61 478.609,478.61 478.609,445.217 512,445.217 512,300.522"/>
+      <rect fill="#000" x="33.391" y="100.174" width="33.391" height="311.652"/>
+      <polygon fill="#000" points="33.391,411.826 0,411.826 0,512 445.217,512 445.217,478.609 33.391,478.609"/>
+      <polygon fill="#000" points="411.826,33.391 411.826,0 0,0 0,100.174 33.391,100.174 33.391,33.391"/>
+      <rect fill="#000" x="411.826" y="33.391" width="33.391" height="33.391"/>
+      <rect fill="#000" x="445.217" y="66.783" width="33.391" height="133.565"/>
+      <rect fill="#000" x="478.609" y="300.522" width="33.391" height="144.696"/>
+      <rect fill="#000" x="445.217" y="445.217" width="33.391" height="33.391"/>
+      <polygon fill="#000" points="378.435,189.217 378.435,122.435 345.043,122.435 345.043,155.826 166.957,155.826 166.957,122.435 345.043,122.435 345.043,89.043 133.565,89.043 133.565,189.217"/>
+      <polygon fill="#000" points="345.043,378.435 166.957,378.435 166.957,333.913 345.043,333.913 345.043,300.522 133.565,300.522 133.565,411.826 378.435,411.826 378.435,333.913 345.043,333.913"/>
+      <polygon fill="#000" points="411.826,233.739 378.435,233.739 378.435,267.13 445.217,267.13 445.217,200.348 411.826,200.348"/>
+      <rect fill="#000" x="445.217" y="267.13" width="33.391" height="33.391"/>
+    </svg>
+    <span class="logo-sub">dice</span>
+  </a>
+
+  <!-- Compact balance chip -->
+  <div class="hbal" id="hbal">
+    <div class="hbal-chip">
+      <svg class="xrp-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="16" fill="#23292F"/>
+        <path d="M21.47 8h2.55l-5.12 5.12a4.16 4.16 0 0 1-5.8 0L8 8h2.55l3.84 3.84a2.42 2.42 0 0 0 3.24 0L21.47 8ZM10.53 24H8l5.1-5.1a4.16 4.16 0 0 1 5.8 0L24 24h-2.55l-3.82-3.82a2.42 2.42 0 0 0-3.24 0L10.53 24Z" fill="white"/>
+      </svg>
+      <span class="hbal-amount" id="hbalAmt">0.000</span>
+      <span class="hbal-tag">XRP</span>
+    </div>
+    <button class="hbal-wallet-btn" id="btnDeposit" title="Deposit / Withdraw">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="header-right" id="headerRight"></div>
+</header>
+
+<main>
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="login-eyebrow"><span class="login-eyebrow-dot"></span>XRP Testnet · Server-side RNG · 3% house cut</div>
+    <div class="login-title">Roll the dice,<br/><em>win test XRP.</em></div>
+    <div class="login-sub">Create a game, set your stake, wait for a challenger.<br/>The second player joining triggers the roll automatically.</div>
+    <div class="login-feats">
+      <div class="login-feat">XRP Testnet</div>
+      <div class="login-feat">Auto-roll on join</div>
+      <div class="login-feat">Tamper-proof</div>
+      <div class="login-feat">Real-time lobby</div>
+    </div>
+    <button class="btn-google" id="btnLogin">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-3.59-13.46-8.83l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Sign in with Google
+    </button>
+  </div>
+
+  <!-- GAME CONTENT -->
+  <div id="gameContent">
+    <div class="active-banner" id="activeBanner">
+      <div class="banner-dot"></div>
+      <div class="banner-text" id="bannerText">Your game is live.</div>
+      <button class="btn-play" id="btnResume" style="padding:8px 16px;font-size:12px;">View</button>
+    </div>
+
+    <div class="section-label">Create a Game</div>
+    <div class="create-card">
+      <div class="create-row">
+        <div class="input-group">
+          <label class="input-label">Your stake (XRP)</label>
+          <input class="stake-input" id="stakeInput" type="number" min="0.1" max="100" step="0.1" placeholder="e.g. 1.0"/>
+          <div class="stake-hint" id="stakeHint">Opponent must match. Dice roll automatically when they join.</div>
+        </div>
+        <button class="btn-create" id="btnCreate">⚄ Create Game</button>
+      </div>
+    </div>
+
+    <div class="section-label">Open Games</div>
+    <div class="lobby" id="lobby">
+      <div class="lobby-empty">No open games right now.<br/>Be the first to create one above.</div>
+    </div>
+  </div>
+</main>
+
+<!-- WALLET MODAL -->
+<div class="modal-overlay" id="walletModal">
+  <div class="wallet-modal">
+    <div class="modal-title">◈ Wallet</div>
+    <div class="wallet-tabs">
+      <button class="wtab active" id="tabDep" onclick="switchTab('dep')">↓ Deposit</button>
+      <button class="wtab" id="tabWit" onclick="switchTab('wit')">↑ Withdraw</button>
+    </div>
+    <div class="wtab-content active" id="depTab">
+      <div class="wnote warn">⚠️ You MUST include the Destination Tag when sending.<br/>Deposits without it cannot be credited to your account.</div>
+      <div class="wfield">
+        <label class="wlabel">House Address</label>
+        <div class="wvalue" id="depAddr">Loading...</div>
+        <button class="wcopy" onclick="wCopy('depAddr')">Copy Address</button>
+      </div>
+      <div class="wfield">
+        <label class="wlabel">Your Destination Tag (required)</label>
+        <div class="wvalue" id="depTag" style="font-size:22px;color:var(--blue-700);font-weight:500;letter-spacing:3px;">—</div>
+        <button class="wcopy" onclick="wCopy('depTag')">Copy Tag</button>
+      </div>
+      <div class="wnote">Minimum deposit: 0.1 XRP. After sending, tap below to credit your account.</div>
+      <button class="btn-waction" id="btnCheckDep">Check for Deposits</button>
+    </div>
+    <div class="wtab-content" id="witTab">
+      <div class="wfield">
+        <label class="wlabel">Available Balance</label>
+        <div class="wvalue" id="witBalDisp" style="font-size:20px;color:var(--blue-700);font-weight:500;">0.000 XRP</div>
+      </div>
+      <div class="wfield">
+        <label class="wlabel">XRP Destination Address</label>
+        <input class="winput" id="witAddr" type="text" placeholder="rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" spellcheck="false"/>
+      </div>
+      <div class="wfield">
+        <label class="wlabel">Amount (XRP)</label>
+        <input class="winput" id="witAmt" type="number" min="1" step="0.1" placeholder="Min 1.0"/>
+        <div class="wnote" style="margin-top:5px;">Minimum: 1.0 XRP</div>
+      </div>
+      <button class="btn-waction" id="btnWitSubmit">Withdraw XRP</button>
+    </div>
+    <div style="text-align:center;margin-top:14px;">
+      <button onclick="closeWallet()" style="background:none;border:none;font-family:var(--mono);font-size:11px;color:var(--ink-light);cursor:pointer;">Close</button>
+    </div>
+    <div class="wstatus" id="walletStatus"></div>
+  </div>
+</div>
+
+<!-- BATTLE MODAL -->
+<div class="modal-overlay" id="battleModal">
+  <div class="battle-modal">
+    <div class="battle-title">⚄ Dice Battle</div>
+    <div class="battle-sub" id="battleSub">Both roll two dice. Highest total wins.</div>
+    <div class="players-row">
+      <div class="player-side">
+        <div class="player-side-name p1c" id="bp1">You</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 1</div>
+      </div>
+      <div class="vs-txt">VS</div>
+      <div class="player-side">
+        <div class="player-side-name p2c" id="bp2">Opponent</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 2</div>
+      </div>
+    </div>
+    <div class="dice-area">
+      <div class="dice-side">
+        <div class="dice-side-lbl">Your Roll</div>
+        <div class="dice-pair">
+          <div class="die p1die" id="p1d1">?</div>
+          <div class="die p1die" id="p1d2">?</div>
+        </div>
+        <div class="dtotal" id="p1tot">—</div>
+      </div>
+      <div class="dice-side">
+        <div class="dice-side-lbl">Opponent's Roll</div>
+        <div class="dice-pair">
+          <div class="die p2die" id="p2d1">?</div>
+          <div class="die p2die" id="p2d2">?</div>
+        </div>
+        <div class="dtotal" id="p2tot">—</div>
+      </div>
+    </div>
+    <div class="rolling-indicator" id="rollingIndicator">
+      <div class="roll-spinner"></div>
+      <div class="roll-lbl">Rolling dice...</div>
+    </div>
+    <div class="battle-result" id="battleResult">
+      <div class="res-title" id="resTit">—</div>
+      <div class="res-detail" id="resDet">—</div>
+    </div>
+    <div class="battle-btns">
+      <button class="btn-close-battle" id="btnCloseBattle" style="display:none" onclick="closeBattle()">Close</button>
+    </div>
+    <div class="bstatus" id="bstatus"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged}
+  from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,
+  collection,query,where,onSnapshot,serverTimestamp}
+  from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const FC={
+  apiKey:"AIzaSyBh_pyqd4GDk71nvTuPbSJf2qOu2a1VNuk",
+  authDomain:"bountywall-893ac.firebaseapp.com",
+  projectId:"bountywall-893ac",
+  storageBucket:"bountywall-893ac.firebasestorage.app",
+  messagingSenderId:"123543253404",
+  appId:"1:123543253404:web:e6f00975a9de10cf9c1859"
+};
+const app=initializeApp(FC);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const provider=new GoogleAuthProvider();
+
+let me=null, bal=0, activeGid=null, lobbyUnsub=null;
+let battleOpen=false, battleRolled=false, battleGid=null, gameUnsub=null;
+const DF=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+
+// ── UTILS ──
+let tt;
+function toast(m,t=''){
+  const e=document.getElementById('toast');
+  e.textContent=m; e.className='toast show '+t;
+  clearTimeout(tt); tt=setTimeout(()=>e.classList.remove('show'),3500);
+}
+function wCopy(id){
+  const t=document.getElementById(id).textContent.trim();
+  const fb=()=>{
+    const a=document.createElement('textarea');
+    a.value=t; a.style.cssText='position:fixed;opacity:0;';
+    document.body.appendChild(a); a.focus(); a.select();
+    try{document.execCommand('copy');toast('Copied!','ok');}
+    catch(e){toast('Long-press to copy.');}
+    document.body.removeChild(a);
+  };
+  navigator.clipboard ? navigator.clipboard.writeText(t).then(()=>toast('Copied!','ok')).catch(fb) : fb();
+}
+window.wCopy=wCopy;
+
+async function getToken(){
+  if(!me) return null;
+  try{ return await me.getIdToken(false); }
+  catch(e){ return null; }
+}
+
+// ── API — Cloudflare Worker ──
+// Replace WORKER_URL with your actual worker URL after deploying
+const WORKER_URL = 'https://bw-game-api.joshast772on.workers.dev';
+
+async function php(ep, body){
+  const t=await getToken();
+  if(!t) throw new Error('Not authenticated');
+  // Convert old PHP filenames to Worker API routes
+  const route = ep
+    .replace('game_roll.php',    'api/roll')
+    .replace('game_deposit.php', 'api/deposit')
+    .replace('game_withdraw.php','api/withdraw')
+    .replace('game_refund.php',  'api/refund');
+  const r=await fetch(WORKER_URL+'/'+route,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({...body,idToken:t})
+  });
+  const data=await r.json().catch(()=>({ok:false,error:'HTTP '+r.status+' — invalid response'}));
+  return data;
+}
+
+// ── BALANCE ──
+function updateBalUI(){
+  document.getElementById('hbalAmt').textContent=bal.toFixed(3);
+  document.getElementById('witBalDisp').textContent=bal.toFixed(3)+' XRP';
+  document.getElementById('stakeHint').textContent=
+    'Balance: '+bal.toFixed(3)+' XRP · Opponent must match. Auto-rolls on join.';
+}
+
+async function loadBal(){
+  if(!me) return;
+  try{
+    const s=await getDoc(doc(db,'game_balances',me.uid));
+    bal=s.exists()?parseFloat(s.data().balance||0):0;
+    updateBalUI();
+  }catch(e){}
+}
+
+// ── WALLET ──
+window.switchTab=function(t){
+  ['dep','wit'].forEach(x=>{
+    document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).className='wtab'+(x===t?' active':'');
+    document.getElementById(x+'Tab').className='wtab-content'+(x===t?' active':'');
+  });
+  setWStatus('');
+};
+// fix tab ids
+window.switchTab=function(t){
+  document.getElementById('tabDep').className='wtab'+(t==='dep'?' active':'');
+  document.getElementById('tabWit').className='wtab'+(t==='wit'?' active':'');
+  document.getElementById('depTab').className='wtab-content'+(t==='dep'?' active':'');
+  document.getElementById('witTab').className='wtab-content'+(t==='wit'?' active':'');
+  setWStatus('');
+};
+window.closeWallet=function(){document.getElementById('walletModal').classList.remove('open');};
+
+function setWStatus(m,t=''){
+  const e=document.getElementById('walletStatus');
+  e.textContent=m; e.className='wstatus'+(t?' '+t:'');
+}
+
+async function openWallet(tab='dep'){
+  switchTab(tab);
+  updateBalUI();
+  document.getElementById('walletModal').classList.add('open');
+  if(tab==='dep'){
+    document.getElementById('depAddr').textContent='Loading...';
+    document.getElementById('depTag').textContent='—';
+    try{
+      const r=await php('game_deposit.php',{action:'get_address'});
+      if(r.ok){
+        document.getElementById('depAddr').textContent=r.address;
+        document.getElementById('depTag').textContent=String(r.destinationTag);
+      }else{
+        document.getElementById('depAddr').textContent='Error';
+        setWStatus(r.error||'Failed to load address','err');
+      }
+    }catch(e){
+      document.getElementById('depAddr').textContent='Connection error';
+      setWStatus('Could not reach server. Are the PHP files uploaded?','err');
+    }
+  }
+}
+
+document.getElementById('btnDeposit').addEventListener('click',()=>openWallet('dep'));
+document.getElementById('walletModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('walletModal')) closeWallet();
+});
+
+document.getElementById('btnCheckDep').addEventListener('click',async()=>{
+  const b=document.getElementById('btnCheckDep');
+  b.disabled=true; b.textContent='Checking...'; setWStatus('');
+  try{
+    const r=await php('game_deposit.php',{action:'check'});
+    if(r.ok){
+      if(r.credited>0){
+        bal=r.balance; updateBalUI();
+        setWStatus('✓ Credited '+r.credited.toFixed(3)+' XRP to your balance!','ok');
+        toast('✓ Deposit credited: '+r.credited.toFixed(3)+' XRP','ok');
+      }else{
+        setWStatus('No new deposits found. Send XRP with Destination Tag.');
+      }
+    }else setWStatus(r.error||'Error checking.','err');
+  }catch(e){setWStatus('✗ '+(e.message||'Connection error.'),'err');}
+  b.disabled=false; b.textContent='Check for Deposits';
+});
+
+document.getElementById('btnWitSubmit').addEventListener('click',async()=>{
+  const addr=document.getElementById('witAddr').value.trim();
+  const amt=parseFloat(document.getElementById('witAmt').value);
+  document.getElementById('witAddr').classList.remove('werr');
+  document.getElementById('witAmt').classList.remove('werr');
+  setWStatus('');
+  if(!addr||!/^r[1-9A-HJ-NP-Za-km-z]{24,33}$/.test(addr)){
+    document.getElementById('witAddr').classList.add('werr');
+    setWStatus('Invalid XRP address.','err'); return;
+  }
+  if(!amt||amt<1){
+    document.getElementById('witAmt').classList.add('werr');
+    setWStatus('Minimum 1 XRP.','err'); return;
+  }
+  if(amt>bal){
+    document.getElementById('witAmt').classList.add('werr');
+    setWStatus('Insufficient balance. You have '+bal.toFixed(3)+' XRP.','err'); return;
+  }
+  const b=document.getElementById('btnWitSubmit');
+  b.disabled=true; b.textContent='Processing...';
+  try{
+    const r=await php('game_withdraw.php',{address:addr,amount:amt});
+    if(r.ok){
+      bal=r.newBalance; updateBalUI();
+      document.getElementById('witAddr').value='';
+      document.getElementById('witAmt').value='';
+      setWStatus('✓ Withdrawal sent! TX: '+(r.txHash||'').slice(0,16)+'...','ok');
+      toast('✓ Withdrawal submitted','ok');
+    }else setWStatus('✗ '+(r.error||'Failed.'),'err');
+  }catch(e){setWStatus('✗ '+(e.message||'Connection error.'),'err');}
+  b.disabled=false; b.textContent='Withdraw XRP';
+});
+
+// ── CREATE GAME ──
+document.getElementById('btnCreate').addEventListener('click',async()=>{
+  const stake=parseFloat(document.getElementById('stakeInput').value);
+  if(!stake||stake<0.1){toast('Min stake 0.1 XRP','err');return;}
+  if(stake>100){toast('Max stake 100 XRP','err');return;}
+  if(stake>bal){toast('Insufficient balance. You have '+bal.toFixed(3)+' XRP','err');return;}
+  if(activeGid){toast('You already have an active game','err');return;}
+  const b=document.getElementById('btnCreate');
+  b.disabled=true; b.textContent='Creating...';
+  try{
+    const nb=parseFloat((bal-stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:nb},{merge:true});
+    bal=nb; updateBalUI();
+    const gr=doc(collection(db,'games'));
+    await setDoc(gr,{
+      status:'waiting',
+      stake:stake,
+      player1:{uid:me.uid,displayName:me.displayName||'Player',photoURL:me.photoURL||''},
+      player2:null,
+      createdAt:serverTimestamp()
+    });
+    activeGid=gr.id;
+    document.getElementById('stakeInput').value='';
+    toast('Game created! Waiting for opponent...','ok');
+  }catch(e){
+    // refund
+    bal=parseFloat((bal+stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:bal},{merge:true});
+    updateBalUI();
+    toast('Error creating game. Try again.','err');
+    console.error(e);
+  }
+  b.disabled=false; b.textContent='⚄ Create Game';
+});
+
+// ── JOIN GAME — auto-rolls after joining ──
+window.joinGame=async function(gid,stake){
+  if(stake>bal){toast('Need '+stake.toFixed(3)+' XRP to join','err');return;}
+  if(!confirm('Join and stake '+stake.toFixed(3)+' XRP? Dice roll automatically.'))return;
+  try{
+    const nb=parseFloat((bal-stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:nb},{merge:true});
+    bal=nb; updateBalUI();
+    await updateDoc(doc(db,'games',gid),{
+      status:'active',
+      player2:{uid:me.uid,displayName:me.displayName||'Player',photoURL:me.photoURL||''}
+    });
+    activeGid=gid;
+    // Open battle modal and immediately trigger roll
+    await openBattleModal(gid, true);
+  }catch(e){
+    toast('Error joining game.','err'); console.error(e);
+  }
+};
+
+// ── CANCEL GAME ──
+window.cancelGame=async function(gid,stake){
+  if(!confirm('Cancel and get '+stake.toFixed(3)+' XRP back?'))return;
+  try{
+    await deleteDoc(doc(db,'games',gid));
+    // Read fresh balance from Firestore (rules only allow decrease via client)
+    // so we use the PHP deposit endpoint to credit the refund
+    // Actually — read current balance and write refund via merge
+    const snap=await getDoc(doc(db,'game_balances',me.uid));
+    const currentBal=snap.exists()?parseFloat(snap.data().balance||0):0;
+    const refundedBal=parseFloat((currentBal+stake).toFixed(6));
+    // Use PHP to do the refund since client rules block balance increases
+    const t=await getToken();
+    if(t){
+      await php('game_refund.php',{amount:stake});
+    }
+    bal=refundedBal; updateBalUI();
+    activeGid=null; updateBanner([]);
+    toast('Cancelled. Stake returned.','ok');
+    await loadBal(); // reload to confirm
+  }catch(e){
+    toast('Error cancelling.','err');
+    console.error(e);
+  }
+};
+
+// ── LOBBY ──
+function startLobby(){
+  if(lobbyUnsub) lobbyUnsub();
+  // No orderBy — avoids composite index requirement. Sort client-side.
+  const q=query(collection(db,'games'),where('status','in',['waiting','active']));
+  lobbyUnsub=onSnapshot(q,snap=>{
+    const gs=snap.docs
+      .map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+
+    activeGid=null;
+    gs.forEach(g=>{
+      if(g.player1?.uid===me.uid||g.player2?.uid===me.uid) activeGid=g.id;
+    });
+    updateBanner(gs);
+
+    // Auto-open battle for P1 when opponent joins — only if modal not already open
+    gs.forEach(g=>{
+      if(g.status==='active' && g.player1?.uid===me.uid && !battleOpen){
+        openBattleModal(g.id, false);
+      }
+    });
+
+    const lobby=document.getElementById('lobby');
+    if(!gs.length){
+      lobby.innerHTML='<div class="lobby-empty">No open games right now.<br/>Be the first to create one above.</div>';
+      return;
+    }
+    lobby.innerHTML=gs.map(g=>{
+      const isMe=g.player1?.uid===me.uid||g.player2?.uid===me.uid;
+      const isP1=g.player1?.uid===me.uid;
+      const stake=parseFloat(g.stake||0);
+      const name=g.player1?.displayName||'Unknown';
+      const ph=g.player1?.photoURL;
+      const av=ph
+        ?`<img class="game-avatar" src="${ph}" alt=""/>`
+        :`<div class="game-avatar-ph">${name.charAt(0).toUpperCase()}</div>`;
+      let badge,actions;
+      if(g.status==='waiting'){
+        if(isP1){
+          badge=`<span class="sbadge badge-mine">Your game</span>`;
+          actions=`<button class="btn-cancel" onclick="cancelGame('${g.id}',${stake})">Cancel & Refund</button>`;
+        }else{
+          badge=`<span class="sbadge badge-wait">Open</span>`;
+          actions=`<button class="btn-join" onclick="joinGame('${g.id}',${stake})">Join — ${stake.toFixed(3)} XRP</button>`;
+        }
+      }else{
+        badge=`<span class="sbadge badge-act">Rolling...</span>`;
+        if(isMe) actions=`<button class="btn-play" onclick="openBattleModal('${g.id}',false)">View</button>`;
+        else actions=`<span style="font-family:var(--mono);font-size:10px;color:var(--ink-light)">In progress</span>`;
+      }
+      return `<div class="game-card ${isMe?(g.status==='active'?'active-game':'my-game'):''}">
+        ${av}
+        <div class="game-info">
+          <div class="game-creator">${name}</div>
+          <div class="game-meta">${badge} &nbsp;·&nbsp; ${stake.toFixed(3)} XRP stake &nbsp;·&nbsp; Pot: ${(stake*2).toFixed(3)} XRP</div>
+        </div>
+        <div style="text-align:right">
+          <div class="game-stake-val">${stake.toFixed(3)}</div>
+          <div class="game-stake-label">XRP each</div>
+        </div>
+        <div class="game-actions">${actions}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function updateBanner(gs){
+  const b=document.getElementById('activeBanner');
+  if(!activeGid){b.classList.remove('show');return;}
+  const g=gs.find(x=>x.id===activeGid);
+  if(!g){b.classList.remove('show');return;}
+  document.getElementById('bannerText').innerHTML=
+    `Game in progress — stake: <strong>${parseFloat(g.stake).toFixed(3)} XRP</strong>`;
+  document.getElementById('btnResume').onclick=()=>openBattleModal(activeGid,false);
+  b.classList.add('show');
+}
+
+// ── BATTLE MODAL ──
+window.openBattleModal=async function(gid, autoRoll){
+  if(battleOpen && battleGid===gid) return; // already open for this game
+  battleGid=gid; battleOpen=true; battleRolled=false;
+
+  // Reset UI
+  ['p1d1','p1d2','p2d1','p2d2'].forEach(id=>{
+    const e=document.getElementById(id);
+    e.textContent='?'; e.classList.remove('rolling');
+  });
+  document.getElementById('p1tot').textContent='—';
+  document.getElementById('p2tot').textContent='—';
+  document.getElementById('p1tot').className='dtotal';
+  document.getElementById('p2tot').className='dtotal';
+  document.getElementById('battleResult').style.display='none';
+  document.getElementById('btnCloseBattle').style.display='none';
+  document.getElementById('bstatus').textContent='';
+  document.getElementById('rollingIndicator').classList.remove('show');
+
+  const sn=await getDoc(doc(db,'games',gid));
+  if(!sn.exists()){toast('Game not found','err');battleOpen=false;return;}
+  const g=sn.data();
+  const isP1=g.player1?.uid===me.uid;
+  const myName=me.displayName||'You';
+  const oppName=isP1?(g.player2?.displayName||'Opponent'):(g.player1?.displayName||'Opponent');
+
+  document.getElementById('bp1').textContent=isP1?myName:oppName;
+  document.getElementById('bp2').textContent=isP1?oppName:myName;
+  document.getElementById('battleSub').textContent=
+    'Stake: '+parseFloat(g.stake).toFixed(3)+' XRP each · Winner takes '
+    +(parseFloat(g.stake)*2*0.97).toFixed(3)+' XRP (3% house cut)';
+
+  document.getElementById('battleModal').classList.add('open');
+
+  // If already complete (e.g. reopening)
+  if(g.result||g.status==='complete'){
+    showResult(g, isP1);
+    document.getElementById('btnCloseBattle').style.display='inline-flex';
+    return;
+  }
+
+  if(autoRoll){
+    // P2 — trigger the roll
+    await doRoll(gid, isP1);
+  } else {
+    // P1 — show spinner and listen for result from Firestore
+    document.getElementById('rollingIndicator').classList.add('show');
+    document.getElementById('bstatus').textContent='Waiting for opponent to join and roll...';
+
+    // Unsub any previous listener
+    if(gameUnsub){ gameUnsub(); gameUnsub=null; }
+
+    // Listen to this game document — fires when P2 writes the result
+    gameUnsub = onSnapshot(doc(db,'games',gid), (snap)=>{
+      if(!snap.exists()) return;
+      const gData = snap.data();
+      if(gData.status==='complete' && gData.winner){
+        // Result is in — show it
+        document.getElementById('rollingIndicator').classList.remove('show');
+        document.getElementById('bstatus').textContent='';
+
+        // Show dice
+        const myD = isP1 ? [gData.p1d1,gData.p1d2] : [gData.p2d1,gData.p2d2];
+        const opD = isP1 ? [gData.p2d1,gData.p2d2] : [gData.p1d1,gData.p1d2];
+        const myT = isP1 ? gData.p1Total : gData.p2Total;
+        const opT = isP1 ? gData.p2Total : gData.p1Total;
+
+        if(myD[0]){
+          ['p1d1','p1d2','p2d1','p2d2'].forEach(id=>{
+            document.getElementById(id).classList.add('rolling');
+          });
+          setTimeout(()=>{
+            ['p1d1','p1d2','p2d1','p2d2'].forEach(id=>document.getElementById(id).classList.remove('rolling'));
+            document.getElementById('p1d1').textContent=DF[myD[0]]||myD[0];
+            document.getElementById('p1d2').textContent=DF[myD[1]]||myD[1];
+            document.getElementById('p2d1').textContent=DF[opD[0]]||opD[0];
+            document.getElementById('p2d2').textContent=DF[opD[1]]||opD[1];
+            const iWin=(isP1&&gData.winner==='player1')||(!isP1&&gData.winner==='player2');
+            document.getElementById('p1tot').textContent=myT;
+            document.getElementById('p2tot').textContent=opT;
+            document.getElementById('p1tot').className='dtotal '+(iWin?'twin':'tlose');
+            document.getElementById('p2tot').className='dtotal '+(iWin?'tlose':'twin');
+            showResult(gData, isP1);
+            document.getElementById('btnCloseBattle').style.display='inline-flex';
+            if(gameUnsub){ gameUnsub(); gameUnsub=null; }
+            loadBal();
+          }, 600);
+        }
+      } else if(gData.status==='active' && gData.player2?.uid){
+        // Opponent just joined — update status text
+        document.getElementById('bstatus').textContent='Opponent joined! Rolling dice...';
+      }
+    });
+  }
+};
+
+window.closeBattle=function(){
+  document.getElementById('battleModal').classList.remove('open');
+  if(gameUnsub){ gameUnsub(); gameUnsub=null; }
+  battleGid=null; battleOpen=false;
+  loadBal();
+};
+document.getElementById('battleModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('battleModal') && !battleRolled){
+    // Only allow close if result is shown
+    if(document.getElementById('battleResult').style.display!=='none') closeBattle();
+  }
+});
+
+async function doRoll(gid, isP1){
+  if(battleRolled) return;
+  battleRolled=true;
+
+  document.getElementById('bstatus').textContent='';
+  document.getElementById('rollingIndicator').classList.add('show');
+
+  // Animate dice
+  ['p1d1','p1d2','p2d1','p2d2'].forEach(id=>{
+    const e=document.getElementById(id);
+    e.textContent=DF[Math.ceil(Math.random()*6)];
+    e.classList.add('rolling');
+  });
+
+  try{
+    const r=await php('game_roll.php',{gameId:gid});
+    document.getElementById('rollingIndicator').classList.remove('show');
+
+    if(!r.ok){
+      document.getElementById('bstatus').textContent='Roll error: '+(r.error||'Unknown error');
+      ['p1d1','p1d2','p2d1','p2d2'].forEach(id=>document.getElementById(id).classList.remove('rolling'));
+      document.getElementById('btnCloseBattle').style.display='inline-flex';
+      battleRolled=false;
+      return;
+    }
+
+    const res=r.result;
+    setTimeout(()=>{
+      ['p1d1','p1d2','p2d1','p2d2'].forEach(id=>document.getElementById(id).classList.remove('rolling'));
+      const myD=isP1?res.p1Dice:res.p2Dice;
+      const opD=isP1?res.p2Dice:res.p1Dice;
+      const myT=isP1?res.p1Total:res.p2Total;
+      const opT=isP1?res.p2Total:res.p1Total;
+      document.getElementById('p1d1').textContent=DF[myD[0]];
+      document.getElementById('p1d2').textContent=DF[myD[1]];
+      document.getElementById('p2d1').textContent=DF[opD[0]];
+      document.getElementById('p2d2').textContent=DF[opD[1]];
+      const iWin=(isP1&&res.winner==='player1')||(!isP1&&res.winner==='player2');
+      document.getElementById('p1tot').textContent=myT;
+      document.getElementById('p2tot').textContent=opT;
+      document.getElementById('p1tot').className='dtotal '+(iWin?'twin':'tlose');
+      document.getElementById('p2tot').className='dtotal '+(iWin?'tlose':'twin');
+      // Show result
+      const el=document.getElementById('battleResult');
+      el.className='battle-result '+(iWin?'win':'lose');
+      document.getElementById('resTit').className='res-title '+(iWin?'win':'lose');
+      document.getElementById('resTit').textContent=iWin?'🏆 You Win!':'💀 You Lose';
+      document.getElementById('resDet').textContent=iWin
+        ?'You won '+parseFloat(res.winnings).toFixed(3)+' XRP! (House: '+parseFloat(res.houseCut).toFixed(3)+' XRP)'
+        :'Opponent won '+parseFloat(res.winnings).toFixed(3)+' XRP. Better luck next time.';
+      el.style.display='block';
+      document.getElementById('btnCloseBattle').style.display='inline-flex';
+      loadBal();
+    }, 900);
+
+  }catch(e){
+    document.getElementById('rollingIndicator').classList.remove('show');
+    document.getElementById('bstatus').textContent='Error: '+(e.message||'Connection failed.');
+    ['p1d1','p1d2','p2d1','p2d2'].forEach(id=>document.getElementById(id).classList.remove('rolling'));
+    document.getElementById('btnCloseBattle').style.display='inline-flex';
+    battleRolled=false;
+    console.error('Roll error:',e);
+  }
+}
+
+function showResult(gd, isP1){
+  const r=gd.result; if(!r) return;
+  const myD=isP1?[gd.p1d1,gd.p1d2]:[gd.p2d1,gd.p2d2];
+  const opD=isP1?[gd.p2d1,gd.p2d2]:[gd.p1d1,gd.p1d2];
+  const myT=isP1?r.p1Total:r.p2Total;
+  const opT=isP1?r.p2Total:r.p1Total;
+  if(myD[0]){
+    document.getElementById('p1d1').textContent=DF[myD[0]]||myD[0];
+    document.getElementById('p1d2').textContent=DF[myD[1]]||myD[1];
+    document.getElementById('p2d1').textContent=DF[opD[0]]||opD[0];
+    document.getElementById('p2d2').textContent=DF[opD[1]]||opD[1];
+  }
+  const iWin=(isP1&&r.winner==='player1')||(!isP1&&r.winner==='player2');
+  document.getElementById('p1tot').textContent=myT||'?';
+  document.getElementById('p2tot').textContent=opT||'?';
+  document.getElementById('p1tot').className='dtotal '+(iWin?'twin':'tlose');
+  document.getElementById('p2tot').className='dtotal '+(iWin?'tlose':'twin');
+  const el=document.getElementById('battleResult');
+  el.className='battle-result '+(iWin?'win':'lose');
+  document.getElementById('resTit').className='res-title '+(iWin?'win':'lose');
+  document.getElementById('resTit').textContent=iWin?'🏆 You Win!':'💀 You Lose';
+  document.getElementById('resDet').textContent=iWin
+    ?'You won '+parseFloat(r.winnings).toFixed(3)+' XRP!'
+    :'Opponent won '+parseFloat(r.winnings).toFixed(3)+' XRP.';
+  el.style.display='block';
+}
+
+// ── AUTH ──
+document.getElementById('btnLogin').addEventListener('click',async()=>{
+  const b=document.getElementById('btnLogin');
+  b.disabled=true; b.textContent='Signing in...';
+  try{
+    await signInWithPopup(auth,provider);
+  }catch(e){
+    b.disabled=false;
+    b.innerHTML=`<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-3.59-13.46-8.83l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Sign in with Google`;
+    if(e.code==='auth/popup-blocked') toast('Allow popups for this site','err');
+    else toast('Sign-in failed. Try again.','err');
+  }
+});
+
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    me=user;
+    document.getElementById('loginScreen').classList.remove('active');
+    document.getElementById('gameContent').classList.add('active');
+    document.getElementById('hbal').classList.add('show');
+    // header user
+    const hr=document.getElementById('headerRight');
+    hr.innerHTML=`
+      <div class="user-chip">
+        ${user.photoURL?`<img src="${user.photoURL}" alt=""/>`:''} 
+        <span>${(user.displayName||user.email||'').split(' ')[0]}</span>
+      </div>
+      <button class="btn-signout" id="bso">Sign out</button>`;
+    document.getElementById('bso').addEventListener('click',()=>signOut(auth));
+    // init balance doc
+    const ref=doc(db,'game_balances',user.uid);
+    const sn=await getDoc(ref);
+    if(!sn.exists()) await setDoc(ref,{balance:0,createdAt:Date.now()});
+    await loadBal();
+    startLobby();
+  }else{
+    me=null;
+    if(lobbyUnsub){lobbyUnsub();lobbyUnsub=null;}
+    document.getElementById('loginScreen').classList.add('active');
+    document.getElementById('gameContent').classList.remove('active');
+    document.getElementById('hbal').classList.remove('show');
+    document.getElementById('headerRight').innerHTML='';
+  }
+});
+</script>
+</body>
+</html>
