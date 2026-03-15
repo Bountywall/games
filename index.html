@@ -18,51 +18,116 @@
       --gold:#d97706;--gold-bg:#fffbeb;--gold-border:#fde68a;
       --xrp:#00a8ff;--xrp-bg:rgba(0,168,255,0.08);--xrp-border:rgba(0,168,255,0.2);
       --mono:'DM Mono',monospace;--serif:'Instrument Serif',serif;--sans:'DM Sans',sans-serif;
+      --header-h:60px;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     body{background:var(--off-white);color:var(--ink);font-family:var(--sans);min-height:100vh;}
-    body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle,#c3d9f5 1px,transparent 1px);background-size:28px 28px;opacity:0.4;pointer-events:none;z-index:0;}
-    body::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue-700),var(--xrp),var(--blue-700));z-index:200;}
+    body::before{content:'';position:fixed;inset:0;
+      background:radial-gradient(circle,#c3d9f5 1px,transparent 1px);
+      background-size:28px 28px;opacity:0.4;pointer-events:none;z-index:0;}
+    body::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--blue-700),var(--xrp),var(--blue-700));z-index:300;}
 
     /* ── HEADER ── */
-    header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.94);
-      backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
-      padding:0 20px;height:56px;display:flex;align-items:center;
-      justify-content:space-between;gap:12px;}
-    .logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;}
-    .logo-svg{width:28px;height:28px;flex-shrink:0;}
-    .logo-sub{font-family:var(--mono);font-size:10px;color:var(--xrp);
-      background:var(--xrp-bg);border:1px solid var(--xrp-border);
-      border-radius:4px;padding:1px 7px;}
+    header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      padding:0 20px;height:var(--header-h);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;}
 
-    /* Slim balance chip */
-    .hbal{display:none;align-items:center;gap:6px;}
+    .logo{display:flex;align-items:center;gap:7px;text-decoration:none;flex-shrink:0;}
+    .logo-svg{width:26px;height:26px;flex-shrink:0;}
+    .logo-sub{font-family:var(--mono);font-size:9px;color:var(--xrp);
+      background:var(--xrp-bg);border:1px solid var(--xrp-border);
+      border-radius:4px;padding:1px 6px;letter-spacing:0.5px;}
+
+    /* Balance chip */
+    .hbal{display:none;align-items:center;gap:6px;flex:1;justify-content:center;}
     .hbal.show{display:flex;}
+    .hbal-inner{display:flex;align-items:center;gap:6px;}
     .hbal-chip{display:flex;align-items:center;gap:5px;
       background:white;border:1px solid var(--border-dark);
-      border-radius:20px;padding:4px 10px 4px 8px;
-      box-shadow:0 1px 4px rgba(30,58,95,0.06);}
-    .xrp-logo{width:15px;height:15px;flex-shrink:0;}
-    .hbal-amount{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink);}
-    .hbal-tag{font-family:var(--mono);font-size:9px;color:var(--xrp);}
-    .hbal-wallet-btn{width:28px;height:28px;border-radius:50%;
-      border:1px solid var(--border-dark);background:white;color:var(--ink-mid);
-      cursor:pointer;display:flex;align-items:center;justify-content:center;
-      transition:all 0.15s;flex-shrink:0;padding:0;}
-    .hbal-wallet-btn:hover{border-color:var(--blue-400);background:var(--blue-50);color:var(--blue-600);}
+      border-radius:20px;padding:5px 12px 5px 8px;
+      box-shadow:0 1px 6px rgba(30,58,95,0.07);cursor:pointer;
+      transition:all 0.15s;}
+    .hbal-chip:hover{border-color:var(--blue-400);box-shadow:0 2px 10px rgba(37,99,235,0.12);}
+    .xrp-logo{width:16px;height:16px;flex-shrink:0;}
+    .hbal-amount{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink);}
+    .hbal-currency{font-family:var(--mono);font-size:9px;color:var(--xrp);font-weight:500;
+      background:var(--xrp-bg);border:1px solid var(--xrp-border);
+      border-radius:3px;padding:1px 4px;margin-left:1px;}
 
-    .header-right{display:flex;align-items:center;gap:7px;flex-shrink:0;}
-    .user-chip{display:flex;align-items:center;gap:5px;background:var(--blue-50);
-      border:1px solid var(--blue-200);border-radius:20px;padding:4px 10px;
-      font-family:var(--mono);font-size:10px;color:var(--blue-600);}
-    .user-chip img{width:18px;height:18px;border-radius:50%;}
-    .btn-signout{background:none;border:1px solid var(--border-dark);color:var(--ink-light);
-      border-radius:6px;padding:4px 9px;font-family:var(--mono);font-size:9px;
-      cursor:pointer;transition:all 0.12s;}
-    .btn-signout:hover{border-color:var(--red);color:var(--red);}
+    /* Hamburger button */
+    .menu-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border-dark);
+      background:white;cursor:pointer;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:4px;
+      transition:all 0.15s;flex-shrink:0;padding:0;}
+    .menu-btn:hover{border-color:var(--blue-400);background:var(--blue-50);}
+    .menu-btn span{display:block;width:16px;height:1.5px;background:var(--ink-mid);
+      border-radius:2px;transition:all 0.2s;}
+    .menu-btn.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+    .menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+    .menu-btn.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+
+    /* ── SIDE DRAWER ── */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(13,27,46,0.4);
+      z-index:200;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+    .drawer-overlay.open{opacity:1;pointer-events:all;}
+    .drawer{position:fixed;top:0;right:0;bottom:0;width:280px;max-width:85vw;
+      background:white;z-index:201;
+      display:flex;flex-direction:column;
+      transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      box-shadow:-8px 0 40px rgba(13,27,46,0.12);}
+    .drawer.open{transform:translateX(0);}
+    .drawer-header{padding:20px 20px 16px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;}
+    .drawer-logo{display:flex;align-items:center;gap:8px;}
+    .drawer-logo svg{width:22px;height:22px;}
+    .drawer-title{font-family:var(--serif);font-size:18px;color:var(--ink);}
+    .drawer-close{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);
+      background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      color:var(--ink-light);transition:all 0.12s;font-size:16px;}
+    .drawer-close:hover{border-color:var(--red);color:var(--red);}
+
+    /* Drawer user section */
+    .drawer-user{padding:16px 20px;border-bottom:1px solid var(--border);
+      display:none;align-items:center;gap:10px;}
+    .drawer-user.show{display:flex;}
+    .drawer-avatar{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);object-fit:cover;flex-shrink:0;}
+    .drawer-avatar-ph{width:36px;height:36px;border-radius:50%;background:var(--blue-100);
+      border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
+      font-family:var(--serif);font-size:15px;color:var(--blue-600);flex-shrink:0;}
+    .drawer-user-info{flex:1;min-width:0;}
+    .drawer-user-name{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .drawer-user-sub{font-family:var(--mono);font-size:9px;color:var(--ink-light);margin-top:1px;}
+
+    /* Drawer nav */
+    .drawer-section-label{font-family:var(--mono);font-size:9px;color:var(--ink-light);
+      text-transform:uppercase;letter-spacing:2px;padding:14px 20px 6px;}
+    .drawer-nav{list-style:none;padding:0 10px;}
+    .drawer-nav li a,.drawer-nav li button{display:flex;align-items:center;gap:10px;
+      width:100%;padding:10px 12px;border-radius:8px;text-decoration:none;
+      font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink-mid);
+      border:none;background:none;cursor:pointer;text-align:left;transition:all 0.12s;}
+    .drawer-nav li a:hover,.drawer-nav li button:hover{background:var(--blue-50);color:var(--blue-700);}
+    .drawer-nav li a.active{background:var(--blue-50);color:var(--blue-700);font-weight:600;}
+    .drawer-nav-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+      font-size:14px;flex-shrink:0;}
+    .drawer-nav-badge{font-family:var(--mono);font-size:8px;color:var(--xrp);
+      background:var(--xrp-bg);border:1px solid var(--xrp-border);
+      border-radius:3px;padding:1px 5px;margin-left:auto;}
+
+    /* Drawer bottom */
+    .drawer-bottom{margin-top:auto;padding:16px 10px;border-top:1px solid var(--border);}
+    .drawer-signout{display:flex;align-items:center;gap:10px;width:100%;
+      padding:10px 12px;border-radius:8px;border:none;background:none;cursor:pointer;
+      font-family:var(--sans);font-size:14px;font-weight:500;color:var(--red);
+      opacity:0.7;transition:all 0.12s;}
+    .drawer-signout:hover{background:var(--red-bg);opacity:1;}
 
     /* ── MAIN ── */
-    main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:36px 24px 80px;}
+    main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:32px 20px 80px;}
 
     /* ── LOGIN ── */
     #loginScreen{display:none;flex-direction:column;align-items:center;
@@ -80,7 +145,7 @@
     .login-title em{font-style:italic;color:var(--blue-600);}
     .login-sub{font-family:var(--mono);font-size:11.5px;color:var(--ink-light);
       line-height:1.9;margin-bottom:32px;max-width:400px;}
-    .login-feats{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;}
+    .login-feats{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;}
     .login-feat{font-family:var(--mono);font-size:10px;color:var(--ink-light);
       display:flex;align-items:center;gap:5px;}
     .login-feat::before{content:'✦';color:var(--blue-400);}
@@ -95,24 +160,31 @@
     #gameContent{display:none;}
     #gameContent.active{display:block;}
     .section-label{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);
-      text-transform:uppercase;letter-spacing:1.8px;margin-bottom:12px;
+      text-transform:uppercase;letter-spacing:1.8px;margin-bottom:14px;
       display:flex;align-items:center;gap:10px;}
     .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 
     /* ── CREATE CARD ── */
-    .create-card{background:white;border:1px solid var(--border);border-radius:14px;
-      padding:24px 28px;margin-bottom:28px;box-shadow:0 2px 14px rgba(30,58,95,0.06);}
+    .create-card{background:white;border:1px solid var(--border);border-radius:16px;
+      padding:24px 28px;margin-bottom:28px;
+      box-shadow:0 2px 16px rgba(30,58,95,0.06);}
+    .create-card-head{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+    .create-card-icon{width:32px;height:32px;border-radius:8px;
+      background:linear-gradient(135deg,var(--blue-50),var(--blue-100));
+      border:1px solid var(--blue-200);display:flex;align-items:center;
+      justify-content:center;font-size:16px;}
+    .create-card-title{font-family:var(--serif);font-size:17px;color:var(--ink);}
     .create-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;}
     .input-group{display:flex;flex-direction:column;gap:6px;flex:1;min-width:140px;}
     .input-label{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);
       text-transform:uppercase;letter-spacing:1.2px;}
     .stake-input{background:var(--blue-50);border:1.5px solid var(--border);
-      border-radius:8px;padding:11px 14px;font-family:var(--mono);font-size:17px;
+      border-radius:9px;padding:12px 14px;font-family:var(--mono);font-size:18px;
       color:var(--ink);outline:none;transition:border-color 0.15s;width:100%;}
     .stake-input:focus{border-color:var(--blue-400);}
     .stake-hint{font-family:var(--mono);font-size:10px;color:var(--ink-light);margin-top:4px;}
     .btn-create{background:linear-gradient(135deg,var(--blue-700),var(--blue-600));
-      color:white;border:none;padding:12px 28px;border-radius:9px;
+      color:white;border:none;padding:13px 28px;border-radius:9px;
       font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;
       transition:all 0.15s;white-space:nowrap;
       box-shadow:0 4px 16px rgba(29,78,216,0.25);}
@@ -121,44 +193,56 @@
 
     /* ── LOBBY ── */
     .lobby{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
-    .lobby-empty{background:white;border:1px solid var(--border);border-radius:12px;
-      padding:48px;text-align:center;font-family:var(--mono);font-size:12px;
-      color:var(--ink-light);line-height:2;}
-    .game-card{background:white;border:1px solid var(--border);border-radius:13px;
-      padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    .lobby-empty{background:white;border:1px dashed var(--border-dark);border-radius:14px;
+      padding:48px 32px;text-align:center;font-family:var(--mono);font-size:12px;
+      color:var(--ink-light);line-height:2.2;}
+    .lobby-empty-icon{font-size:28px;margin-bottom:10px;display:block;opacity:0.4;}
+    .game-card{background:white;border:1px solid var(--border);border-radius:14px;
+      padding:18px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
       box-shadow:0 2px 10px rgba(30,58,95,0.05);transition:all 0.15s;}
-    .game-card:hover{box-shadow:0 4px 20px rgba(30,58,95,0.1);border-color:var(--border-dark);}
+    .game-card:hover{box-shadow:0 6px 24px rgba(30,58,95,0.1);
+      border-color:var(--border-dark);transform:translateY(-1px);}
     .game-card.my-game{border-color:var(--blue-200);background:var(--blue-50);}
     .game-card.active-game{border-color:var(--gold-border);background:var(--gold-bg);}
-    .game-avatar{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);object-fit:cover;flex-shrink:0;}
-    .game-avatar-ph{width:38px;height:38px;border-radius:50%;background:var(--blue-100);
-      border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
-      font-family:var(--serif);font-size:15px;color:var(--blue-600);flex-shrink:0;}
+    .game-avatar{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);
+      object-fit:cover;flex-shrink:0;}
+    .game-avatar-ph{width:38px;height:38px;border-radius:50%;
+      background:linear-gradient(135deg,var(--blue-100),var(--blue-200));
+      border:2px solid var(--blue-200);display:flex;align-items:center;
+      justify-content:center;font-family:var(--serif);font-size:15px;
+      color:var(--blue-700);flex-shrink:0;}
     .game-info{flex:1;min-width:0;}
     .game-creator{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);}
-    .game-meta{font-family:var(--mono);font-size:10px;color:var(--ink-light);margin-top:3px;}
-    .game-stake-val{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--blue-700);}
-    .game-stake-label{font-family:var(--mono);font-size:9px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;}
-    .game-actions{display:flex;gap:8px;align-items:center;}
-    .sbadge{font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.8px;}
+    .game-meta{font-family:var(--mono);font-size:10px;color:var(--ink-light);margin-top:3px;
+      display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .game-stake-box{text-align:right;flex-shrink:0;}
+    .game-stake-val{font-family:var(--mono);font-size:19px;font-weight:500;color:var(--blue-700);}
+    .game-stake-label{font-family:var(--mono);font-size:9px;color:var(--ink-light);
+      text-transform:uppercase;letter-spacing:1px;}
+    .game-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+    .sbadge{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;
+      text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
     .badge-wait{background:var(--blue-50);color:var(--blue-600);border:1px solid var(--blue-200);}
     .badge-act{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);}
     .badge-mine{background:var(--xrp-bg);color:var(--xrp);border:1px solid var(--xrp-border);}
     .btn-join{background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:white;
-      border:none;padding:9px 20px;border-radius:8px;font-family:var(--sans);
+      border:none;padding:9px 18px;border-radius:8px;font-family:var(--sans);
       font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;
       box-shadow:0 2px 10px rgba(29,78,216,0.2);}
     .btn-join:hover{filter:brightness(1.08);transform:translateY(-1px);}
     .btn-cancel{background:none;border:1px solid var(--border-dark);color:var(--ink-light);
-      padding:8px 16px;border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.12s;}
+      padding:8px 14px;border-radius:8px;font-family:var(--mono);font-size:10px;
+      cursor:pointer;transition:all 0.12s;}
     .btn-cancel:hover{border-color:var(--red);color:var(--red);}
-    .btn-play{background:linear-gradient(135deg,var(--gold),#f59e0b);color:white;border:none;
-      padding:9px 20px;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+    .btn-play{background:linear-gradient(135deg,var(--gold),#f59e0b);color:white;
+      border:none;padding:9px 18px;border-radius:8px;font-family:var(--sans);
+      font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
     .btn-play:hover{filter:brightness(1.08);transform:translateY(-1px);}
 
     /* ── ACTIVE BANNER ── */
-    .active-banner{background:var(--gold-bg);border:1px solid var(--gold-border);
-      border-radius:12px;padding:14px 20px;margin-bottom:20px;display:none;align-items:center;gap:12px;}
+    .active-banner{background:linear-gradient(135deg,var(--gold-bg),#fef9ec);
+      border:1px solid var(--gold-border);border-radius:12px;
+      padding:14px 18px;margin-bottom:22px;display:none;align-items:center;gap:12px;}
     .active-banner.show{display:flex;}
     .banner-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);
       animation:blink 1.2s ease-in-out infinite;flex-shrink:0;}
@@ -166,176 +250,271 @@
     .banner-text{font-family:var(--mono);font-size:11px;color:var(--gold);flex:1;}
 
     /* ── MODALS ── */
-    .modal-overlay{position:fixed;inset:0;background:rgba(13,27,46,0.6);
-      backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;
-      justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s;}
+    .modal-overlay{position:fixed;inset:0;background:rgba(13,27,46,0.55);
+      backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+      z-index:500;display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity 0.22s;padding:16px;}
     .modal-overlay.open{opacity:1;pointer-events:all;}
 
-    /* WALLET MODAL */
-    .wallet-modal{background:white;border:1px solid var(--border);border-radius:16px;
-      padding:28px 32px;max-width:440px;width:95%;
-      box-shadow:0 20px 56px rgba(13,27,46,0.18);
-      transform:translateY(16px);transition:transform 0.22s;}
-    .modal-overlay.open .wallet-modal{transform:translateY(0);}
-    .modal-title{font-family:var(--serif);font-size:22px;color:var(--ink);margin-bottom:20px;}
-    .wallet-tabs{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-    .wtab{flex:1;padding:10px;font-family:var(--mono);font-size:11px;text-align:center;
-      cursor:pointer;border:none;background:white;color:var(--ink-light);
-      transition:all 0.12s;letter-spacing:1px;text-transform:uppercase;}
-    .wtab.active{background:var(--ink);color:white;}
-    .wtab-content{display:none;}
+    /* ── WALLET MODAL ── */
+    .wallet-modal{background:white;border:1px solid var(--border);border-radius:20px;
+      padding:0;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;
+      box-shadow:0 24px 60px rgba(13,27,46,0.18);
+      transform:translateY(20px) scale(0.98);transition:transform 0.25s,opacity 0.25s;
+      opacity:0;}
+    .modal-overlay.open .wallet-modal{transform:translateY(0) scale(1);opacity:1;}
+
+    /* Wallet header with crypto selector */
+    .wallet-header{padding:20px 24px 0;}
+    .wallet-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+    .wallet-header-title{font-family:var(--serif);font-size:20px;color:var(--ink);}
+    .wallet-close{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);
+      background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      color:var(--ink-light);font-size:14px;transition:all 0.12s;}
+    .wallet-close:hover{border-color:var(--red);color:var(--red);}
+
+    /* Crypto selector row */
+    .crypto-selector{display:flex;gap:8px;margin-bottom:4px;overflow-x:auto;
+      scrollbar-width:none;-ms-overflow-style:none;}
+    .crypto-selector::-webkit-scrollbar{display:none;}
+    .crypto-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;
+      border-radius:20px;border:1.5px solid var(--border);background:white;
+      cursor:pointer;transition:all 0.15s;white-space:nowrap;font-family:var(--mono);
+      font-size:11px;color:var(--ink-mid);flex-shrink:0;}
+    .crypto-pill.active{border-color:var(--xrp);background:var(--xrp-bg);color:var(--xrp);}
+    .crypto-pill:hover:not(.active){border-color:var(--border-dark);}
+    .crypto-pill-soon{opacity:0.4;cursor:not-allowed;}
+    .crypto-pill-soon:hover{border-color:var(--border) !important;}
+    .crypto-soon-tag{font-size:7px;color:var(--ink-light);background:var(--off-white);
+      border:1px solid var(--border);border-radius:2px;padding:0 3px;margin-left:2px;}
+
+    /* Wallet tabs */
+    .wallet-tabs-wrap{padding:0 24px;border-bottom:1px solid var(--border);margin-bottom:0;}
+    .wallet-tabs{display:flex;gap:0;}
+    .wtab{flex:1;padding:11px 8px;font-family:var(--mono);font-size:11px;text-align:center;
+      cursor:pointer;border:none;background:transparent;color:var(--ink-light);
+      border-bottom:2px solid transparent;transition:all 0.15s;letter-spacing:0.5px;}
+    .wtab.active{color:var(--blue-700);border-bottom-color:var(--blue-600);font-weight:500;}
+    .wtab-content{display:none;padding:20px 24px;}
     .wtab-content.active{display:block;}
+
     .wfield{margin-bottom:16px;}
     .wlabel{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);
       text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;display:block;}
-    .wvalue{background:var(--blue-50);border:1px solid var(--border);
-      border-radius:7px;padding:11px 14px;font-family:var(--mono);font-size:12px;
-      color:var(--ink);word-break:break-all;line-height:1.6;}
+
+    /* Address value box with copy */
+    .wvalue-row{display:flex;align-items:stretch;gap:0;
+      border:1px solid var(--border);border-radius:9px;overflow:hidden;
+      background:var(--blue-50);}
+    .wvalue{flex:1;padding:10px 12px;font-family:var(--mono);font-size:11.5px;
+      color:var(--ink);word-break:break-all;line-height:1.6;background:transparent;border:none;}
+    .wvalue-copy{flex-shrink:0;padding:0 14px;background:white;border-left:1px solid var(--border);
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      color:var(--blue-600);transition:all 0.12s;font-family:var(--mono);font-size:10px;gap:4px;}
+    .wvalue-copy:hover{background:var(--blue-50);}
+
+    /* Tag box — big prominent number */
+    .wtag-box{background:linear-gradient(135deg,var(--blue-50),#e8f0fe);
+      border:1.5px solid var(--blue-200);border-radius:10px;padding:14px 16px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .wtag-number{font-family:var(--mono);font-size:24px;font-weight:500;
+      color:var(--blue-700);letter-spacing:3px;}
+    .wtag-copy{padding:7px 14px;background:var(--blue-700);color:white;border:none;
+      border-radius:6px;font-family:var(--mono);font-size:10px;cursor:pointer;
+      transition:all 0.12s;flex-shrink:0;}
+    .wtag-copy:hover{background:var(--blue-600);}
+
     .winput{width:100%;background:var(--blue-50);border:1.5px solid var(--border);
-      border-radius:7px;padding:11px 14px;font-family:var(--mono);font-size:13px;
+      border-radius:9px;padding:12px 14px;font-family:var(--mono);font-size:13px;
       color:var(--ink);outline:none;transition:border-color 0.15s;}
     .winput:focus{border-color:var(--blue-400);}
     .winput.werr{border-color:var(--red);background:var(--red-bg);}
-    .wnote{font-family:var(--mono);font-size:10px;color:var(--ink-light);line-height:1.7;margin-bottom:14px;}
-    .wnote.warn{color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:6px;padding:8px 12px;}
-    .btn-waction{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue-700),var(--blue-600));
-      color:white;border:none;border-radius:9px;font-family:var(--sans);font-size:14px;
-      font-weight:700;cursor:pointer;transition:all 0.15s;}
-    .btn-waction:hover{filter:brightness(1.08);}
-    .btn-waction:disabled{opacity:0.35;cursor:not-allowed;filter:none;}
-    .wcopy{display:inline-flex;align-items:center;gap:5px;margin-top:6px;
-      font-family:var(--mono);font-size:10px;color:var(--blue-600);
-      background:var(--blue-50);border:1px solid var(--blue-200);
-      border-radius:4px;padding:4px 10px;cursor:pointer;transition:all 0.12s;}
-    .wcopy:hover{background:var(--blue-100);}
+    .wnote{font-family:var(--mono);font-size:10px;color:var(--ink-light);line-height:1.7;margin-bottom:12px;}
+    .wnote.warn{color:#92400e;background:#fef3c7;border:1px solid #fde68a;
+      border-radius:7px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start;}
+    .wnote.warn::before{content:'⚠';flex-shrink:0;}
+
+    /* Balance display in withdraw */
+    .wbal-display{display:flex;align-items:center;gap:8px;
+      background:var(--blue-50);border:1px solid var(--border);
+      border-radius:9px;padding:12px 14px;margin-bottom:16px;}
+    .wbal-display svg{flex-shrink:0;}
+    .wbal-display-val{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--blue-700);}
+    .wbal-display-label{font-family:var(--mono);font-size:9px;color:var(--ink-light);margin-top:1px;}
+
+    .btn-waction{width:100%;padding:13px;
+      background:linear-gradient(135deg,var(--blue-700),var(--blue-600));
+      color:white;border:none;border-radius:10px;font-family:var(--sans);font-size:14px;
+      font-weight:700;cursor:pointer;transition:all 0.15s;
+      box-shadow:0 3px 12px rgba(29,78,216,0.2);}
+    .btn-waction:hover{filter:brightness(1.08);transform:translateY(-1px);}
+    .btn-waction:disabled{opacity:0.35;cursor:not-allowed;transform:none;filter:none;}
     .wstatus{font-family:var(--mono);font-size:11px;text-align:center;
-      margin-top:10px;min-height:16px;color:var(--ink-light);line-height:1.6;}
+      padding:10px 16px 4px;min-height:16px;color:var(--ink-light);line-height:1.6;}
     .wstatus.ok{color:var(--green);}
     .wstatus.err{color:var(--red);}
 
-    /* BATTLE MODAL */
-    .battle-modal{background:white;border:1px solid var(--border);border-radius:18px;
-      padding:32px;max-width:540px;width:95%;
+    /* ── BATTLE MODAL ── */
+    .battle-modal{background:white;border:1px solid var(--border);border-radius:20px;
+      padding:28px 28px 24px;max-width:520px;width:100%;
       box-shadow:0 24px 64px rgba(13,27,46,0.18);
-      transform:translateY(16px);transition:transform 0.22s;}
-    .modal-overlay.open .battle-modal{transform:translateY(0);}
-    .battle-title{font-family:var(--serif);font-size:26px;color:var(--ink);text-align:center;margin-bottom:4px;}
-    .battle-sub{font-family:var(--mono);font-size:11px;color:var(--ink-light);text-align:center;margin-bottom:26px;}
-    .players-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:24px;}
+      transform:translateY(20px) scale(0.98);transition:transform 0.25s,opacity 0.25s;opacity:0;}
+    .modal-overlay.open .battle-modal{transform:translateY(0) scale(1);opacity:1;}
+    .battle-title{font-family:var(--serif);font-size:24px;color:var(--ink);
+      text-align:center;margin-bottom:3px;}
+    .battle-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-light);
+      text-align:center;margin-bottom:22px;line-height:1.6;}
+    .players-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;
+      align-items:center;margin-bottom:20px;}
     .player-side{text-align:center;}
-    .player-side-name{font-family:var(--sans);font-size:13px;font-weight:700;margin-bottom:3px;}
+    .player-side-name{font-family:var(--sans);font-size:13px;font-weight:700;margin-bottom:2px;}
     .p1c{color:var(--blue-600);}
     .p2c{color:var(--red);}
-    .vs-txt{font-family:var(--serif);font-size:20px;color:var(--ink-light);text-align:center;}
-    .dice-area{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
-    .dice-side{display:flex;flex-direction:column;align-items:center;gap:10px;}
-    .dice-side-lbl{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1.5px;}
+    .vs-txt{font-family:var(--serif);font-size:18px;color:var(--ink-light);text-align:center;}
+    .dice-area{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+    .dice-side{display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .dice-side-lbl{font-family:var(--mono);font-size:9px;color:var(--ink-light);
+      text-transform:uppercase;letter-spacing:1.5px;}
     .dice-pair{display:flex;gap:8px;justify-content:center;}
-    .die{width:60px;height:60px;background:white;border:2px solid var(--border);
+    .die{width:58px;height:58px;background:white;border:2px solid var(--border);
       border-radius:12px;display:flex;align-items:center;justify-content:center;
-      font-size:28px;box-shadow:0 4px 12px rgba(30,58,95,0.1);transition:transform 0.1s;}
-    .die.p1die{border-color:var(--blue-200);}
-    .die.p2die{border-color:var(--red-border);}
+      font-size:26px;box-shadow:0 4px 14px rgba(30,58,95,0.08);transition:transform 0.1s;}
+    .die.p1die{border-color:var(--blue-200);background:var(--blue-50);}
+    .die.p2die{border-color:var(--red-border);background:var(--red-bg);}
     .die.rolling{animation:droll 0.8s ease;}
-    @keyframes droll{0%{transform:rotate(0) scale(1);}15%{transform:rotate(-20deg) scale(1.1);}30%{transform:rotate(15deg) scale(0.95);}45%{transform:rotate(-10deg) scale(1.08);}60%{transform:rotate(8deg) scale(0.97);}75%{transform:rotate(-5deg) scale(1.03);}90%{transform:rotate(3deg) scale(0.99);}100%{transform:rotate(0) scale(1);}}
-    .dtotal{font-family:var(--mono);font-size:26px;font-weight:500;color:var(--ink);text-align:center;}
+    @keyframes droll{
+      0%{transform:rotate(0) scale(1);}15%{transform:rotate(-20deg) scale(1.12);}
+      30%{transform:rotate(15deg) scale(0.94);}45%{transform:rotate(-10deg) scale(1.08);}
+      60%{transform:rotate(8deg) scale(0.97);}75%{transform:rotate(-5deg) scale(1.03);}
+      90%{transform:rotate(3deg) scale(0.99);}100%{transform:rotate(0) scale(1);}
+    }
+    .dtotal{font-family:var(--mono);font-size:24px;font-weight:500;
+      color:var(--ink);text-align:center;}
     .dtotal.twin{color:var(--green);}
     .dtotal.tlose{color:var(--red);}
-    .battle-result{text-align:center;padding:16px;border-radius:12px;margin-bottom:20px;display:none;}
+    .battle-result{text-align:center;padding:14px;border-radius:12px;
+      margin-bottom:16px;display:none;}
     .battle-result.win{background:var(--green-bg);border:1px solid var(--green-border);}
     .battle-result.lose{background:var(--red-bg);border:1px solid var(--red-border);}
-    .res-title{font-family:var(--serif);font-size:26px;margin-bottom:5px;}
+    .res-title{font-family:var(--serif);font-size:24px;margin-bottom:4px;}
     .res-title.win{color:var(--green);}
     .res-title.lose{color:var(--red);}
     .res-detail{font-family:var(--mono);font-size:11px;color:var(--ink-light);line-height:1.8;}
-    .battle-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+    .battle-btns{display:flex;gap:10px;justify-content:center;}
     .btn-close-battle{background:none;border:1.5px solid var(--border-dark);color:var(--ink-mid);
-      padding:13px 28px;border-radius:10px;font-family:var(--sans);font-size:14px;
+      padding:11px 28px;border-radius:9px;font-family:var(--sans);font-size:14px;
       font-weight:600;cursor:pointer;transition:all 0.15s;}
     .btn-close-battle:hover{border-color:var(--blue-400);color:var(--blue-600);}
-    .bstatus{font-family:var(--mono);font-size:11px;color:var(--ink-light);
-      text-align:center;margin-top:12px;min-height:16px;line-height:1.6;}
-    /* rolling indicator */
-    .rolling-indicator{display:none;flex-direction:column;align-items:center;gap:8px;padding:8px 0;}
+    .bstatus{font-family:var(--mono);font-size:10.5px;color:var(--ink-light);
+      text-align:center;margin-top:10px;min-height:16px;line-height:1.6;}
+    .rolling-indicator{display:none;flex-direction:column;align-items:center;gap:8px;padding:6px 0;}
     .rolling-indicator.show{display:flex;}
-    .roll-spinner{width:32px;height:32px;border:2px solid var(--border);
+    .roll-spinner{width:28px;height:28px;border:2px solid var(--border);
       border-top-color:var(--blue-600);border-radius:50%;
       animation:spin 0.7s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg);}}
-    .roll-lbl{font-family:var(--mono);font-size:11px;color:var(--ink-light);}
+    .roll-lbl{font-family:var(--mono);font-size:10.5px;color:var(--ink-light);}
 
-    /* TOAST */
-    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(14px);
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:24px;left:50%;
+      transform:translateX(-50%) translateY(12px);
       background:var(--ink);color:white;font-family:var(--mono);font-size:12px;
-      padding:11px 22px;border-radius:8px;opacity:0;transition:all 0.2s;z-index:1000;
-      pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+      padding:10px 20px;border-radius:8px;opacity:0;transition:all 0.2s;
+      z-index:1000;pointer-events:none;white-space:nowrap;
+      box-shadow:0 8px 24px rgba(0,0,0,0.2);}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
     .toast.ok{background:var(--green);}
     .toast.err{background:var(--red);}
 
-    @media(max-width:680px){
+    /* ── MOBILE ── */
+    @media(max-width:640px){
       header{padding:0 14px;gap:8px;}
-      .hbal-chip{padding:5px 10px;}
+      .hbal{flex:1;}
       main{padding:20px 14px 60px;}
+      .create-card{padding:18px;}
+      .game-card{padding:14px;}
       .dice-area{grid-template-columns:1fr;}
-      .battle-modal{padding:22px 16px;}
+      .battle-modal{padding:22px 16px 18px;}
+      .wallet-modal{border-radius:16px;}
+      .die{width:52px;height:52px;font-size:24px;}
     }
   </style>
 </head>
 <body>
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<!-- SIDE DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-logo">
+      <svg width="22" height="22" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#2488FF" d="M478.609,300.522v-33.39h-33.391v-66.784h33.391V66.783h-33.391v-33.39h-33.391V0H0v100.174h33.39v311.652H0V512h445.217v-33.39h33.391v-33.391H512V300.522H478.609z"/>
+        <polygon fill="#005ECE" points="478.609,300.522 478.609,267.132 445.217,267.132 445.217,200.348 478.609,200.348 478.609,66.783 445.217,66.783 445.217,33.392 411.826,33.392 411.826,0 256,0 256,122.435 345.043,122.435 345.043,155.826 256,155.826 256,333.913 345.043,333.913 345.043,378.435 256,378.435 256,512 445.217,512 445.217,478.61 478.609,478.61 478.609,445.217 512,445.217 512,300.522"/>
+      </svg>
+      <span class="drawer-title">BountyWall</span>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-user" id="drawerUser">
+    <div class="drawer-avatar-ph" id="drawerAvatarPh">?</div>
+    <div class="drawer-user-info">
+      <div class="drawer-user-name" id="drawerUserName">—</div>
+      <div class="drawer-user-sub">Signed in</div>
+    </div>
+  </div>
+  <div class="drawer-section-label">Games</div>
+  <ul class="drawer-nav">
+    <li>
+      <a href="#" class="active">
+        <span class="drawer-nav-icon">⚄</span>
+        Dice
+        <span class="drawer-nav-badge">Live</span>
+      </a>
+    </li>
+  </ul>
+  <div class="drawer-bottom">
+    <button class="drawer-signout" id="drawerSignOut" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </button>
+  </div>
+</div>
+
 <header>
   <a class="logo" href="https://bountywall.com">
-    <!-- BountyWall B logo -->
     <svg class="logo-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <path fill="#2488FF" d="M478.609,300.522v-33.39h-33.391v-66.784h33.391V66.783h-33.391v-33.39h-33.391V0H0v100.174h33.39v311.652H0V512h445.217v-33.39h33.391v-33.391H512V300.522H478.609z M345.043,378.435H166.957v-44.522h178.087V378.435z M345.043,155.826H166.957v-33.391h178.087V155.826z"/>
       <polygon fill="#005ECE" points="478.609,300.522 478.609,267.132 445.217,267.132 445.217,200.348 478.609,200.348 478.609,66.783 445.217,66.783 445.217,33.392 411.826,33.392 411.826,0 256,0 256,122.435 345.043,122.435 345.043,155.826 256,155.826 256,333.913 345.043,333.913 345.043,378.435 256,378.435 256,512 445.217,512 445.217,478.61 478.609,478.61 478.609,445.217 512,445.217 512,300.522"/>
       <rect fill="#000" x="33.391" y="100.174" width="33.391" height="311.652"/>
       <polygon fill="#000" points="33.391,411.826 0,411.826 0,512 445.217,512 445.217,478.609 33.391,478.609"/>
       <polygon fill="#000" points="411.826,33.391 411.826,0 0,0 0,100.174 33.391,100.174 33.391,33.391"/>
-      <rect fill="#000" x="411.826" y="33.391" width="33.391" height="33.391"/>
-      <rect fill="#000" x="445.217" y="66.783" width="33.391" height="133.565"/>
-      <rect fill="#000" x="478.609" y="300.522" width="33.391" height="144.696"/>
-      <rect fill="#000" x="445.217" y="445.217" width="33.391" height="33.391"/>
-      <polygon fill="#000" points="378.435,189.217 378.435,122.435 345.043,122.435 345.043,155.826 166.957,155.826 166.957,122.435 345.043,122.435 345.043,89.043 133.565,89.043 133.565,189.217"/>
-      <polygon fill="#000" points="345.043,378.435 166.957,378.435 166.957,333.913 345.043,333.913 345.043,300.522 133.565,300.522 133.565,411.826 378.435,411.826 378.435,333.913 345.043,333.913"/>
-      <polygon fill="#000" points="411.826,233.739 378.435,233.739 378.435,267.13 445.217,267.13 445.217,200.348 411.826,200.348"/>
-      <rect fill="#000" x="445.217" y="267.13" width="33.391" height="33.391"/>
     </svg>
     <span class="logo-sub">dice</span>
   </a>
-
-  <!-- Compact balance chip -->
   <div class="hbal" id="hbal">
-    <div class="hbal-chip">
-      <svg class="xrp-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div class="hbal-chip" id="btnDeposit" title="Open Wallet">
+      <svg class="xrp-logo" viewBox="0 0 32 32" fill="none">
         <circle cx="16" cy="16" r="16" fill="#23292F"/>
         <path d="M21.47 8h2.55l-5.12 5.12a4.16 4.16 0 0 1-5.8 0L8 8h2.55l3.84 3.84a2.42 2.42 0 0 0 3.24 0L21.47 8ZM10.53 24H8l5.1-5.1a4.16 4.16 0 0 1 5.8 0L24 24h-2.55l-3.82-3.82a2.42 2.42 0 0 0-3.24 0L10.53 24Z" fill="white"/>
       </svg>
       <span class="hbal-amount" id="hbalAmt">0.000</span>
-      <span class="hbal-tag">XRP</span>
+      <span class="hbal-currency">XRP</span>
     </div>
-    <button class="hbal-wallet-btn" id="btnDeposit" title="Deposit / Withdraw">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
-        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
-        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
-      </svg>
-    </button>
   </div>
-
-  <div class="header-right" id="headerRight"></div>
+  <button class="menu-btn" id="menuBtn" onclick="toggleDrawer()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </header>
 
 <main>
-  <!-- LOGIN -->
   <div id="loginScreen">
-    <div class="login-eyebrow"><span class="login-eyebrow-dot"></span>XRP Testnet · Server-side RNG · 3% house cut</div>
+    <div class="login-eyebrow"><span class="login-eyebrow-dot"></span>XRP Devnet · Server-side RNG · 3% house cut</div>
     <div class="login-title">Roll the dice,<br/><em>win test XRP.</em></div>
-    <div class="login-sub">Create a game, set your stake, wait for a challenger.<br/>The second player joining triggers the roll automatically.</div>
+    <div class="login-sub">Create a game, set your stake, wait for a challenger.<br/>Dice roll automatically when the second player joins.</div>
     <div class="login-feats">
-      <div class="login-feat">XRP Testnet</div>
+      <div class="login-feat">XRP Devnet</div>
       <div class="login-feat">Auto-roll on join</div>
-      <div class="login-feat">Tamper-proof</div>
+      <div class="login-feat">Tamper-proof RNG</div>
       <div class="login-feat">Real-time lobby</div>
     </div>
     <button class="btn-google" id="btnLogin">
@@ -344,29 +523,30 @@
     </button>
   </div>
 
-  <!-- GAME CONTENT -->
   <div id="gameContent">
     <div class="active-banner" id="activeBanner">
       <div class="banner-dot"></div>
       <div class="banner-text" id="bannerText">Your game is live.</div>
       <button class="btn-play" id="btnResume" style="padding:8px 16px;font-size:12px;">View</button>
     </div>
-
     <div class="section-label">Create a Game</div>
     <div class="create-card">
+      <div class="create-card-head">
+        <div class="create-card-icon">⚄</div>
+        <div class="create-card-title">New Dice Game</div>
+      </div>
       <div class="create-row">
         <div class="input-group">
           <label class="input-label">Your stake (XRP)</label>
           <input class="stake-input" id="stakeInput" type="number" min="0.1" max="100" step="0.1" placeholder="e.g. 1.0"/>
-          <div class="stake-hint" id="stakeHint">Opponent must match. Dice roll automatically when they join.</div>
+          <div class="stake-hint" id="stakeHint">Opponent must match. Auto-rolls on join.</div>
         </div>
         <button class="btn-create" id="btnCreate">⚄ Create Game</button>
       </div>
     </div>
-
     <div class="section-label">Open Games</div>
     <div class="lobby" id="lobby">
-      <div class="lobby-empty">No open games right now.<br/>Be the first to create one above.</div>
+      <div class="lobby-empty"><span class="lobby-empty-icon">⚄</span>No open games right now.<br/>Be the first to create one above.</div>
     </div>
   </div>
 </main>
@@ -374,30 +554,61 @@
 <!-- WALLET MODAL -->
 <div class="modal-overlay" id="walletModal">
   <div class="wallet-modal">
-    <div class="modal-title">◈ Wallet</div>
-    <div class="wallet-tabs">
-      <button class="wtab active" id="tabDep" onclick="switchTab('dep')">↓ Deposit</button>
-      <button class="wtab" id="tabWit" onclick="switchTab('wit')">↑ Withdraw</button>
+    <div class="wallet-header">
+      <div class="wallet-header-top">
+        <div style="font-family:var(--serif);font-size:20px;color:var(--ink);">Wallet</div>
+        <button class="wallet-close" onclick="closeWallet()">✕</button>
+      </div>
+      <div class="crypto-selector">
+        <div class="crypto-pill active">
+          <svg width="14" height="14" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#23292F"/><path d="M21.47 8h2.55l-5.12 5.12a4.16 4.16 0 0 1-5.8 0L8 8h2.55l3.84 3.84a2.42 2.42 0 0 0 3.24 0L21.47 8ZM10.53 24H8l5.1-5.1a4.16 4.16 0 0 1 5.8 0L24 24h-2.55l-3.82-3.82a2.42 2.42 0 0 0-3.24 0L10.53 24Z" fill="white"/></svg>
+          XRP
+        </div>
+        <div class="crypto-pill crypto-pill-soon">
+          <svg width="14" height="14" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#F7931A"/><path d="M22.5 14.2c.3-2-1.2-3-3.3-3.7l.7-2.7-1.6-.4-.6 2.6-1.3-.3.6-2.6-1.6-.4-.7 2.7-1-.3v0l-2.2-.6-.4 1.7s1.2.3 1.2.3c.6.2.7.6.7.9l-1.7 6.8c-.1.3-.4.7-1 .5 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5.5-.2-.7 2.7 1.6.4.7-2.7 1.3.3-.7 2.7 1.6.4.7-2.7c2.7.5 4.8.3 5.7-2.2.7-2-.1-3.2-1.5-3.9 1-.2 1.8-1 2-2.4zm-3.5 5c-.5 2-3.9.9-5 .6l.9-3.5c1.1.3 4.6.8 4.1 2.9zm.5-5c-.5 1.8-3.4.9-4.3.7l.8-3.2c.9.2 3.9.7 3.5 2.5z" fill="white"/></svg>
+          BTC <span class="crypto-soon-tag">soon</span>
+        </div>
+        <div class="crypto-pill crypto-pill-soon">
+          <svg width="14" height="14" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#627EEA"/><path d="M16 6v7.4l6.3 2.8L16 6z" fill="white" opacity=".6"/><path d="M16 6L9.7 16.2l6.3-2.8V6z" fill="white"/><path d="M16 21.1v4.9l6.3-8.7L16 21.1z" fill="white" opacity=".6"/><path d="M16 26v-4.9l-6.3-3.8L16 26z" fill="white"/></svg>
+          ETH <span class="crypto-soon-tag">soon</span>
+        </div>
+      </div>
+    </div>
+    <div class="wallet-tabs-wrap">
+      <div class="wallet-tabs">
+        <button class="wtab active" id="tabDep" onclick="switchTab('dep')">↓ Deposit</button>
+        <button class="wtab" id="tabWit" onclick="switchTab('wit')">↑ Withdraw</button>
+      </div>
     </div>
     <div class="wtab-content active" id="depTab">
-      <div class="wnote warn">⚠️ You MUST include the Destination Tag when sending.<br/>Deposits without it cannot be credited to your account.</div>
+      <div class="wnote warn" style="margin-bottom:14px;">You MUST include the Destination Tag when sending XRP. Deposits without it cannot be credited.</div>
       <div class="wfield">
         <label class="wlabel">House Address</label>
-        <div class="wvalue" id="depAddr">Loading...</div>
-        <button class="wcopy" onclick="wCopy('depAddr')">Copy Address</button>
+        <div class="wvalue-row">
+          <div class="wvalue" id="depAddr">Loading...</div>
+          <button class="wvalue-copy" onclick="wCopy('depAddr')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
       </div>
       <div class="wfield">
-        <label class="wlabel">Your Destination Tag (required)</label>
-        <div class="wvalue" id="depTag" style="font-size:22px;color:var(--blue-700);font-weight:500;letter-spacing:3px;">—</div>
-        <button class="wcopy" onclick="wCopy('depTag')">Copy Tag</button>
+        <label class="wlabel">Your Destination Tag</label>
+        <div class="wtag-box">
+          <span class="wtag-number" id="depTag">—</span>
+          <button class="wtag-copy" onclick="wCopy('depTag')">Copy Tag</button>
+        </div>
       </div>
-      <div class="wnote">Minimum deposit: 0.1 XRP. After sending, tap below to credit your account.</div>
+      <div class="wnote" style="margin-bottom:14px;">Minimum deposit: 0.1 XRP. After sending, tap below.</div>
       <button class="btn-waction" id="btnCheckDep">Check for Deposits</button>
     </div>
     <div class="wtab-content" id="witTab">
-      <div class="wfield">
-        <label class="wlabel">Available Balance</label>
-        <div class="wvalue" id="witBalDisp" style="font-size:20px;color:var(--blue-700);font-weight:500;">0.000 XRP</div>
+      <div class="wbal-display">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#23292F"/><path d="M21.47 8h2.55l-5.12 5.12a4.16 4.16 0 0 1-5.8 0L8 8h2.55l3.84 3.84a2.42 2.42 0 0 0 3.24 0L21.47 8ZM10.53 24H8l5.1-5.1a4.16 4.16 0 0 1 5.8 0L24 24h-2.55l-3.82-3.82a2.42 2.42 0 0 0-3.24 0L10.53 24Z" fill="white"/></svg>
+        <div>
+          <div class="wbal-display-val" id="witBalDisp">0.000 XRP</div>
+          <div class="wbal-display-label">Available balance</div>
+        </div>
       </div>
       <div class="wfield">
         <label class="wlabel">XRP Destination Address</label>
@@ -410,9 +621,6 @@
       </div>
       <button class="btn-waction" id="btnWitSubmit">Withdraw XRP</button>
     </div>
-    <div style="text-align:center;margin-top:14px;">
-      <button onclick="closeWallet()" style="background:none;border:none;font-family:var(--mono);font-size:11px;color:var(--ink-light);cursor:pointer;">Close</button>
-    </div>
     <div class="wstatus" id="walletStatus"></div>
   </div>
 </div>
@@ -423,51 +631,29 @@
     <div class="battle-title">⚄ Dice Battle</div>
     <div class="battle-sub" id="battleSub">Both roll two dice. Highest total wins.</div>
     <div class="players-row">
-      <div class="player-side">
-        <div class="player-side-name p1c" id="bp1">You</div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 1</div>
-      </div>
+      <div class="player-side"><div class="player-side-name p1c" id="bp1">You</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 1</div></div>
       <div class="vs-txt">VS</div>
-      <div class="player-side">
-        <div class="player-side-name p2c" id="bp2">Opponent</div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 2</div>
-      </div>
+      <div class="player-side"><div class="player-side-name p2c" id="bp2">Opponent</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 2</div></div>
     </div>
     <div class="dice-area">
       <div class="dice-side">
         <div class="dice-side-lbl">Your Roll</div>
-        <div class="dice-pair">
-          <div class="die p1die" id="p1d1">?</div>
-          <div class="die p1die" id="p1d2">?</div>
-        </div>
+        <div class="dice-pair"><div class="die p1die" id="p1d1">?</div><div class="die p1die" id="p1d2">?</div></div>
         <div class="dtotal" id="p1tot">—</div>
       </div>
       <div class="dice-side">
         <div class="dice-side-lbl">Opponent's Roll</div>
-        <div class="dice-pair">
-          <div class="die p2die" id="p2d1">?</div>
-          <div class="die p2die" id="p2d2">?</div>
-        </div>
+        <div class="dice-pair"><div class="die p2die" id="p2d1">?</div><div class="die p2die" id="p2d2">?</div></div>
         <div class="dtotal" id="p2tot">—</div>
       </div>
     </div>
-    <div class="rolling-indicator" id="rollingIndicator">
-      <div class="roll-spinner"></div>
-      <div class="roll-lbl">Rolling dice...</div>
-    </div>
-    <div class="battle-result" id="battleResult">
-      <div class="res-title" id="resTit">—</div>
-      <div class="res-detail" id="resDet">—</div>
-    </div>
-    <div class="battle-btns">
-      <button class="btn-close-battle" id="btnCloseBattle" style="display:none" onclick="closeBattle()">Close</button>
-    </div>
+    <div class="rolling-indicator" id="rollingIndicator"><div class="roll-spinner"></div><div class="roll-lbl" id="rollLbl">Rolling dice...</div></div>
+    <div class="battle-result" id="battleResult"><div class="res-title" id="resTit">—</div><div class="res-detail" id="resDet">—</div></div>
+    <div class="battle-btns"><button class="btn-close-battle" id="btnCloseBattle" style="display:none" onclick="closeBattle()">Close</button></div>
     <div class="bstatus" id="bstatus"></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged}
@@ -560,14 +746,22 @@ async function loadBal(){
 }
 
 // ── WALLET ──
-window.switchTab=function(t){
-  ['dep','wit'].forEach(x=>{
-    document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).className='wtab'+(x===t?' active':'');
-    document.getElementById(x+'Tab').className='wtab-content'+(x===t?' active':'');
-  });
-  setWStatus('');
+// ── DRAWER ──
+window.toggleDrawer=function(){
+  const d=document.getElementById('drawer');
+  const o=document.getElementById('drawerOverlay');
+  const b=document.getElementById('menuBtn');
+  const open=d.classList.contains('open');
+  d.classList.toggle('open');
+  o.classList.toggle('open');
+  b.classList.toggle('open');
 };
-// fix tab ids
+window.closeDrawer=function(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('menuBtn').classList.remove('open');
+};
+
 window.switchTab=function(t){
   document.getElementById('tabDep').className='wtab'+(t==='dep'?' active':'');
   document.getElementById('tabWit').className='wtab'+(t==='wit'?' active':'');
@@ -1041,15 +1235,20 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('loginScreen').classList.remove('active');
     document.getElementById('gameContent').classList.add('active');
     document.getElementById('hbal').classList.add('show');
-    // header user
-    const hr=document.getElementById('headerRight');
-    hr.innerHTML=`
-      <div class="user-chip">
-        ${user.photoURL?`<img src="${user.photoURL}" alt=""/>`:''} 
-        <span>${(user.displayName||user.email||'').split(' ')[0]}</span>
-      </div>
-      <button class="btn-signout" id="bso">Sign out</button>`;
-    document.getElementById('bso').addEventListener('click',()=>signOut(auth));
+    // Populate drawer user section
+    const drawerUser=document.getElementById('drawerUser');
+    const drawerAph=document.getElementById('drawerAvatarPh');
+    const drawerName=document.getElementById('drawerUserName');
+    const drawerSO=document.getElementById('drawerSignOut');
+    drawerUser.classList.add('show');
+    drawerName.textContent=(user.displayName||user.email||'User');
+    if(user.photoURL){
+      drawerAph.innerHTML=`<img src="${user.photoURL}" class="drawer-avatar" alt=""/>`;
+    } else {
+      drawerAph.textContent=(user.displayName||'?').charAt(0).toUpperCase();
+    }
+    drawerSO.style.display='flex';
+    drawerSO.onclick=()=>{ closeDrawer(); signOut(auth); };
     // init balance doc
     const ref=doc(db,'game_balances',user.uid);
     const sn=await getDoc(ref);
@@ -1062,7 +1261,9 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('loginScreen').classList.add('active');
     document.getElementById('gameContent').classList.remove('active');
     document.getElementById('hbal').classList.remove('show');
-    document.getElementById('headerRight').innerHTML='';
+    document.getElementById('drawerUser').classList.remove('show');
+    document.getElementById('drawerSignOut').style.display='none';
+    closeDrawer();
   }
 });
 </script>
