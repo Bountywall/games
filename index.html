@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BountyWall — Dice Arena</title>
+  <title>BountyWall — Games</title>
   <link rel="icon" type="image/x-icon" href="/bounty.ico"/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
@@ -426,8 +426,119 @@
     .toast.ok{background:var(--green);}
     .toast.err{background:var(--red);}
 
-    /* ── MOBILE ── */
+    /* ── HOME SCREEN ── */
+    #homeScreen{display:none;}
+    #homeScreen.active{display:block;}
+
+    .home-hero{
+      background:linear-gradient(135deg,#0d1b2e 0%,#1a3a6b 50%,#0d2d5e 100%);
+      border-radius:20px;padding:36px 32px;margin-bottom:32px;
+      position:relative;overflow:hidden;}
+    .home-hero::before{content:'';position:absolute;top:-60px;right:-60px;
+      width:240px;height:240px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,168,255,0.15),transparent 70%);
+      pointer-events:none;}
+    .home-hero::after{content:'';position:absolute;bottom:-40px;left:-40px;
+      width:180px;height:180px;border-radius:50%;
+      background:radial-gradient(circle,rgba(37,99,235,0.12),transparent 70%);
+      pointer-events:none;}
+    .home-greeting{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.5);
+      text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+    .home-name{font-family:var(--serif);font-size:clamp(26px,4vw,38px);
+      color:white;line-height:1.1;margin-bottom:8px;}
+    .home-name span{color:var(--xrp);font-style:italic;}
+    .home-sub{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.45);
+      line-height:1.8;margin-bottom:20px;}
+    .home-stats{display:flex;gap:20px;flex-wrap:wrap;}
+    .home-stat{display:flex;flex-direction:column;gap:2px;}
+    .home-stat-val{font-family:var(--mono);font-size:16px;font-weight:500;color:white;}
+    .home-stat-label{font-family:var(--mono);font-size:9px;
+      color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1.2px;}
+    .home-stat-sep{width:1px;background:rgba(255,255,255,0.1);align-self:stretch;margin:4px 0;}
+
+    /* Games grid */
+    .games-grid-label{font-family:var(--mono);font-size:9.5px;color:var(--ink-light);
+      text-transform:uppercase;letter-spacing:1.8px;margin-bottom:16px;
+      display:flex;align-items:center;gap:10px;}
+    .games-grid-label::after{content:'';flex:1;height:1px;background:var(--border);}
+    .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:16px;margin-bottom:32px;}
+
+    /* Game entry card */
+    .game-entry-card{background:white;border:1px solid var(--border);border-radius:16px;
+      overflow:hidden;cursor:pointer;transition:all 0.2s;
+      box-shadow:0 2px 16px rgba(30,58,95,0.06);}
+    .game-entry-card:hover{transform:translateY(-3px);
+      box-shadow:0 12px 36px rgba(29,78,216,0.15);border-color:var(--blue-300);}
+    .game-entry-card-banner{height:120px;position:relative;overflow:hidden;
+      background:linear-gradient(135deg,#0d1b2e,#1a3a6b,#0a2d6b);}
+    .game-entry-card-banner-dice{position:absolute;inset:0;display:flex;
+      align-items:center;justify-content:center;gap:12px;}
+    .banner-die{width:52px;height:52px;background:rgba(255,255,255,0.1);
+      border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:24px;backdrop-filter:blur(4px);}
+    .banner-die:nth-child(2){transform:rotate(-8deg) scale(1.1);
+      background:rgba(0,168,255,0.15);border-color:rgba(0,168,255,0.3);}
+    .banner-die:nth-child(1){transform:rotate(6deg);}
+    .banner-die:nth-child(3){transform:rotate(-4deg) scale(0.9);}
+    .game-entry-card-glow{position:absolute;inset:0;
+      background:radial-gradient(circle at 50% 100%,rgba(0,168,255,0.2),transparent 60%);}
+    .game-entry-card-live{position:absolute;top:10px;right:10px;
+      display:flex;align-items:center;gap:5px;
+      background:rgba(5,150,105,0.9);border-radius:20px;
+      padding:3px 10px;font-family:var(--mono);font-size:9px;color:white;}
+    .live-dot{width:5px;height:5px;border-radius:50%;background:white;
+      animation:blink 1.2s ease-in-out infinite;}
+    .game-entry-card-body{padding:18px 20px;}
+    .game-entry-card-title{font-family:var(--serif);font-size:20px;color:var(--ink);
+      margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+    .game-entry-card-desc{font-family:var(--mono);font-size:10.5px;color:var(--ink-light);
+      line-height:1.7;margin-bottom:14px;}
+    .game-entry-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+    .game-tag{font-family:var(--mono);font-size:9px;padding:3px 8px;
+      border-radius:4px;border:1px solid var(--border);}
+    .game-tag-blue{background:var(--blue-50);color:var(--blue-600);border-color:var(--blue-200);}
+    .game-tag-xrp{background:var(--xrp-bg);color:var(--xrp);border-color:var(--xrp-border);}
+    .game-tag-green{background:var(--green-bg);color:var(--green);border-color:var(--green-border);}
+    .btn-play-now{display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;padding:12px;
+      background:linear-gradient(135deg,var(--blue-700),var(--blue-600));
+      color:white;border:none;border-radius:10px;font-family:var(--sans);
+      font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;
+      box-shadow:0 4px 16px rgba(29,78,216,0.25);}
+    .btn-play-now:hover{filter:brightness(1.08);}
+
+    /* ── ENHANCED DICE SECTION ── */
+    .dice-page-header{
+      background:linear-gradient(135deg,#0d1b2e,#1a3a6b);
+      border-radius:16px;padding:24px 28px;margin-bottom:28px;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:16px;position:relative;overflow:hidden;}
+    .dice-page-header::before{content:'⚄';position:absolute;right:20px;top:50%;
+      transform:translateY(-50%);font-size:80px;opacity:0.05;pointer-events:none;
+      line-height:1;}
+    .dice-page-header-left{}
+    .dice-page-back{display:inline-flex;align-items:center;gap:6px;
+      font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.5);
+      background:none;border:none;cursor:pointer;padding:0;margin-bottom:8px;
+      transition:color 0.15s;}
+    .dice-page-back:hover{color:white;}
+    .dice-page-title{font-family:var(--serif);font-size:26px;color:white;margin-bottom:4px;}
+    .dice-page-sub{font-family:var(--mono);font-size:10px;
+      color:rgba(255,255,255,0.4);line-height:1.6;}
+    .dice-page-stats{display:flex;gap:16px;}
+    .dstat{text-align:center;}
+    .dstat-val{font-family:var(--mono);font-size:18px;font-weight:500;color:white;}
+    .dstat-label{font-family:var(--mono);font-size:8px;
+      color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;}
+
     @media(max-width:640px){
+      .home-hero{padding:24px 20px;}
+      .games-grid{grid-template-columns:1fr;}
+      .dice-page-header{padding:20px;}
+      .dice-page-stats{display:none;}
+    }
       header{padding:0 14px;gap:8px;}
       .hbal{flex:1;}
       main{padding:20px 14px 60px;}
@@ -462,10 +573,19 @@
       <div class="drawer-user-sub">Signed in</div>
     </div>
   </div>
+  <div class="drawer-section-label">Navigation</div>
+  <ul class="drawer-nav">
+    <li>
+      <a href="#" id="drawerNavHome" onclick="navTo('home');closeDrawer();">
+        <span class="drawer-nav-icon">⌂</span>
+        Home
+      </a>
+    </li>
+  </ul>
   <div class="drawer-section-label">Games</div>
   <ul class="drawer-nav">
     <li>
-      <a href="#" class="active">
+      <a href="#" id="drawerNavDice" onclick="navTo('dice');closeDrawer();">
         <span class="drawer-nav-icon">⚄</span>
         Dice
         <span class="drawer-nav-badge">Live</span>
@@ -481,7 +601,7 @@
 </div>
 
 <header>
-  <a class="logo" href="https://bountywall.com">
+  <a class="logo" href="https://games.bountywall.com">
     <svg class="logo-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <path fill="#2488FF" d="M478.609,300.522v-33.39h-33.391v-66.784h33.391V66.783h-33.391v-33.39h-33.391V0H0v100.174h33.39v311.652H0V512h445.217v-33.39h33.391v-33.391H512V300.522H478.609z M345.043,378.435H166.957v-44.522h178.087V378.435z M345.043,155.826H166.957v-33.391h178.087V155.826z"/>
       <polygon fill="#005ECE" points="478.609,300.522 478.609,267.132 445.217,267.132 445.217,200.348 478.609,200.348 478.609,66.783 445.217,66.783 445.217,33.392 411.826,33.392 411.826,0 256,0 256,122.435 345.043,122.435 345.043,155.826 256,155.826 256,333.913 345.043,333.913 345.043,378.435 256,378.435 256,512 445.217,512 445.217,478.61 478.609,478.61 478.609,445.217 512,445.217 512,300.522"/>
@@ -507,10 +627,11 @@
 </header>
 
 <main>
+  <!-- LOGIN -->
   <div id="loginScreen">
     <div class="login-eyebrow"><span class="login-eyebrow-dot"></span>XRP Devnet · Server-side RNG · 3% house cut</div>
-    <div class="login-title">Roll the dice,<br/><em>win test XRP.</em></div>
-    <div class="login-sub">Create a game, set your stake, wait for a challenger.<br/>Dice roll automatically when the second player joins.</div>
+    <div class="login-title">Play, roll,<br/><em>win test XRP.</em></div>
+    <div class="login-sub">Sign in to access the BountyWall game arena.<br/>Provably fair · Instant payouts · Real-time multiplayer.</div>
     <div class="login-feats">
       <div class="login-feat">XRP Devnet</div>
       <div class="login-feat">Auto-roll on join</div>
@@ -523,12 +644,88 @@
     </button>
   </div>
 
+  <!-- HOME SCREEN -->
+  <div id="homeScreen">
+    <div class="home-hero">
+      <div class="home-greeting">Welcome back</div>
+      <div class="home-name">Hello, <span id="homeUserName">Player</span></div>
+      <div class="home-sub">Ready to play? Choose a game below and put your XRP on the line.</div>
+      <div class="home-stats">
+        <div class="home-stat">
+          <div class="home-stat-val" id="homeBalVal">0.000</div>
+          <div class="home-stat-label">XRP Balance</div>
+        </div>
+        <div class="home-stat-sep"></div>
+        <div class="home-stat">
+          <div class="home-stat-val">Devnet</div>
+          <div class="home-stat-label">Network</div>
+        </div>
+        <div class="home-stat-sep"></div>
+        <div class="home-stat">
+          <div class="home-stat-val">3%</div>
+          <div class="home-stat-label">House cut</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="games-grid-label">Our Games</div>
+    <div class="games-grid">
+      <!-- Dice Game Card -->
+      <div class="game-entry-card" onclick="navTo('dice')">
+        <div class="game-entry-card-banner">
+          <div class="game-entry-card-banner-dice">
+            <div class="banner-die">⚂</div>
+            <div class="banner-die">⚄</div>
+            <div class="banner-die">⚁</div>
+          </div>
+          <div class="game-entry-card-glow"></div>
+          <div class="game-entry-card-live"><span class="live-dot"></span>Live</div>
+        </div>
+        <div class="game-entry-card-body">
+          <div class="game-entry-card-title">Dice ⚄</div>
+          <div class="game-entry-card-desc">
+            Challenge another player to a dice battle. Both roll two dice — highest total wins. Server-side RNG, tamper-proof, instant payout.
+          </div>
+          <div class="game-entry-card-tags">
+            <span class="game-tag game-tag-blue">2 Players</span>
+            <span class="game-tag game-tag-xrp">XRP Stakes</span>
+            <span class="game-tag game-tag-green">Auto-Roll</span>
+          </div>
+          <button class="btn-play-now">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DICE GAME SCREEN -->
   <div id="gameContent">
+    <!-- Dark header banner for dice page -->
+    <div class="dice-page-header">
+      <div class="dice-page-header-left">
+        <button class="dice-page-back" onclick="navTo('home')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Games
+        </button>
+        <div class="dice-page-title">⚄ Dice Arena</div>
+        <div class="dice-page-sub">Roll two dice · Highest total wins · 3% house cut</div>
+      </div>
+      <div class="dice-page-stats">
+        <div class="dstat">
+          <div class="dstat-val" id="diceBalVal">0.000</div>
+          <div class="dstat-label">XRP Balance</div>
+        </div>
+      </div>
+    </div>
+
     <div class="active-banner" id="activeBanner">
       <div class="banner-dot"></div>
       <div class="banner-text" id="bannerText">Your game is live.</div>
       <button class="btn-play" id="btnResume" style="padding:8px 16px;font-size:12px;">View</button>
     </div>
+
     <div class="section-label">Create a Game</div>
     <div class="create-card">
       <div class="create-card-head">
@@ -544,6 +741,7 @@
         <button class="btn-create" id="btnCreate">⚄ Create Game</button>
       </div>
     </div>
+
     <div class="section-label">Open Games</div>
     <div class="lobby" id="lobby">
       <div class="lobby-empty"><span class="lobby-empty-icon">⚄</span>No open games right now.<br/>Be the first to create one above.</div>
@@ -565,12 +763,13 @@
           XRP
         </div>
         <div class="crypto-pill crypto-pill-soon">
-          <svg width="14" height="14" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#F7931A"/><path d="M22.5 14.2c.3-2-1.2-3-3.3-3.7l.7-2.7-1.6-.4-.6 2.6-1.3-.3.6-2.6-1.6-.4-.7 2.7-1-.3v0l-2.2-.6-.4 1.7s1.2.3 1.2.3c.6.2.7.6.7.9l-1.7 6.8c-.1.3-.4.7-1 .5 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5.5-.2-.7 2.7 1.6.4.7-2.7 1.3.3-.7 2.7 1.6.4.7-2.7c2.7.5 4.8.3 5.7-2.2.7-2-.1-3.2-1.5-3.9 1-.2 1.8-1 2-2.4zm-3.5 5c-.5 2-3.9.9-5 .6l.9-3.5c1.1.3 4.6.8 4.1 2.9zm.5-5c-.5 1.8-3.4.9-4.3.7l.8-3.2c.9.2 3.9.7 3.5 2.5z" fill="white"/></svg>
-          BTC <span class="crypto-soon-tag">soon</span>
-        </div>
-        <div class="crypto-pill crypto-pill-soon">
-          <svg width="14" height="14" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#627EEA"/><path d="M16 6v7.4l6.3 2.8L16 6z" fill="white" opacity=".6"/><path d="M16 6L9.7 16.2l6.3-2.8V6z" fill="white"/><path d="M16 21.1v4.9l6.3-8.7L16 21.1z" fill="white" opacity=".6"/><path d="M16 26v-4.9l-6.3-3.8L16 26z" fill="white"/></svg>
-          ETH <span class="crypto-soon-tag">soon</span>
+          <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="16" fill="#FF6600"/>
+            <path d="M16 5L8 10v6l8 4 8-4v-6L16 5z" fill="white" opacity=".9"/>
+            <path d="M8 16v6l8 5 8-5v-6l-8 4-8-4z" fill="white" opacity=".6"/>
+            <path d="M16 9l-4 2.5v3l4 2 4-2v-3L16 9z" fill="#FF6600"/>
+          </svg>
+          XMR <span class="crypto-soon-tag">soon</span>
         </div>
       </div>
     </div>
@@ -734,6 +933,11 @@ function updateBalUI(){
   document.getElementById('witBalDisp').textContent=bal.toFixed(3)+' XRP';
   document.getElementById('stakeHint').textContent=
     'Balance: '+bal.toFixed(3)+' XRP · Opponent must match. Auto-rolls on join.';
+  // Sync home + dice balance displays
+  const hbv=document.getElementById('homeBalVal');
+  const dbv=document.getElementById('diceBalVal');
+  if(hbv) hbv.textContent=bal.toFixed(3);
+  if(dbv) dbv.textContent=bal.toFixed(3);
 }
 
 async function loadBal(){
@@ -746,8 +950,25 @@ async function loadBal(){
 }
 
 // ── WALLET ──
-// ── DRAWER ──
-window.toggleDrawer=function(){
+// ── NAVIGATION ──
+let currentScreen = 'home';
+window.navTo = function(screen) {
+  currentScreen = screen;
+  document.getElementById('homeScreen').classList.toggle('active', screen === 'home');
+  document.getElementById('gameContent').classList.toggle('active', screen === 'dice');
+  // Update drawer active state
+  const navHome = document.getElementById('drawerNavHome');
+  const navDice = document.getElementById('drawerNavDice');
+  if(navHome) navHome.className = screen === 'home' ? 'active' : '';
+  if(navDice) navDice.className = screen === 'dice' ? 'active' : '';
+  // Update page title
+  document.title = screen === 'dice' ? 'BountyWall — Dice Arena' : 'BountyWall — Games';
+  // Start lobby when entering dice
+  if(screen === 'dice' && me && !lobbyUnsub) startLobby();
+  // Update dice balance display
+  if(screen === 'dice') updateBalUI();
+  window.scrollTo(0,0);
+};
   const d=document.getElementById('drawer');
   const o=document.getElementById('drawerOverlay');
   const b=document.getElementById('menuBtn');
@@ -955,6 +1176,7 @@ function startLobby(){
     // Auto-open battle for P1 when opponent joins — only if modal not already open
     gs.forEach(g=>{
       if(g.status==='active' && g.player1?.uid===me.uid && !battleOpen){
+        navTo('dice');
         openBattleModal(g.id, false);
       }
     });
@@ -1233,8 +1455,11 @@ onAuthStateChanged(auth,async user=>{
   if(user){
     me=user;
     document.getElementById('loginScreen').classList.remove('active');
-    document.getElementById('gameContent').classList.add('active');
     document.getElementById('hbal').classList.add('show');
+    // Set home screen username
+    const firstName=(user.displayName||user.email||'Player').split(' ')[0];
+    const homeUN=document.getElementById('homeUserName');
+    if(homeUN) homeUN.textContent=firstName;
     // Populate drawer user section
     const drawerUser=document.getElementById('drawerUser');
     const drawerAph=document.getElementById('drawerAvatarPh');
@@ -1254,11 +1479,13 @@ onAuthStateChanged(auth,async user=>{
     const sn=await getDoc(ref);
     if(!sn.exists()) await setDoc(ref,{balance:0,createdAt:Date.now()});
     await loadBal();
+    navTo('home');
     startLobby();
   }else{
     me=null;
     if(lobbyUnsub){lobbyUnsub();lobbyUnsub=null;}
     document.getElementById('loginScreen').classList.add('active');
+    document.getElementById('homeScreen').classList.remove('active');
     document.getElementById('gameContent').classList.remove('active');
     document.getElementById('hbal').classList.remove('show');
     document.getElementById('drawerUser').classList.remove('show');
