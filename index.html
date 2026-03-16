@@ -538,7 +538,6 @@
       .games-grid{grid-template-columns:1fr;}
       .dice-page-header{padding:20px;}
       .dice-page-stats{display:none;}
-    }
       header{padding:0 14px;gap:8px;}
       .hbal{flex:1;}
       main{padding:20px 14px 60px;}
@@ -548,7 +547,43 @@
       .battle-modal{padding:22px 16px 18px;}
       .wallet-modal{border-radius:16px;}
       .die{width:52px;height:52px;font-size:24px;}
+      .barrel-scenes-row{grid-template-columns:1fr;}
+      .barrel-page-header{padding:20px;}
     }
+
+    /* ── BARREL SHOWDOWN ── */
+    #barrelContent{display:none;}
+    #barrelContent.active{display:block;}
+    .barrel-page-header{
+      background:linear-gradient(135deg,#1a0a00,#3d1a00,#2d1200);
+      border-radius:16px;padding:24px 28px;margin-bottom:28px;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:16px;position:relative;overflow:hidden;}
+    .barrel-page-header::before{content:'🪣';position:absolute;right:20px;top:50%;
+      transform:translateY(-50%);font-size:80px;opacity:0.06;pointer-events:none;}
+    .barrel-page-title{font-family:var(--serif);font-size:26px;color:white;margin-bottom:4px;}
+    .barrel-page-sub{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.4);line-height:1.6;}
+    .barrel-page-back{display:inline-flex;align-items:center;gap:6px;
+      font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.5);
+      background:none;border:none;cursor:pointer;padding:0;margin-bottom:8px;transition:color 0.15s;}
+    .barrel-page-back:hover{color:white;}
+    .game-entry-card-banner-barrel{position:absolute;inset:0;
+      background:linear-gradient(135deg,#1a0a00,#3d1a00);
+      display:flex;align-items:center;justify-content:center;gap:16px;}
+    .barrel-scenes-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+    .barrel-scene-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;}
+    .barrel-scene-lbl{font-family:var(--mono);font-size:9px;color:var(--ink-light);
+      text-transform:uppercase;letter-spacing:1.5px;}
+    .barrel-result{text-align:center;padding:14px;border-radius:12px;margin-bottom:16px;display:none;}
+    .barrel-result.win{background:var(--green-bg);border:1px solid var(--green-border);}
+    .barrel-result.lose{background:var(--red-bg);border:1px solid var(--red-border);}
+    .barrel-create-card{background:white;border:1px solid var(--border);border-radius:16px;
+      padding:24px 28px;margin-bottom:28px;box-shadow:0 2px 16px rgba(30,58,95,0.06);}
+    .barrel-create-head{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+    .barrel-create-icon{width:32px;height:32px;border-radius:8px;
+      background:linear-gradient(135deg,#fff3e0,#ffe0b2);border:1px solid #ffcc80;
+      display:flex;align-items:center;justify-content:center;font-size:16px;}
+    .barrel-lobby{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
   </style>
 </head>
 <body>
@@ -588,6 +623,13 @@
       <a href="#" id="drawerNavDice" onclick="navTo('dice');closeDrawer();">
         <span class="drawer-nav-icon">⚄</span>
         Dice
+        <span class="drawer-nav-badge">Live</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" id="drawerNavBarrel" onclick="navTo('barrel');closeDrawer();">
+        <span class="drawer-nav-icon">🪣</span>
+        Barrel Showdown
         <span class="drawer-nav-badge">Live</span>
       </a>
     </li>
@@ -697,10 +739,63 @@
           </button>
         </div>
       </div>
+      <!-- Barrel Showdown Card -->
+      <div class="game-entry-card" onclick="navTo('barrel')">
+        <div class="game-entry-card-banner" style="background:linear-gradient(135deg,#1a0a00,#3d1a00,#2d1200);">
+          <div class="game-entry-card-banner-barrel">
+            <!-- Pixel barrel SVGs -->
+            <svg width="36" height="44" viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+              <rect x="4" y="4" width="28" height="36" rx="4" fill="#8B4513"/>
+              <rect x="4" y="4" width="28" height="36" rx="4" fill="none" stroke="#5D2E0C" stroke-width="2"/>
+              <rect x="2" y="10" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="2" y="20" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="2" y="30" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="6" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+              <rect x="14" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+              <rect x="22" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+            </svg>
+            <svg width="44" height="52" viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+              <rect x="4" y="4" width="28" height="36" rx="4" fill="#8B4513"/>
+              <rect x="4" y="4" width="28" height="36" rx="4" fill="none" stroke="#5D2E0C" stroke-width="2"/>
+              <rect x="2" y="10" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="2" y="20" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="2" y="30" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="6" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+              <rect x="14" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+              <rect x="22" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+            </svg>
+            <svg width="36" height="44" viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+              <rect x="4" y="4" width="28" height="36" rx="4" fill="#8B4513"/>
+              <rect x="4" y="4" width="28" height="36" rx="4" fill="none" stroke="#5D2E0C" stroke-width="2"/>
+              <rect x="2" y="10" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="2" y="20" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="2" y="30" width="32" height="4" fill="#5D2E0C"/>
+              <rect x="6" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+              <rect x="14" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+              <rect x="22" y="6" width="4" height="32" fill="#A0522D" opacity=".4"/>
+            </svg>
+          </div>
+          <div class="game-entry-card-glow" style="background:radial-gradient(circle at 50% 100%,rgba(242,101,28,0.25),transparent 60%)"></div>
+          <div class="game-entry-card-live"><span class="live-dot"></span>Live</div>
+        </div>
+        <div class="game-entry-card-body">
+          <div class="game-entry-card-title">Barrel Showdown 🪣</div>
+          <div class="game-entry-card-desc">
+            3 barrels. 1 hides XRP. Shoot your barrel — find the coin and win. Western pixel art, server-side RNG, instant payout.
+          </div>
+          <div class="game-entry-card-tags">
+            <span class="game-tag game-tag-blue">2 Players</span>
+            <span class="game-tag game-tag-xrp">XRP Stakes</span>
+            <span class="game-tag" style="background:#fff3e0;color:#e65100;border-color:#ffcc80;">Western</span>
+          </div>
+          <button class="btn-play-now" style="background:linear-gradient(135deg,#bf360c,#e64a19);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play Now
+          </button>
+        </div>
+      </div>
     </div>
   </div>
-
-  <!-- DICE GAME SCREEN -->
   <div id="gameContent">
     <!-- Dark header banner for dice page -->
     <div class="dice-page-header">
@@ -748,6 +843,108 @@
     </div>
   </div>
 </main>
+
+  <!-- BARREL SHOWDOWN SCREEN -->
+  <div id="barrelContent">
+    <div class="barrel-page-header">
+      <div>
+        <button class="barrel-page-back" onclick="navTo('home')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Games
+        </button>
+        <div class="barrel-page-title">🪣 Barrel Showdown</div>
+        <div class="barrel-page-sub">3 barrels · 1 has XRP · Shoot and find out · 3% house cut</div>
+      </div>
+    </div>
+
+    <div class="active-banner" id="barrelActiveBanner">
+      <div class="banner-dot"></div>
+      <div class="banner-text" id="barrelBannerText">Your barrel game is live.</div>
+      <button class="btn-play" id="btnBarrelResume" style="padding:8px 16px;font-size:12px;">View</button>
+    </div>
+
+    <div class="section-label">Create a Game</div>
+    <div class="barrel-create-card">
+      <div class="barrel-create-head">
+        <div class="barrel-create-icon">🪣</div>
+        <div class="create-card-title">New Barrel Showdown</div>
+      </div>
+      <div class="create-row">
+        <div class="input-group">
+          <label class="input-label">Your stake (XRP)</label>
+          <input class="stake-input" id="barrelStakeInput" type="number" min="0.1" max="100" step="0.1" placeholder="e.g. 1.0"/>
+          <div class="stake-hint" id="barrelStakeHint">Shoot the right barrel to win. Auto-shoots when opponent joins.</div>
+        </div>
+        <button class="btn-create" id="btnBarrelCreate" style="background:linear-gradient(135deg,#bf360c,#e64a19);box-shadow:0 4px 16px rgba(230,74,25,0.3);">🪣 Create Game</button>
+      </div>
+    </div>
+
+    <div class="section-label">Open Games</div>
+    <div class="barrel-lobby" id="barrelLobby">
+      <div class="lobby-empty"><span class="lobby-empty-icon">🪣</span>No barrel games right now.<br/>Be the first to create one above.</div>
+    </div>
+  </div>
+</main>
+
+<!-- BARREL SHOWDOWN MODAL -->
+<div class="modal-overlay" id="barrelModal">
+  <div class="battle-modal" style="max-width:640px;">
+    <div class="battle-title">🪣 Barrel Showdown</div>
+    <div class="battle-sub" id="barrelSub">Shoot a barrel — find the XRP coin to win.</div>
+
+    <div class="players-row" style="margin-bottom:14px;">
+      <div class="player-side"><div class="player-side-name p1c" id="barp1">You</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 1</div></div>
+      <div class="vs-txt">VS</div>
+      <div class="player-side"><div class="player-side-name p2c" id="barp2">Opponent</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 2</div></div>
+    </div>
+
+    <!-- Two pixel art scenes side by side -->
+    <div class="barrel-scenes-row">
+      <div class="barrel-scene-wrap">
+        <div class="barrel-scene-lbl">Your Shot</div>
+        <div style="position:relative;width:100%;">
+          <canvas id="barrelCanvas1" width="240" height="160"
+            style="width:100%;border-radius:10px;border:2px solid var(--blue-200);image-rendering:pixelated;display:block;cursor:pointer;"
+            title="Click a barrel to shoot!"></canvas>
+          <div id="barrelCountdown1" style="display:none;position:absolute;inset:0;
+            background:rgba(0,0,0,0.55);border-radius:8px;
+            display:none;align-items:center;justify-content:center;z-index:5;">
+            <span id="barrelCdNum1" style="font-family:var(--mono);font-size:52px;font-weight:700;color:white;text-shadow:0 0 20px rgba(255,100,0,0.9);"></span>
+          </div>
+        </div>
+        <div id="barrelShootLabel1" style="font-family:var(--mono);font-size:10px;color:var(--ink-light);">Waiting...</div>
+      </div>
+      <div class="barrel-scene-wrap">
+        <div class="barrel-scene-lbl">Opponent's Shot</div>
+        <div style="position:relative;width:100%;">
+          <canvas id="barrelCanvas2" width="240" height="160"
+            style="width:100%;border-radius:10px;border:2px solid var(--red-border);image-rendering:pixelated;display:block;"></canvas>
+          <div id="barrelCountdown2" style="display:none;position:absolute;inset:0;
+            background:rgba(0,0,0,0.55);border-radius:8px;
+            display:none;align-items:center;justify-content:center;z-index:5;">
+            <span id="barrelCdNum2" style="font-family:var(--mono);font-size:52px;font-weight:700;color:white;text-shadow:0 0 20px rgba(255,100,0,0.9);"></span>
+          </div>
+        </div>
+        <div id="barrelShootLabel2" style="font-family:var(--mono);font-size:10px;color:var(--ink-light);">Waiting...</div>
+      </div>
+    </div>
+
+    <div class="rolling-indicator" id="barrelRolling">
+      <div class="roll-spinner"></div>
+      <div class="roll-lbl" id="barrelRollLbl">Waiting for opponent...</div>
+    </div>
+
+    <div class="barrel-result" id="barrelResult">
+      <div class="res-title" id="barrelResTit">—</div>
+      <div class="res-detail" id="barrelResDet">—</div>
+    </div>
+
+    <div class="battle-btns">
+      <button class="btn-close-battle" id="btnCloseBarrel" style="display:none" onclick="closeBarrel()">Close</button>
+    </div>
+    <div class="bstatus" id="barrelStatus"></div>
+  </div>
+</div>
 
 <!-- WALLET MODAL -->
 <div class="modal-overlay" id="walletModal">
@@ -954,17 +1151,20 @@ window.navTo = function(screen) {
   currentScreen = screen;
   document.getElementById('homeScreen').classList.toggle('active', screen === 'home');
   document.getElementById('gameContent').classList.toggle('active', screen === 'dice');
+  document.getElementById('barrelContent').classList.toggle('active', screen === 'barrel');
   // Update drawer active state
-  const navHome = document.getElementById('drawerNavHome');
-  const navDice = document.getElementById('drawerNavDice');
-  if(navHome) navHome.className = screen === 'home' ? 'active' : '';
-  if(navDice) navDice.className = screen === 'dice' ? 'active' : '';
-  // Update page title
-  document.title = screen === 'dice' ? 'BountyWall — Dice Arena' : 'BountyWall — Games';
-  // Start lobby when entering dice
-  if(screen === 'dice' && me && !lobbyUnsub) startLobby();
-  // Update dice balance display
-  if(screen === 'dice') updateBalUI();
+  const navHome   = document.getElementById('drawerNavHome');
+  const navDice   = document.getElementById('drawerNavDice');
+  const navBarrel = document.getElementById('drawerNavBarrel');
+  if(navHome)   navHome.className   = screen === 'home'   ? 'active' : '';
+  if(navDice)   navDice.className   = screen === 'dice'   ? 'active' : '';
+  if(navBarrel) navBarrel.className = screen === 'barrel' ? 'active' : '';
+  document.title = screen === 'dice' ? 'BountyWall — Dice Arena'
+    : screen === 'barrel' ? 'BountyWall — Barrel Showdown'
+    : 'BountyWall — Games';
+  if(screen === 'dice'   && me && !lobbyUnsub)       startLobby();
+  if(screen === 'barrel' && me && !barrelLobbyUnsub){ startBarrelLobby(); setTimeout(()=>{drawIdleBarrelScene('barrelCanvas1');drawIdleBarrelScene('barrelCanvas2');},80); }
+  if(screen === 'dice' || screen === 'barrel') updateBalUI();
   window.scrollTo(0,0);
 };
 
@@ -1493,6 +1693,463 @@ onAuthStateChanged(auth,async user=>{
     closeDrawer();
   }
 });
+
+// ══════════════════════════════════════════════════════
+// BARREL SHOWDOWN
+// ══════════════════════════════════════════════════════
+let barrelLobbyUnsub=null, barrelGameUnsub=null;
+let barrelOpen=false, barrelGid=null, barrelShot=false;
+let barrelActiveGid=null;
+
+// ── PIXEL ART DRAWING ──
+const PIXEL = 4; // scale factor for 16-bit feel
+
+function drawBarrelScene(canvasId, state) {
+  // state: { phase:'idle'|'countdown'|'shoot'|'reveal', shotBarrel:1|2|3, winBarrel:1|2|3, isWin:bool, cdNum:int }
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.imageSmoothingEnabled = false;
+
+  // Sky gradient
+  ctx.fillStyle = '#5b8dd9';
+  ctx.fillRect(0, 0, W, H*0.55);
+  ctx.fillStyle = '#87ceeb';
+  ctx.fillRect(0, H*0.2, W, H*0.35);
+
+  // Sun
+  ctx.fillStyle = '#FFD700';
+  ctx.beginPath(); ctx.arc(W*0.82, H*0.12, 14, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#FFF176';
+  ctx.beginPath(); ctx.arc(W*0.82, H*0.12, 9, 0, Math.PI*2); ctx.fill();
+
+  // Ground
+  ctx.fillStyle = '#4a7c3f';
+  ctx.fillRect(0, H*0.55, W, H*0.45);
+  ctx.fillStyle = '#5a9e4e';
+  ctx.fillRect(0, H*0.55, W, 6);
+  // Ground texture
+  ctx.fillStyle = '#3d6b34';
+  for(let x=0; x<W; x+=16) {
+    ctx.fillRect(x, H*0.55+3, 8, 3);
+    ctx.fillRect(x+8, H*0.6, 6, 2);
+  }
+
+  // Cactus (right side)
+  drawCactus(ctx, W*0.82, H*0.55);
+
+  // Fence posts
+  ctx.fillStyle = '#c8a86b';
+  for(let i=0; i<5; i++) {
+    const fx = W*0.04 + i*(W*0.24);
+    ctx.fillRect(fx, H*0.44, 6, H*0.14);
+    ctx.fillStyle = '#a08040';
+    ctx.fillRect(fx, H*0.44, 6, 3);
+    ctx.fillStyle = '#c8a86b';
+  }
+  // Fence rail
+  ctx.fillStyle = '#c8a86b';
+  ctx.fillRect(W*0.04, H*0.5, W*0.92, 4);
+  ctx.fillRect(W*0.04, H*0.53, W*0.92, 3);
+
+  // 3 barrels
+  const barrelX = [W*0.15, W*0.47, W*0.72];
+  const barrelY = H*0.52;
+  for(let i=0; i<3; i++) {
+    const bx = barrelX[i];
+    const bn = i+1; // barrel number 1-3
+    const isShot = state.phase !== 'idle' && state.phase !== 'countdown' && state.shotBarrel === bn;
+    const isWin  = isShot && state.isWin;
+    const isLose = isShot && !state.isWin;
+
+    if(isShot && state.phase === 'reveal') {
+      if(isWin) {
+        drawBarrelExplode(ctx, bx, barrelY, true);
+        drawXrpCoin(ctx, bx, barrelY - 28);
+      } else {
+        drawBarrelExplode(ctx, bx, barrelY, false);
+      }
+    } else {
+      drawBarrel(ctx, bx, barrelY, isShot && state.phase === 'shoot');
+    }
+
+    // Barrel number label
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.font = `bold ${PIXEL*3}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText(bn, bx, barrelY + 38);
+  }
+
+  // Gunshot flash
+  if(state.phase === 'shoot') {
+    ctx.fillStyle = 'rgba(255,200,0,0.15)';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Countdown overlay
+  if(state.phase === 'countdown' && state.cdNum > 0) {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = state.cdNum === 'DRAW' ? '#f2651c' : 'white';
+    ctx.font = `bold ${state.cdNum === 'DRAW' ? 24 : 40}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText(state.cdNum, W/2, H/2 + 14);
+  }
+}
+
+function drawBarrel(ctx, x, y, shaking) {
+  const ox = shaking ? (Math.random()*4-2) : 0;
+  x += ox;
+  // Body
+  ctx.fillStyle = '#8B4513';
+  roundRect(ctx, x-16, y-32, 32, 40, 4);
+  ctx.fill();
+  // Planks shading
+  ctx.fillStyle = '#A0522D';
+  for(let i=0; i<3; i++) ctx.fillRect(x-14+i*10, y-30, 6, 36);
+  // Hoops
+  ctx.fillStyle = '#4a2800';
+  ctx.fillRect(x-17, y-22, 34, 5);
+  ctx.fillRect(x-17, y-8,  34, 5);
+  ctx.fillRect(x-17, y+6,  34, 5);
+  // Top
+  ctx.fillStyle = '#6B3410';
+  roundRect(ctx, x-16, y-34, 32, 6, 2);
+  ctx.fill();
+  // Highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.1)';
+  ctx.fillRect(x-12, y-30, 6, 34);
+}
+
+function drawBarrelExplode(ctx, x, y, hasXrp) {
+  // Broken pieces
+  ctx.fillStyle = '#8B4513';
+  ctx.save(); ctx.translate(x-20, y-20); ctx.rotate(-0.4);
+  ctx.fillRect(0, 0, 14, 24); ctx.restore();
+  ctx.save(); ctx.translate(x+8, y-24); ctx.rotate(0.5);
+  ctx.fillRect(0, 0, 16, 20); ctx.restore();
+  ctx.save(); ctx.translate(x-6, y+8); ctx.rotate(0.2);
+  ctx.fillRect(0, 0, 20, 10); ctx.restore();
+  // Smoke puffs
+  ctx.fillStyle = 'rgba(180,180,180,0.5)';
+  ctx.beginPath(); ctx.arc(x, y-20, 14, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x-14, y-28, 10, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+12, y-26, 8, 0, Math.PI*2); ctx.fill();
+  // Sparks
+  ctx.fillStyle = '#FFD700';
+  const sparks = [[x-10,y-40],[x+8,y-38],[x-18,y-30],[x+16,y-32],[x,y-48]];
+  sparks.forEach(([sx,sy])=>{
+    ctx.beginPath(); ctx.arc(sx,sy,3,0,Math.PI*2); ctx.fill();
+  });
+}
+
+function drawXrpCoin(ctx, x, y) {
+  // Outer ring
+  ctx.fillStyle = '#00a8ff';
+  ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#0077cc';
+  ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI*2);
+  ctx.arc(x, y, 14, 0, Math.PI*2, true); ctx.fill();
+  // Inner circle
+  ctx.fillStyle = '#00c8ff';
+  ctx.beginPath(); ctx.arc(x, y, 13, 0, Math.PI*2); ctx.fill();
+  // XRP logo paths (simplified pixel version)
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 14px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('✕', x, y+5);
+  // Glow
+  ctx.fillStyle = 'rgba(0,168,255,0.3)';
+  ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI*2); ctx.fill();
+}
+
+function drawCactus(ctx, x, y) {
+  ctx.fillStyle = '#2d8a2d';
+  ctx.fillRect(x-4, y-36, 8, 36);
+  ctx.fillRect(x-14, y-24, 10, 6);
+  ctx.fillRect(x-14, y-30, 6, 8);
+  ctx.fillRect(x+4, y-20, 10, 6);
+  ctx.fillRect(x+8, y-26, 6, 8);
+  ctx.fillStyle = '#1e6b1e';
+  ctx.fillRect(x-3, y-34, 3, 34);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.arcTo(x+w, y, x+w, y+r, r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+  ctx.lineTo(x+r, y+h);
+  ctx.arcTo(x, y+h, x, y+h-r, r);
+  ctx.lineTo(x, y+r);
+  ctx.arcTo(x, y, x+r, y, r);
+  ctx.closePath();
+}
+
+// Draw idle scenes on load
+function drawIdleBarrelScene(canvasId) {
+  drawBarrelScene(canvasId, { phase:'idle', shotBarrel:0, winBarrel:0, isWin:false, cdNum:0 });
+}
+
+// ── BARREL GAME LOGIC ──
+document.getElementById('btnBarrelCreate').addEventListener('click', async()=>{
+  const stake=parseFloat(document.getElementById('barrelStakeInput').value);
+  if(!stake||stake<0.1){toast('Min stake 0.1 XRP','err');return;}
+  if(stake>100){toast('Max stake 100 XRP','err');return;}
+  if(stake>bal){toast('Insufficient balance. You have '+bal.toFixed(3)+' XRP','err');return;}
+  if(barrelActiveGid){toast('You already have an active barrel game','err');return;}
+  const b=document.getElementById('btnBarrelCreate');
+  b.disabled=true; b.textContent='Creating...';
+  try{
+    const nb=parseFloat((bal-stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:nb},{merge:true});
+    bal=nb; updateBalUI();
+    const gr=doc(collection(db,'barrel_games'));
+    await setDoc(gr,{
+      status:'waiting', stake,
+      player1:{uid:me.uid,displayName:me.displayName||'Player',photoURL:me.photoURL||''},
+      player2:null, createdAt:serverTimestamp()
+    });
+    barrelActiveGid=gr.id;
+    document.getElementById('barrelStakeInput').value='';
+    toast('Barrel game created! Waiting for opponent...','ok');
+  }catch(e){
+    bal=parseFloat((bal+stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:bal},{merge:true});
+    updateBalUI(); toast('Error creating game.','err');
+  }
+  b.disabled=false; b.textContent='🪣 Create Game';
+});
+
+window.joinBarrelGame=async function(gid,stake){
+  if(stake>bal){toast('Need '+stake.toFixed(3)+' XRP to join','err');return;}
+  if(!confirm('Join barrel game and stake '+stake.toFixed(3)+' XRP?'))return;
+  try{
+    const nb=parseFloat((bal-stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:nb},{merge:true});
+    bal=nb; updateBalUI();
+    await updateDoc(doc(db,'barrel_games',gid),{
+      status:'active',
+      player2:{uid:me.uid,displayName:me.displayName||'Player',photoURL:me.photoURL||''}
+    });
+    barrelActiveGid=gid;
+    openBarrelModal(gid, true);
+  }catch(e){toast('Error joining.','err');}
+};
+
+window.cancelBarrelGame=async function(gid,stake){
+  if(!confirm('Cancel and get '+stake.toFixed(3)+' XRP back?'))return;
+  try{
+    await deleteDoc(doc(db,'barrel_games',gid));
+    const t=await getToken();
+    if(t) await fetch(WORKER_URL+'/api/refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:t,amount:stake})});
+    barrelActiveGid=null;
+    toast('Cancelled. Stake returned.','ok');
+    await loadBal();
+  }catch(e){toast('Error cancelling.','err');}
+};
+
+function startBarrelLobby(){
+  if(barrelLobbyUnsub) barrelLobbyUnsub();
+  const q=query(collection(db,'barrel_games'),where('status','in',['waiting','active']));
+  barrelLobbyUnsub=onSnapshot(q,snap=>{
+    const gs=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    barrelActiveGid=null;
+    gs.forEach(g=>{
+      if(g.player1?.uid===me.uid||g.player2?.uid===me.uid) barrelActiveGid=g.id;
+    });
+    // Update active banner
+    const banner=document.getElementById('barrelActiveBanner');
+    if(barrelActiveGid){
+      const ag=gs.find(x=>x.id===barrelActiveGid);
+      if(ag&&ag.status==='active'){
+        document.getElementById('barrelBannerText').innerHTML=`Barrel game live — stake: <strong>${parseFloat(ag.stake).toFixed(3)} XRP</strong>`;
+        document.getElementById('btnBarrelResume').onclick=()=>openBarrelModal(barrelActiveGid,false);
+        banner.classList.add('show');
+      } else banner.classList.remove('show');
+    } else banner.classList.remove('show');
+    // Auto-open for P1 when opponent joins
+    gs.forEach(g=>{
+      if(g.status==='active'&&g.player1?.uid===me.uid&&!barrelOpen){
+        openBarrelModal(g.id,false);
+      }
+    });
+    const lobby=document.getElementById('barrelLobby');
+    if(!gs.length){
+      lobby.innerHTML='<div class="lobby-empty"><span class="lobby-empty-icon">🪣</span>No barrel games right now.<br/>Be the first to create one above.</div>';
+      return;
+    }
+    lobby.innerHTML=gs.map(g=>{
+      const isMe=g.player1?.uid===me.uid||g.player2?.uid===me.uid;
+      const isP1=g.player1?.uid===me.uid;
+      const stake=parseFloat(g.stake||0);
+      const name=g.player1?.displayName||'Unknown';
+      const ph=g.player1?.photoURL;
+      const av=ph?`<img class="game-avatar" src="${ph}" alt=""/>`:`<div class="game-avatar-ph">${name.charAt(0).toUpperCase()}</div>`;
+      let badge,actions;
+      if(g.status==='waiting'){
+        if(isP1){
+          badge=`<span class="sbadge badge-mine">Your game</span>`;
+          actions=`<button class="btn-cancel" onclick="cancelBarrelGame('${g.id}',${stake})">Cancel & Refund</button>`;
+        }else{
+          badge=`<span class="sbadge badge-wait">Open</span>`;
+          actions=`<button class="btn-join" onclick="joinBarrelGame('${g.id}',${stake})" style="background:linear-gradient(135deg,#bf360c,#e64a19);">Join — ${stake.toFixed(3)} XRP</button>`;
+        }
+      }else{
+        badge=`<span class="sbadge badge-act">In Progress</span>`;
+        if(isMe) actions=`<button class="btn-play" onclick="openBarrelModal('${g.id}',false)">View</button>`;
+        else actions=`<span style="font-family:var(--mono);font-size:10px;color:var(--ink-light)">Closed</span>`;
+      }
+      return `<div class="game-card ${isMe?(g.status==='active'?'active-game':'my-game'):''}">
+        ${av}<div class="game-info"><div class="game-creator">${name}</div>
+        <div class="game-meta">${badge} &nbsp;·&nbsp; ${stake.toFixed(3)} XRP stake &nbsp;·&nbsp; Pot: ${(stake*2).toFixed(3)} XRP</div></div>
+        <div class="game-stake-box"><div class="game-stake-val">${stake.toFixed(3)}</div><div class="game-stake-label">XRP each</div></div>
+        <div class="game-actions">${actions}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+window.openBarrelModal=async function(gid, autoShoot){
+  if(barrelOpen && barrelGid===gid) return;
+  barrelGid=gid; barrelOpen=true; barrelShot=false;
+  // Reset UI
+  document.getElementById('barrelResult').style.display='none';
+  document.getElementById('btnCloseBarrel').style.display='none';
+  document.getElementById('barrelStatus').textContent='';
+  document.getElementById('barrelRolling').classList.remove('show');
+  document.getElementById('barrelShootLabel1').textContent='Your shot';
+  document.getElementById('barrelShootLabel2').textContent='Opponent\'s shot';
+  // Draw idle scenes
+  drawIdleBarrelScene('barrelCanvas1');
+  drawIdleBarrelScene('barrelCanvas2');
+  const sn=await getDoc(doc(db,'barrel_games',gid));
+  if(!sn.exists()){toast('Game not found','err');barrelOpen=false;return;}
+  const g=sn.data();
+  const isP1=g.player1?.uid===me.uid;
+  document.getElementById('barp1').textContent=isP1?(me.displayName||'You'):(g.player2?.displayName||'Opponent');
+  document.getElementById('barp2').textContent=isP1?(g.player2?.displayName||'Opponent'):(g.player1?.displayName||'You');
+  document.getElementById('barrelSub').textContent='Stake: '+parseFloat(g.stake).toFixed(3)+' XRP each · Winner takes '+(parseFloat(g.stake)*2*0.97).toFixed(3)+' XRP';
+  document.getElementById('barrelModal').classList.add('open');
+  if(g.status==='complete'&&g.p1Barrel){
+    showBarrelResult(g, isP1);
+    document.getElementById('btnCloseBarrel').style.display='inline-flex';
+    return;
+  }
+  if(autoShoot){
+    // P2 — start countdown then auto-shoot
+    startBarrelCountdown(gid, isP1);
+  } else {
+    // P1 — wait and listen for result
+    document.getElementById('barrelRolling').classList.add('show');
+    document.getElementById('barrelRollLbl').textContent='Waiting for opponent to join...';
+    if(barrelGameUnsub){barrelGameUnsub();barrelGameUnsub=null;}
+    barrelGameUnsub=onSnapshot(doc(db,'barrel_games',gid),(snap)=>{
+      if(!snap.exists()) return;
+      const gd=snap.data();
+      if(gd.status==='complete'&&gd.p1Barrel){
+        document.getElementById('barrelRolling').classList.remove('show');
+        if(barrelGameUnsub){barrelGameUnsub();barrelGameUnsub=null;}
+        startBarrelRevealAnimation(gd, isP1);
+      } else if(gd.status==='active'&&gd.player2?.uid){
+        document.getElementById('barrelRollLbl').textContent='Opponent joined! Starting countdown...';
+        if(barrelGameUnsub){barrelGameUnsub();barrelGameUnsub=null;}
+        startBarrelCountdown(gid, isP1);
+      }
+    });
+  }
+};
+
+window.closeBarrel=function(){
+  document.getElementById('barrelModal').classList.remove('open');
+  if(barrelGameUnsub){barrelGameUnsub();barrelGameUnsub=null;}
+  barrelGid=null; barrelOpen=false;
+  loadBal();
+};
+document.getElementById('barrelModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('barrelModal')&&document.getElementById('barrelResult').style.display!=='none') closeBarrel();
+});
+
+async function startBarrelCountdown(gid, isP1){
+  document.getElementById('barrelRolling').classList.remove('show');
+  // Animate countdown on both canvases
+  const counts = [3,2,1,'DRAW!'];
+  for(const c of counts){
+    drawBarrelScene('barrelCanvas1',{phase:'countdown',shotBarrel:0,winBarrel:0,isWin:false,cdNum:c});
+    drawBarrelScene('barrelCanvas2',{phase:'countdown',shotBarrel:0,winBarrel:0,isWin:false,cdNum:c});
+    document.getElementById('barrelShootLabel1').textContent = c === 'DRAW!' ? '🔫 DRAW!' : String(c);
+    document.getElementById('barrelShootLabel2').textContent = c === 'DRAW!' ? '🔫 DRAW!' : String(c);
+    await new Promise(r=>setTimeout(r, c==='DRAW!'?600:900));
+  }
+  // Shoot flash
+  drawBarrelScene('barrelCanvas1',{phase:'shoot',shotBarrel:1,winBarrel:1,isWin:false,cdNum:0});
+  drawBarrelScene('barrelCanvas2',{phase:'shoot',shotBarrel:1,winBarrel:1,isWin:false,cdNum:0});
+  await new Promise(r=>setTimeout(r,300));
+  // Call worker
+  try{
+    const r=await php('api/barrel',{gameId:gid});
+    if(!r.ok){
+      document.getElementById('barrelStatus').textContent='Error: '+(r.error||'Roll failed');
+      document.getElementById('btnCloseBarrel').style.display='inline-flex';
+      return;
+    }
+    barrelShot=true;
+    const sn=await getDoc(doc(db,'barrel_games',gid));
+    startBarrelRevealAnimation(sn.data(), isP1, r.result);
+  }catch(e){
+    document.getElementById('barrelStatus').textContent='Error: '+e.message;
+    document.getElementById('btnCloseBarrel').style.display='inline-flex';
+  }
+}
+
+async function startBarrelRevealAnimation(gData, isP1, result){
+  const r=result||{p1Barrel:gData.p1Barrel,p2Barrel:gData.p2Barrel,winBarrel:gData.winBarrel,
+    winner:gData.winner,winnings:gData.winnings,houseCut:gData.houseCut};
+  if(!r||!r.p1Barrel) return;
+  const myBarrel  = isP1 ? r.p1Barrel : r.p2Barrel;
+  const oppBarrel = isP1 ? r.p2Barrel : r.p1Barrel;
+  const iWin=(isP1&&r.winner==='player1')||(!isP1&&r.winner==='player2');
+
+  document.getElementById('barrelShootLabel1').textContent='🔫 Shooting barrel #'+myBarrel+'...';
+  document.getElementById('barrelShootLabel2').textContent='🔫 Shooting barrel #'+oppBarrel+'...';
+
+  // Shoot phase
+  drawBarrelScene('barrelCanvas1',{phase:'shoot',shotBarrel:myBarrel,winBarrel:r.winBarrel,isWin:iWin,cdNum:0});
+  drawBarrelScene('barrelCanvas2',{phase:'shoot',shotBarrel:oppBarrel,winBarrel:r.winBarrel,isWin:!iWin,cdNum:0});
+  await new Promise(res=>setTimeout(res,700));
+
+  // Reveal phase
+  drawBarrelScene('barrelCanvas1',{phase:'reveal',shotBarrel:myBarrel,winBarrel:r.winBarrel,isWin:iWin,cdNum:0});
+  drawBarrelScene('barrelCanvas2',{phase:'reveal',shotBarrel:oppBarrel,winBarrel:r.winBarrel,isWin:!iWin,cdNum:0});
+
+  document.getElementById('barrelShootLabel1').textContent=iWin?'🪙 XRP Found!':'💨 Empty!';
+  document.getElementById('barrelShootLabel2').textContent=iWin?'💨 Empty!':'🪙 XRP Found!';
+
+  showBarrelResult(gData, isP1, r);
+  document.getElementById('btnCloseBarrel').style.display='inline-flex';
+  loadBal();
+}
+
+function showBarrelResult(gd, isP1, result){
+  const r=result||{winner:gd.winner,winnings:gd.winnings,houseCut:gd.houseCut,p1Barrel:gd.p1Barrel,p2Barrel:gd.p2Barrel};
+  if(!r) return;
+  const iWin=(isP1&&r.winner==='player1')||(!isP1&&r.winner==='player2');
+  const el=document.getElementById('barrelResult');
+  el.className='barrel-result '+(iWin?'win':'lose');
+  document.getElementById('barrelResTit').className='res-title '+(iWin?'win':'lose');
+  document.getElementById('barrelResTit').textContent=iWin?'🪙 You found the XRP!':'💨 Empty barrel!';
+  document.getElementById('barrelResDet').textContent=iWin
+    ?'You won '+parseFloat(r.winnings||0).toFixed(3)+' XRP! (House: '+parseFloat(r.houseCut||0).toFixed(3)+' XRP)'
+    :'Your barrel was empty. Opponent found the XRP.';
+  el.style.display='block';
+}
+
+// Draw idle scenes when barrel screen is shown — handled in navTo above
+
 </script>
 </body>
 </html>
