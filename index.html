@@ -555,7 +555,7 @@
     #barrelContent{display:none;}
     #barrelContent.active{display:block;}
     .barrel-page-header{
-      background:linear-gradient(135deg,#1a0a00,#3d1a00,#2d1200);
+      background:linear-gradient(135deg,#0d1b2e,#1a3a6b,#0a2d6b);
       border-radius:16px;padding:24px 28px;margin-bottom:28px;
       display:flex;align-items:center;justify-content:space-between;
       flex-wrap:wrap;gap:16px;position:relative;overflow:hidden;}
@@ -581,7 +581,8 @@
       padding:24px 28px;margin-bottom:28px;box-shadow:0 2px 16px rgba(30,58,95,0.06);}
     .barrel-create-head{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
     .barrel-create-icon{width:32px;height:32px;border-radius:8px;
-      background:linear-gradient(135deg,#fff3e0,#ffe0b2);border:1px solid #ffcc80;
+      background:linear-gradient(135deg,var(--blue-50),var(--blue-100));
+      border:1px solid var(--blue-200);
       display:flex;align-items:center;justify-content:center;font-size:16px;}
     .barrel-lobby{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
   </style>
@@ -878,7 +879,7 @@
           <input class="stake-input" id="barrelStakeInput" type="number" min="0.1" max="100" step="0.1" placeholder="e.g. 1.0"/>
           <div class="stake-hint" id="barrelStakeHint">Shoot the right barrel to win. Auto-shoots when opponent joins.</div>
         </div>
-        <button class="btn-create" id="btnBarrelCreate" style="background:linear-gradient(135deg,#bf360c,#e64a19);box-shadow:0 4px 16px rgba(230,74,25,0.3);">🪣 Create Game</button>
+        <button class="btn-create" id="btnBarrelCreate" class="btn-create">🪣 Create Game</button>
       </div>
     </div>
 
@@ -901,14 +902,27 @@
       <div class="player-side"><div class="player-side-name p2c" id="barp2">Opponent</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Player 2</div></div>
     </div>
 
-    <!-- Single shared WebGL scene -->
-    <div style="position:relative;width:100%;margin-bottom:14px;">
-      <canvas id="barrelWebGL" style="width:100%;border-radius:12px;border:2px solid var(--border);display:block;"></canvas>
-      <div id="barrelStatusOverlay" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);
-        font-family:var(--mono);font-size:13px;color:white;letter-spacing:2px;
-        text-shadow:0 0 10px rgba(0,168,255,0.8);background:rgba(0,0,0,0.5);
-        padding:4px 16px;border-radius:20px;white-space:nowrap;pointer-events:none;">
-        STANDBY
+    <!-- Two WebGL scenes — P1 on top, P2 on bottom -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+      <div style="position:relative;width:100%;">
+        <div style="position:absolute;top:7px;left:10px;z-index:2;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.45);padding:2px 8px;border-radius:4px;pointer-events:none;" id="bglLabel1">YOUR SHOT</div>
+        <canvas id="barrelWebGL1" style="width:100%;border-radius:10px;border:2px solid var(--blue-200);display:block;"></canvas>
+        <div id="barrelStatusOverlay1" style="position:absolute;top:7px;left:50%;transform:translateX(-50%);
+          font-family:var(--mono);font-size:12px;color:white;letter-spacing:2px;
+          text-shadow:0 0 10px rgba(0,168,255,0.8);background:rgba(0,0,0,0.5);
+          padding:3px 14px;border-radius:20px;white-space:nowrap;pointer-events:none;">
+          STANDBY
+        </div>
+      </div>
+      <div style="position:relative;width:100%;">
+        <div style="position:absolute;top:7px;left:10px;z-index:2;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.45);padding:2px 8px;border-radius:4px;pointer-events:none;" id="bglLabel2">OPPONENT'S SHOT</div>
+        <canvas id="barrelWebGL2" style="width:100%;border-radius:10px;border:2px solid var(--red-border);display:block;"></canvas>
+        <div id="barrelStatusOverlay2" style="position:absolute;top:7px;left:50%;transform:translateX(-50%);
+          font-family:var(--mono);font-size:12px;color:white;letter-spacing:2px;
+          text-shadow:0 0 10px rgba(0,168,255,0.8);background:rgba(0,0,0,0.5);
+          padding:3px 14px;border-radius:20px;white-space:nowrap;pointer-events:none;">
+          STANDBY
+        </div>
       </div>
     </div>
 
@@ -1686,20 +1700,14 @@ let barrelOpen=false, barrelGid=null, barrelShot=false;
 let barrelActiveGid=null;
 
 // ── WEBGL BARREL ENGINE ──
-// Initialised lazily when the barrel modal first opens
-let bgl = null; // barrel WebGL state
+let bgl = null; // {scene1, scene2, ...}
 
-function initBarrelWebGL() {
-  if(bgl) return;
-  const canvas = document.getElementById('barrelWebGL');
+function buildBarrelScene(canvas, canvasId) {
+  // Each scene is fully independent
   const THREE = window.THREE;
-  if(!canvas || !THREE) { console.warn('Three.js not loaded'); return; }
-
-  // Size canvas to modal width
-  const modalW = Math.min(480, window.innerWidth - 80);
-  const modalH = Math.round(modalW * 0.58);
-  canvas.width = modalW;
-  canvas.height = modalH;
+  const modalW = Math.min(460, window.innerWidth - 80);
+  const modalH = Math.round(modalW * 0.42);
+  canvas.width = modalW; canvas.height = modalH;
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
   renderer.setSize(modalW, modalH);
@@ -1716,145 +1724,118 @@ function initBarrelWebGL() {
   camera.position.set(0, 1.3, 2.2);
   camera.lookAt(0, 0.55, -1);
 
-  // Lighting
   scene.add(new THREE.AmbientLight(0xfff0d0, 1.0));
   const sun = new THREE.DirectionalLight(0xfff5cc, 2.6);
-  sun.position.set(8, 14, 6); sun.castShadow=true;
-  sun.shadow.mapSize.width=1024; sun.shadow.mapSize.height=1024;
+  sun.position.set(8,14,6); sun.castShadow=true;
+  sun.shadow.mapSize.width=512; sun.shadow.mapSize.height=512;
   sun.shadow.camera.near=0.5; sun.shadow.camera.far=50;
   sun.shadow.camera.left=-10; sun.shadow.camera.right=10;
   sun.shadow.camera.top=10; sun.shadow.camera.bottom=-10;
   scene.add(sun);
   scene.add(new THREE.HemisphereLight(0x87ceeb,0xf5deb3,0.9));
 
-  // Sky
-  const skyMesh=new THREE.Mesh(new THREE.SphereGeometry(50,16,8),new THREE.MeshBasicMaterial({color:0x4aa8d8,side:THREE.BackSide}));
-  scene.add(skyMesh);
-  const horizMesh=new THREE.Mesh(new THREE.CylinderGeometry(49,49,12,16,1,true),new THREE.MeshBasicMaterial({color:0x9dd8f0,side:THREE.BackSide,transparent:true,opacity:0.7}));
-  horizMesh.position.y=-4; scene.add(horizMesh);
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(50,16,8),new THREE.MeshBasicMaterial({color:0x4aa8d8,side:THREE.BackSide})));
+  const horizM=new THREE.Mesh(new THREE.CylinderGeometry(49,49,12,16,1,true),new THREE.MeshBasicMaterial({color:0x9dd8f0,side:THREE.BackSide,transparent:true,opacity:0.7}));
+  horizM.position.y=-4; scene.add(horizM);
 
-  // Ocean
-  const oceanMesh=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshLambertMaterial({color:0x006994}));
-  oceanMesh.rotation.x=-Math.PI/2; oceanMesh.position.y=-0.4; scene.add(oceanMesh);
+  const oceanM=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshLambertMaterial({color:0x006994}));
+  oceanM.rotation.x=-Math.PI/2; oceanM.position.y=-0.4; scene.add(oceanM);
   const oceanHi=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshBasicMaterial({color:0x40a8d0,transparent:true,opacity:0.3}));
   oceanHi.rotation.x=-Math.PI/2; oceanHi.position.y=-0.38; scene.add(oceanHi);
 
-  // Island
-  const islandMesh=new THREE.Mesh(new THREE.CylinderGeometry(11,9,0.5,28),new THREE.MeshLambertMaterial({color:0xf0d080}));
-  islandMesh.position.y=-0.25; islandMesh.receiveShadow=true; scene.add(islandMesh);
-  const ripMat=new THREE.MeshBasicMaterial({color:0xe0c060,transparent:true,opacity:0.35});
-  for(let i=0;i<20;i++){const rx=(Math.random()-.5)*18,rz=(Math.random()-.5)*18;if(rx*rx+rz*rz>100)continue;const r=new THREE.Mesh(new THREE.TorusGeometry(.25+Math.random()*.5,.018,4,14),ripMat);r.rotation.x=Math.PI/2;r.position.set(rx,.02,rz);scene.add(r);}
+  const islandM=new THREE.Mesh(new THREE.CylinderGeometry(11,9,0.5,28),new THREE.MeshLambertMaterial({color:0xf0d080}));
+  islandM.position.y=-0.25; scene.add(islandM);
 
   // Clouds
   const cMat=new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:0.92});
-  [[- 10,8,-18],[9,10,-20],[-3,12,-24],[13,9,-16]].forEach(([cx,cy,cz])=>{
+  [[-10,8,-18],[9,10,-20],[-3,12,-24]].forEach(([cx,cy,cz])=>{
     const cg=new THREE.Group();
-    [[0,0,0,.9],[1.1,.2,0,.65],[-.9,.1,0,.7],[.3,.5,0,.55]].forEach(([x,y,z,r])=>{
-      const m=new THREE.Mesh(new THREE.SphereGeometry(r,8,5),cMat);m.position.set(x,y,z);cg.add(m);
-    });
-    cg.position.set(cx,cy,cz); scene.add(cg);
+    [[0,0,0,.9],[1.1,.2,0,.65],[-.9,.1,0,.7]].forEach(([x,y,z,r])=>{const m=new THREE.Mesh(new THREE.SphereGeometry(r,7,5),cMat);m.position.set(x,y,z);cg.add(m);});
+    cg.position.set(cx,cy,cz);scene.add(cg);
   });
 
-  // Palms
-  const trunkMat=new THREE.MeshLambertMaterial({color:0x8b6914});
-  const frondMat=new THREE.MeshLambertMaterial({color:0x228822,side:THREE.DoubleSide});
-  [[-5.5,-2.5,1],[5.5,-2,-1],[-7.5,1,.5]].forEach(([px,pz,ld])=>{
+  // Palms (lighter version)
+  const trM=new THREE.MeshLambertMaterial({color:0x8b6914});
+  const frM=new THREE.MeshLambertMaterial({color:0x228822,side:THREE.DoubleSide});
+  [[-5.5,-2.5,1],[5.5,-2,-1]].forEach(([px,pz,ld])=>{
     const pg=new THREE.Group();
-    for(let i=0;i<4;i++){const s=new THREE.Mesh(new THREE.CylinderGeometry(.09-.01*i,.1-.01*i,.7,7),trunkMat);s.position.set(ld*i*.12,i*.65+.35,0);s.rotation.z=-ld*.12;s.castShadow=true;pg.add(s);}
+    for(let i=0;i<4;i++){const s=new THREE.Mesh(new THREE.CylinderGeometry(.09-.01*i,.1-.01*i,.7,7),trM);s.position.set(ld*i*.12,i*.65+.35,0);s.rotation.z=-ld*.12;pg.add(s);}
     const tx=ld*4*.12,ty=4*.65+.35;
-    for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;const fr=new THREE.Mesh(new THREE.PlaneGeometry(.28,1.5),frondMat);fr.position.set(px+tx+Math.cos(a)*.3,ty+.3,pz+Math.sin(a)*.3);fr.rotation.y=a;fr.rotation.z=.65;fr.castShadow=true;scene.add(fr);}
+    for(let i=0;i<5;i++){const a=(i/5)*Math.PI*2;const fr=new THREE.Mesh(new THREE.PlaneGeometry(.28,1.4),frM);fr.position.set(px+tx+Math.cos(a)*.3,ty+.3,pz+Math.sin(a)*.3);fr.rotation.y=a;fr.rotation.z=.65;scene.add(fr);}
     pg.position.set(px,0,pz);scene.add(pg);
   });
 
   // Dock
-  const dkMat=new THREE.MeshLambertMaterial({color:0x8b6030});
-  for(let i=-1;i<=1;i++){const p=new THREE.Mesh(new THREE.BoxGeometry(.85,.06,2.8),dkMat);p.position.set(i*.9,.02,-1);p.receiveShadow=true;scene.add(p);}
-  [-1.4,0,1.4].forEach(z2=>{const s=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,.35,6),dkMat);s.position.set(0,-.15,z2);scene.add(s);});
+  const dkM=new THREE.MeshLambertMaterial({color:0x8b6030});
+  for(let i=-1;i<=1;i++){const p=new THREE.Mesh(new THREE.BoxGeometry(.85,.06,2.8),dkM);p.position.set(i*.9,.02,-1);scene.add(p);}
 
   // Barrels
-  const bBodyMat=new THREE.MeshLambertMaterial({color:0x5a2808});
-  const bStaveMat=new THREE.MeshLambertMaterial({color:0x7a3c10});
-  const bHoopMat=new THREE.MeshLambertMaterial({color:0x150500});
-  const bLidMat=new THREE.MeshLambertMaterial({color:0x2e0e00});
-  const barrels3d=[-1.8,0,1.8].map(x=>{
+  const bBM=new THREE.MeshLambertMaterial({color:0x5a2808});
+  const bSM=new THREE.MeshLambertMaterial({color:0x7a3c10});
+  const bHM=new THREE.MeshLambertMaterial({color:0x150500});
+  const bLM=new THREE.MeshLambertMaterial({color:0x2e0e00});
+  const barrels=[-1.8,0,1.8].map(x=>{
     const g=new THREE.Group();
-    const body=new THREE.Mesh(new THREE.CylinderGeometry(.52,.46,1.1,14),bBodyMat);
-    body.castShadow=true;body.receiveShadow=true;g.add(body);
-    for(let i=0;i<10;i++){const a=(i/10)*Math.PI*2;const s=new THREE.Mesh(new THREE.BoxGeometry(.055,1.12,.04),bStaveMat);s.position.set(Math.cos(a)*.49,0,Math.sin(a)*.49);s.rotation.y=a;g.add(s);}
-    [-.35,0,.35].forEach(y=>{const h=new THREE.Mesh(new THREE.TorusGeometry(.54,.04,7,18),bHoopMat);h.rotation.x=Math.PI/2;h.position.y=y;g.add(h);});
-    const lid=new THREE.Mesh(new THREE.CylinderGeometry(.52,.52,.07,14),bLidMat);lid.position.y=.585;g.add(lid);
-    const lidRim=new THREE.Mesh(new THREE.TorusGeometry(.52,.025,6,14),bHoopMat);lidRim.rotation.x=Math.PI/2;lidRim.position.y=.585;g.add(lidRim);
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(.52,.46,1.1,14),bBM);body.castShadow=true;body.receiveShadow=true;g.add(body);
+    for(let i=0;i<10;i++){const a=(i/10)*Math.PI*2;const s=new THREE.Mesh(new THREE.BoxGeometry(.055,1.12,.04),bSM);s.position.set(Math.cos(a)*.49,0,Math.sin(a)*.49);s.rotation.y=a;g.add(s);}
+    [-.35,0,.35].forEach(y=>{const h=new THREE.Mesh(new THREE.TorusGeometry(.54,.04,7,18),bHM);h.rotation.x=Math.PI/2;h.position.y=y;g.add(h);});
+    const lid=new THREE.Mesh(new THREE.CylinderGeometry(.52,.52,.07,14),bLM);lid.position.y=.585;g.add(lid);
     g.position.set(x,.55,-1.2);g.userData.baseY=.55;g.userData.baseX=x;
-    scene.add(g); return g;
+    scene.add(g);return g;
   });
 
   // XRP Coin — black + white
-  const coinGroup=new THREE.Group();
-  const outerMat=new THREE.MeshLambertMaterial({color:0x111111,emissive:0x050505});
-  const outerMesh=new THREE.Mesh(new THREE.CylinderGeometry(.52,.52,.09,32),outerMat);outerMesh.rotation.x=Math.PI/2;coinGroup.add(outerMesh);
-  coinGroup.add(new THREE.Mesh(new THREE.TorusGeometry(.52,.045,10,32),new THREE.MeshLambertMaterial({color:0x222222})));
-  const bandMesh=new THREE.Mesh(new THREE.CylinderGeometry(.43,.43,.11,32),new THREE.MeshLambertMaterial({color:0x1a1a1a}));bandMesh.rotation.x=Math.PI/2;coinGroup.add(bandMesh);
-  const faceMesh=new THREE.Mesh(new THREE.CylinderGeometry(.37,.37,.12,32),new THREE.MeshLambertMaterial({color:0x0d0d0d,emissive:0x0a0a0a,emissiveIntensity:.3}));faceMesh.rotation.x=Math.PI/2;coinGroup.add(faceMesh);
-  coinGroup.add(new THREE.Mesh(new THREE.TorusGeometry(.38,.018,8,32),new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xaaaaaa,emissiveIntensity:.2})));
-  const logoMat=new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xdddddd,emissiveIntensity:.5});
-  const topShp=new THREE.Shape();topShp.moveTo(-.265,.225);topShp.lineTo(.265,.225);topShp.lineTo(.18,.145);topShp.lineTo(0,.06);topShp.lineTo(-.18,.145);topShp.closePath();
-  const tM=new THREE.Mesh(new THREE.ShapeGeometry(topShp),logoMat);tM.position.z=.07;coinGroup.add(tM);
-  const tMb=tM.clone();tMb.position.z=-.07;tMb.rotation.y=Math.PI;coinGroup.add(tMb);
-  const botShp=new THREE.Shape();botShp.moveTo(-.265,-.225);botShp.lineTo(.265,-.225);botShp.lineTo(.18,-.145);botShp.lineTo(0,-.06);botShp.lineTo(-.18,-.145);botShp.closePath();
-  const bM=new THREE.Mesh(new THREE.ShapeGeometry(botShp),logoMat);bM.position.z=.07;coinGroup.add(bM);
-  const bMb=bM.clone();bMb.position.z=-.07;bMb.rotation.y=Math.PI;coinGroup.add(bMb);
-  const glowDisc=new THREE.Mesh(new THREE.CircleGeometry(.68,32),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.08,side:THREE.DoubleSide}));coinGroup.add(glowDisc);
-  const pulseRing=new THREE.Mesh(new THREE.TorusGeometry(.62,.035,8,32),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.15}));pulseRing.userData.isPulse=true;coinGroup.add(pulseRing);
-  const coinLight=new THREE.PointLight(0xffffff,2.5,5);coinGroup.userData.coinLight=coinLight;coinGroup.add(coinLight);
-  coinGroup.visible=false;scene.add(coinGroup);
+  const coin=new THREE.Group();
+  const oM=new THREE.MeshLambertMaterial({color:0x111111,emissive:0x050505});
+  const oMesh=new THREE.Mesh(new THREE.CylinderGeometry(.52,.52,.09,32),oM);oMesh.rotation.x=Math.PI/2;coin.add(oMesh);
+  coin.add(new THREE.Mesh(new THREE.TorusGeometry(.52,.045,10,32),new THREE.MeshLambertMaterial({color:0x222222})));
+  const bnd=new THREE.Mesh(new THREE.CylinderGeometry(.43,.43,.11,32),new THREE.MeshLambertMaterial({color:0x1a1a1a}));bnd.rotation.x=Math.PI/2;coin.add(bnd);
+  const fce=new THREE.Mesh(new THREE.CylinderGeometry(.37,.37,.12,32),new THREE.MeshLambertMaterial({color:0x0d0d0d,emissive:0x0a0a0a,emissiveIntensity:.3}));fce.rotation.x=Math.PI/2;coin.add(fce);
+  coin.add(new THREE.Mesh(new THREE.TorusGeometry(.38,.018,8,32),new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xaaaaaa,emissiveIntensity:.2})));
+  const lMat=new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xdddddd,emissiveIntensity:.5});
+  const tS=new THREE.Shape();tS.moveTo(-.265,.225);tS.lineTo(.265,.225);tS.lineTo(.18,.145);tS.lineTo(0,.06);tS.lineTo(-.18,.145);tS.closePath();
+  const tM2=new THREE.Mesh(new THREE.ShapeGeometry(tS),lMat);tM2.position.z=.07;coin.add(tM2);
+  const tMb=tM2.clone();tMb.position.z=-.07;tMb.rotation.y=Math.PI;coin.add(tMb);
+  const bS=new THREE.Shape();bS.moveTo(-.265,-.225);bS.lineTo(.265,-.225);bS.lineTo(.18,-.145);bS.lineTo(0,-.06);bS.lineTo(-.18,-.145);bS.closePath();
+  const bM2=new THREE.Mesh(new THREE.ShapeGeometry(bS),lMat);bM2.position.z=.07;coin.add(bM2);
+  const bMb=bM2.clone();bMb.position.z=-.07;bMb.rotation.y=Math.PI;coin.add(bMb);
+  const pRing=new THREE.Mesh(new THREE.TorusGeometry(.62,.035,8,32),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.15}));pRing.userData.isPulse=true;coin.add(pRing);
+  const cLight=new THREE.PointLight(0xffffff,2.5,5);coin.userData.coinLight=cLight;coin.add(cLight);
+  coin.visible=false;scene.add(coin);
 
   // Gun
-  const gunGroup=new THREE.Group();
-  const gM=new THREE.MeshLambertMaterial({color:0x111111});
-  const gMd=new THREE.MeshLambertMaterial({color:0x0d0d0d});
-  const gMs=new THREE.MeshLambertMaterial({color:0x2a2a2a,emissive:0x0a0a0a});
-  const gW=new THREE.MeshLambertMaterial({color:0x6b3010});
-  const gWd=new THREE.MeshLambertMaterial({color:0x4a1e08});
+  const gun=new THREE.Group();
+  const gM=new THREE.MeshLambertMaterial({color:0x111111}),gMd=new THREE.MeshLambertMaterial({color:0x0d0d0d}),gMs=new THREE.MeshLambertMaterial({color:0x2a2a2a,emissive:0x0a0a0a}),gW=new THREE.MeshLambertMaterial({color:0x6b3010}),gWd=new THREE.MeshLambertMaterial({color:0x4a1e08});
   [-.072,.072].forEach(bx=>{
-    const bl=new THREE.Mesh(new THREE.CylinderGeometry(.052,.048,.78,10),gM);bl.rotation.x=Math.PI/2;bl.position.set(bx,.02,-.28);gunGroup.add(bl);
-    const mz=new THREE.Mesh(new THREE.CylinderGeometry(.058,.052,.05,10),gMd);mz.rotation.x=Math.PI/2;mz.position.set(bx,.02,-.68);gunGroup.add(mz);
-    const hl=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,.06,8),gMd);hl.rotation.x=Math.PI/2;hl.position.set(bx,.02,-.72);gunGroup.add(hl);
-    const bd=new THREE.Mesh(new THREE.TorusGeometry(.058,.012,6,10),gMs);bd.rotation.x=Math.PI/2;bd.position.set(bx,.02,-.48);gunGroup.add(bd);
+    const bl=new THREE.Mesh(new THREE.CylinderGeometry(.052,.048,.78,10),gM);bl.rotation.x=Math.PI/2;bl.position.set(bx,.02,-.28);gun.add(bl);
+    const mz=new THREE.Mesh(new THREE.CylinderGeometry(.058,.052,.05,10),gMd);mz.rotation.x=Math.PI/2;mz.position.set(bx,.02,-.68);gun.add(mz);
+    const bd=new THREE.Mesh(new THREE.TorusGeometry(.058,.012,6,10),gMs);bd.rotation.x=Math.PI/2;bd.position.set(bx,.02,-.48);gun.add(bd);
   });
-  const rib=new THREE.Mesh(new THREE.BoxGeometry(.15,.022,.78),gMs);rib.position.set(0,.075,-.28);gunGroup.add(rib);
-  const lug=new THREE.Mesh(new THREE.BoxGeometry(.17,.04,.76),gMd);lug.position.set(0,-.032,-.28);gunGroup.add(lug);
-  const rec=new THREE.Mesh(new THREE.BoxGeometry(.22,.18,.28),gM);rec.position.set(0,.02,.1);gunGroup.add(rec);
-  [-1,1].forEach(s=>{const pl=new THREE.Mesh(new THREE.BoxGeometry(.024,.15,.24),gW);pl.position.set(s*.12,.02,.1);gunGroup.add(pl);});
-  const tang=new THREE.Mesh(new THREE.BoxGeometry(.1,.04,.18),gM);tang.position.set(0,.12,.18);gunGroup.add(tang);
-  const hinge=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.24,10),gMs);hinge.rotation.z=Math.PI/2;hinge.position.set(0,-.04,-.02);gunGroup.add(hinge);
-  const gd=new THREE.Mesh(new THREE.TorusGeometry(.065,.014,7,14,Math.PI*1.1),gM);gd.position.set(0,-.11,.14);gd.rotation.x=Math.PI/2;gd.rotation.z=.1;gunGroup.add(gd);
-  const tr=new THREE.Mesh(new THREE.BoxGeometry(.016,.09,.014),gMd);tr.position.set(0,-.14,.12);gunGroup.add(tr);
-  const grp=new THREE.Mesh(new THREE.BoxGeometry(.15,.3,.18),gW);grp.position.set(0,-.22,.18);grp.rotation.x=.28;gunGroup.add(grp);
-  const grpp=new THREE.Mesh(new THREE.BoxGeometry(.12,.22,.04),gWd);grpp.position.set(0,-.24,.25);gunGroup.add(grpp);
-  const stk=new THREE.Mesh(new THREE.BoxGeometry(.18,.26,.5),gW);stk.position.set(0,-.06,.48);gunGroup.add(stk);
-  const butt=new THREE.Mesh(new THREE.BoxGeometry(.18,.28,.04),gMd);butt.position.set(0,-.06,.74);gunGroup.add(butt);
-  const comb=new THREE.Mesh(new THREE.BoxGeometry(.1,.08,.46),gWd);comb.position.set(0,.1,.48);gunGroup.add(comb);
-  const fe=new THREE.Mesh(new THREE.BoxGeometry(.16,.1,.52),gW);fe.position.set(0,-.068,-.12);gunGroup.add(fe);
-  const feb=new THREE.Mesh(new THREE.CylinderGeometry(.065,.065,.52,8),gWd);feb.rotation.x=Math.PI/2;feb.position.set(0,-.09,-.12);gunGroup.add(feb);
-  gunGroup.position.set(.28,-.38,.0);gunGroup.rotation.x=.08;gunGroup.rotation.y=-.04;
-  camera.add(gunGroup);scene.add(camera);
+  const ribM=new THREE.Mesh(new THREE.BoxGeometry(.15,.022,.78),gMs);ribM.position.set(0,.075,-.28);gun.add(ribM);
+  const rec=new THREE.Mesh(new THREE.BoxGeometry(.22,.18,.28),gM);rec.position.set(0,.02,.1);gun.add(rec);
+  [-1,1].forEach(s=>{const pl=new THREE.Mesh(new THREE.BoxGeometry(.024,.15,.24),gW);pl.position.set(s*.12,.02,.1);gun.add(pl);});
+  const grp=new THREE.Mesh(new THREE.BoxGeometry(.15,.3,.18),gW);grp.position.set(0,-.22,.18);grp.rotation.x=.28;gun.add(grp);
+  const stk=new THREE.Mesh(new THREE.BoxGeometry(.18,.26,.5),gW);stk.position.set(0,-.06,.48);gun.add(stk);
+  const butt=new THREE.Mesh(new THREE.BoxGeometry(.18,.28,.04),gMd);butt.position.set(0,-.06,.74);gun.add(butt);
+  const fe=new THREE.Mesh(new THREE.BoxGeometry(.16,.1,.52),gW);fe.position.set(0,-.068,-.12);gun.add(fe);
+  gun.position.set(.28,-.38,.0);gun.rotation.x=.08;gun.rotation.y=-.04;
+  camera.add(gun);scene.add(camera);
 
-  // Flash light
   const flashLt=new THREE.PointLight(0xffcc44,0,10);flashLt.position.set(0,0,-.9);camera.add(flashLt);
 
   // Particles
-  const pCount=120,pPos=new Float32Array(pCount*3),pCol=new Float32Array(pCount*3);
+  const pCnt=80,pPos=new Float32Array(pCnt*3),pCol=new Float32Array(pCnt*3);
   const pGeo=new THREE.BufferGeometry();
   pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
   pGeo.setAttribute('color',new THREE.BufferAttribute(pCol,3));
   const pMat=new THREE.PointsMaterial({size:.1,vertexColors:true,transparent:true,opacity:1,depthWrite:false});
   const pMesh=new THREE.Points(pGeo,pMat);pMesh.visible=false;scene.add(pMesh);
-  let pVel=[];const pLife=new Float32Array(pCount);
+  let pVel=[];const pLife=new Float32Array(pCnt);
 
   function spawnParticles(x,y,z){
     pMesh.visible=true;pVel=[];
-    const cols=[[1,.5,.1],[1,.8,.2],[1,1,.5],[.6,.2,.05],[1,.3,.1],[.85,.65,.3],[1,1,1]];
-    for(let i=0;i<pCount;i++){
+    const cols=[[1,.5,.1],[1,.8,.2],[1,1,.5],[.6,.2,.05],[1,.3,.1]];
+    for(let i=0;i<pCnt;i++){
       const a=Math.random()*Math.PI*2,el=(Math.random()-.25)*Math.PI,sp=.04+Math.random()*.2;
       const c=cols[i%cols.length];
       pPos[i*3]=x;pPos[i*3+1]=y;pPos[i*3+2]=z;
@@ -1864,11 +1845,10 @@ function initBarrelWebGL() {
   }
   function updateParticles(){
     let any=false;
-    for(let i=0;i<pCount;i++){
+    for(let i=0;i<pCnt;i++){
       if(pLife[i]<=0)continue;any=true;
       const v=pVel[i];pPos[i*3]+=v.vx;pPos[i*3+1]+=v.vy;pPos[i*3+2]+=v.vz;
-      v.vy-=.004;pLife[i]-=.016+Math.random()*.012;
-      pCol[i*3+1]*=.985;pCol[i*3+2]*=.96;
+      v.vy-=.004;pLife[i]-=.018;pCol[i*3+1]*=.985;pCol[i*3+2]*=.96;
     }
     pGeo.attributes.position.needsUpdate=true;pGeo.attributes.color.needsUpdate=true;
     if(!any)pMesh.visible=false;
@@ -1877,89 +1857,110 @@ function initBarrelWebGL() {
   const wChunks=[];
   function spawnChunks(x,y,z){
     const mat=new THREE.MeshLambertMaterial({color:0x6b3010});
-    for(let i=0;i<12;i++){
-      const m=new THREE.Mesh(new THREE.BoxGeometry(.05+Math.random()*.14,.04+Math.random()*.1,.04+Math.random()*.08),mat);
-      m.position.set(x+(Math.random()-.5)*.35,y+(Math.random()-.5)*.25,z+(Math.random()-.5)*.35);
-      m.userData.v={x:(Math.random()-.5)*.13,y:.05+Math.random()*.14,z:(Math.random()-.5)*.1};
-      m.userData.r={x:(Math.random()-.5)*.24,y:(Math.random()-.5)*.22};
-      m.castShadow=true;scene.add(m);wChunks.push(m);
+    for(let i=0;i<8;i++){
+      const m=new THREE.Mesh(new THREE.BoxGeometry(.05+Math.random()*.12,.04+Math.random()*.08,.04+Math.random()*.07),mat);
+      m.position.set(x+(Math.random()-.5)*.3,y,z+(Math.random()-.5)*.3);
+      m.userData.v={x:(Math.random()-.5)*.12,y:.05+Math.random()*.12,z:(Math.random()-.5)*.1};
+      m.userData.r={x:(Math.random()-.5)*.22,y:(Math.random()-.5)*.2};
+      scene.add(m);wChunks.push(m);
     }
   }
   function clearChunks(){wChunks.forEach(m=>scene.remove(m));wChunks.length=0;}
 
-  let bPhase='idle',bShake=0,bGunRecoil=0,bCoinY=0,bCoinSpin=0,bT=0;
-  let bShotBarrel=0,bIsWin=false;
+  let phase='idle',shake=0,gunRecoil=0,coinY=0,coinSpin=0,t=0,shotIdx=0,isWin=false;
+  let active=true;
 
-  function barrelAnimate(){
-    if(!bgl||!bgl.active) return;
-    requestAnimationFrame(barrelAnimate);
-    bT+=.016;
-    oceanHi.material.opacity=.25+Math.sin(bT*1.3)*.07;
-    if(bPhase==='idle'){
-      barrels3d.forEach((b,i)=>{b.position.y=b.userData.baseY+Math.sin(bT*1.1+i*1.4)*.02;b.rotation.y=Math.sin(bT*.4+i)*.06;});
+  function setStatus(txt){
+    const el=document.getElementById('barrelStatusOverlay'+canvasId);
+    if(el)el.textContent=txt;
+  }
+
+  function tick(){
+    if(!active)return;
+    requestAnimationFrame(tick);
+    t+=.016;
+    oceanHi.material.opacity=.25+Math.sin(t*1.3)*.07;
+    if(phase==='idle'){
+      barrels.forEach((b,i)=>{b.position.y=b.userData.baseY+Math.sin(t*1.1+i*1.4)*.02;b.rotation.y=Math.sin(t*.4+i)*.06;});
     }
-    camera.position.y=1.3+Math.sin(bT*.7)*.009;
-    if(bShake>0){camera.position.x+=(Math.random()-.5)*bShake*.07;bShake*=.78;}
-    if(bGunRecoil>0){gunGroup.position.z=bGunRecoil*.18;gunGroup.rotation.x=.08-bGunRecoil*.3;bGunRecoil*=.68;if(bGunRecoil<.01){bGunRecoil=0;gunGroup.position.z=0;gunGroup.rotation.x=.08;}}
+    camera.position.y=1.3+Math.sin(t*.7)*.009;
+    if(shake>0){camera.position.x+=(Math.random()-.5)*shake*.07;shake*=.78;}
+    if(gunRecoil>0){gun.position.z=gunRecoil*.18;gun.rotation.x=.08-gunRecoil*.3;gunRecoil*=.68;if(gunRecoil<.01){gunRecoil=0;gun.position.z=0;gun.rotation.x=.08;}}
     if(flashLt.intensity>0)flashLt.intensity*=.7;
-    if(bPhase==='explode'||bPhase==='reveal'){
+    if(phase==='explode'||phase==='reveal'){
       updateParticles();
       wChunks.forEach(c=>{c.position.x+=c.userData.v.x;c.position.y+=c.userData.v.y;c.position.z+=c.userData.v.z;c.userData.v.y-=.005;c.rotation.x+=c.userData.r.x;c.rotation.y+=c.userData.r.y;});
     }
-    if(bPhase==='reveal'&&bIsWin&&coinGroup.visible){
-      bCoinY=Math.min(bCoinY+.018,1.5);bCoinSpin+=.05;
-      const b=barrels3d[bShotBarrel];
-      coinGroup.position.set(b.userData.baseX,.8+bCoinY,-1.2);
-      coinGroup.rotation.y=bCoinSpin;coinGroup.rotation.x=Math.sin(bCoinSpin*.4)*.15;
-      coinGroup.children.forEach(c=>{if(c.userData&&c.userData.isPulse){c.scale.setScalar(1+Math.sin(bT*4)*.12);c.material.opacity=.15+Math.sin(bT*4)*.12;}});
-      coinGroup.userData.coinLight.intensity=2.5+Math.sin(bT*4)*.6;
+    if(phase==='reveal'&&isWin&&coin.visible){
+      coinY=Math.min(coinY+.018,1.5);coinSpin+=.05;
+      const b=barrels[shotIdx];
+      coin.position.set(b.userData.baseX,.8+coinY,-1.2);
+      coin.rotation.y=coinSpin;coin.rotation.x=Math.sin(coinSpin*.4)*.15;
+      coin.children.forEach(c=>{if(c.userData&&c.userData.isPulse){c.scale.setScalar(1+Math.sin(t*4)*.12);}});
+      coin.userData.coinLight.intensity=2.5+Math.sin(t*4)*.6;
     }
     renderer.render(scene,camera);
   }
 
-  function setBarrelStatus(txt){
-    const el=document.getElementById('barrelStatusOverlay');
-    if(el)el.textContent=txt;
-  }
-
-  async function runBarrelSequence(shotIdx, winIdx, isWin){
-    bShotBarrel=shotIdx; bIsWin=isWin;
-    bPhase='countdown';
+  async function runSequence(sIdx, isW){
+    shotIdx=sIdx; isWin=isW; phase='countdown';
     for(let n=3;n>=1;n--){
-      setBarrelStatus('⚡ '+n);
-      barrels3d[shotIdx].scale.set(1.07,1.07,1.07);
+      setStatus('⚡ '+n);
+      barrels[shotIdx].scale.set(1.07,1.07,1.07);
       await new Promise(r=>setTimeout(r,170));
-      barrels3d[shotIdx].scale.set(1,1,1);
+      barrels[shotIdx].scale.set(1,1,1);
       await new Promise(r=>setTimeout(r,730));
     }
-    setBarrelStatus('🔫 DRAW!');
+    setStatus('🔫 DRAW!');
     await new Promise(r=>setTimeout(r,300));
-    bPhase='shoot';flashLt.intensity=10;bShake=1.2;bGunRecoil=1.0;
+    phase='shoot';flashLt.intensity=10;shake=1.2;gunRecoil=1.0;
     await new Promise(r=>setTimeout(r,220));
-    const b=barrels3d[shotIdx];
-    b.visible=false;
+    const b=barrels[shotIdx];b.visible=false;
     spawnParticles(b.userData.baseX,.55,-1.2);
     spawnChunks(b.userData.baseX,.8,-1.2);
-    bPhase='explode';
-    setBarrelStatus(isWin?'🪙 XRP FOUND!':'💨 EMPTY!');
+    phase='explode';
+    setStatus(isWin?'🪙 XRP FOUND!':'💨 EMPTY!');
     await new Promise(r=>setTimeout(r,900));
-    bPhase='reveal';
-    if(isWin){coinGroup.position.set(b.userData.baseX,.8,-1.2);coinGroup.visible=true;bCoinY=0;bCoinSpin=0;setBarrelStatus('🏆 YOU WIN!');}
-    else{setBarrelStatus('💀 EMPTY BARREL');}
+    phase='reveal';
+    if(isWin){coin.position.set(b.userData.baseX,.8,-1.2);coin.visible=true;coinY=0;coinSpin=0;setStatus('🏆 WIN!');}
+    else setStatus('💀 EMPTY');
   }
 
-  function resetBarrelScene(){
-    barrels3d.forEach(b=>{b.visible=true;b.position.y=b.userData.baseY;b.rotation.y=0;});
-    coinGroup.visible=false;clearChunks();flashLt.intensity=0;bPhase='idle';
-    setBarrelStatus('STANDBY');
+  function reset(){
+    barrels.forEach(b=>{b.visible=true;b.position.y=b.userData.baseY;b.rotation.y=0;b.scale.set(1,1,1);});
+    coin.visible=false;clearChunks();flashLt.intensity=0;phase='idle';setStatus('STANDBY');
   }
 
-  bgl={renderer,scene,camera,barrels3d,coinGroup,runBarrelSequence,resetBarrelScene,setBarrelStatus,active:true};
-  barrelAnimate();
+  tick();
+  return {runSequence, reset, stop:()=>{active=false;}, start:()=>{active=true;tick();}, setStatus};
 }
 
-function stopBarrelWebGL(){if(bgl)bgl.active=false;}
-function startBarrelWebGL(){if(bgl){bgl.active=true;(function loop(){if(!bgl||!bgl.active)return;requestAnimationFrame(loop);bgl.renderer.render(bgl.scene,bgl.camera);})();}}
+function initBarrelWebGL() {
+  if(bgl) return;
+  const THREE = window.THREE;
+  if(!THREE){ console.warn('Three.js not loaded'); return; }
+  const c1=document.getElementById('barrelWebGL1');
+  const c2=document.getElementById('barrelWebGL2');
+  if(!c1||!c2) return;
+  const scene1 = buildBarrelScene(c1, '1');
+  const scene2 = buildBarrelScene(c2, '2');
+  bgl = { scene1, scene2,
+    async runBarrelSequence(myBarrel, winBarrel, iWin, oppBarrel, iOppWin){
+      // Run both simultaneously
+      await Promise.all([
+        scene1.runSequence(myBarrel, iWin),
+        scene2.runSequence(oppBarrel, iOppWin),
+      ]);
+    },
+    resetBarrelScene(){ scene1.reset(); scene2.reset(); },
+    stop(){ scene1.stop(); scene2.stop(); },
+    start(){ scene1.start(); scene2.start(); }
+  };
+}
+
+function stopBarrelWebGL(){if(bgl){bgl.stop();}}
+function startBarrelWebGL(){if(bgl){bgl.start();}}
+
 
 // ── BARREL GAME LOGIC ──
 document.getElementById('btnBarrelCreate').addEventListener('click', async()=>{
@@ -2064,7 +2065,7 @@ function startBarrelLobby(){
           actions=`<button class="btn-cancel" onclick="cancelBarrelGame('${g.id}',${stake})">Cancel & Refund</button>`;
         }else{
           badge=`<span class="sbadge badge-wait">Open</span>`;
-          actions=`<button class="btn-join" onclick="joinBarrelGame('${g.id}',${stake})" style="background:linear-gradient(135deg,#bf360c,#e64a19);">Join — ${stake.toFixed(3)} XRP</button>`;
+          actions=`<button class="btn-join" onclick="joinBarrelGame('${g.id}',${stake})" >Join — ${stake.toFixed(3)} XRP</button>`;
         }
       }else{
         badge=`<span class="sbadge badge-act">In Progress</span>`;
@@ -2091,7 +2092,7 @@ window.openBarrelModal=async function(gid, autoShoot){
   document.getElementById('barrelRolling').classList.remove('show');
   // Init WebGL engine on first open
   initBarrelWebGL();
-  if(bgl) { bgl.active=true; bgl.resetBarrelScene(); }
+  if(bgl) { bgl.start(); bgl.resetBarrelScene(); }
   const sn=await getDoc(doc(db,'barrel_games',gid));
   if(!sn.exists()){toast('Game not found','err');barrelOpen=false;return;}
   const g=sn.data();
@@ -2130,7 +2131,7 @@ window.openBarrelModal=async function(gid, autoShoot){
 window.closeBarrel=function(){
   document.getElementById('barrelModal').classList.remove('open');
   if(barrelGameUnsub){barrelGameUnsub();barrelGameUnsub=null;}
-  if(bgl) bgl.active=false;
+  if(bgl) bgl.stop();
   barrelGid=null; barrelOpen=false;
   loadBal();
 };
@@ -2140,7 +2141,6 @@ document.getElementById('barrelModal').addEventListener('click',e=>{
 
 async function startBarrelCountdown(gid, isP1){
   document.getElementById('barrelRolling').classList.remove('show');
-  // Call worker to get result first (server-side RNG)
   let result=null;
   try{
     const r=await php('api/barrel',{gameId:gid});
@@ -2155,10 +2155,14 @@ async function startBarrelCountdown(gid, isP1){
     document.getElementById('btnCloseBarrel').style.display='inline-flex';
     return;
   }
-  // Now run WebGL animation with known result
-  const myBarrel  = isP1 ? result.p1Barrel-1 : result.p2Barrel-1; // 0-indexed
-  const iWin=(isP1&&result.winner==='player1')||(!isP1&&result.winner==='player2');
-  if(bgl) await bgl.runBarrelSequence(myBarrel, result.winBarrel-1, iWin);
+  const myBarrel  = (isP1 ? result.p1Barrel : result.p2Barrel) - 1;
+  const oppBarrel = (isP1 ? result.p2Barrel : result.p1Barrel) - 1;
+  const iWin    = (isP1&&result.winner==='player1')||(!isP1&&result.winner==='player2');
+  const iOppWin = !iWin;
+  // Update labels
+  const l1=document.getElementById('bglLabel1'); if(l1) l1.textContent='YOUR SHOT';
+  const l2=document.getElementById('bglLabel2'); if(l2) l2.textContent="OPPONENT'S SHOT";
+  if(bgl) await bgl.runBarrelSequence(myBarrel, result.winBarrel-1, iWin, oppBarrel, iOppWin);
   showBarrelResult({}, isP1, result);
   document.getElementById('btnCloseBarrel').style.display='inline-flex';
   loadBal();
@@ -2168,9 +2172,11 @@ async function startBarrelRevealAnimation(gData, isP1, result){
   const r=result||{p1Barrel:gData.p1Barrel,p2Barrel:gData.p2Barrel,winBarrel:gData.winBarrel,
     winner:gData.winner,winnings:gData.winnings,houseCut:gData.houseCut};
   if(!r||!r.p1Barrel) return;
-  const myBarrel=(isP1?r.p1Barrel:r.p2Barrel)-1;
-  const iWin=(isP1&&r.winner==='player1')||(!isP1&&r.winner==='player2');
-  if(bgl) await bgl.runBarrelSequence(myBarrel, r.winBarrel-1, iWin);
+  const myBarrel  = (isP1 ? r.p1Barrel : r.p2Barrel) - 1;
+  const oppBarrel = (isP1 ? r.p2Barrel : r.p1Barrel) - 1;
+  const iWin    = (isP1&&r.winner==='player1')||(!isP1&&r.winner==='player2');
+  const iOppWin = !iWin;
+  if(bgl) await bgl.runBarrelSequence(myBarrel, r.winBarrel-1, iWin, oppBarrel, iOppWin);
   showBarrelResult(gData, isP1, r);
   document.getElementById('btnCloseBarrel').style.display='inline-flex';
   loadBal();
