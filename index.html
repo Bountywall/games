@@ -2861,7 +2861,12 @@ function startHoopLobby(){
         banner.classList.add('show');
       }else banner.classList.remove('show');
     }else banner.classList.remove('show');
-    // NO auto-open — player clicks View themselves to avoid race conditions
+    // Auto-open modal for P1 when opponent joins (P1 watches only, doesn't call worker)
+    gs.forEach(g=>{
+      if(g.status==='active'&&g.player1?.uid===me.uid&&!hoopOpen){
+        openHoopModal(g.id,false);
+      }
+    });
     const lobby=document.getElementById('hoopLobby');
     if(!gs.length){lobby.innerHTML='<div class="lobby-empty"><span class="lobby-empty-icon">🏀</span>No hoop games right now.<br/>Be the first to create one above.</div>';return;}
     lobby.innerHTML=gs.map(g=>{
@@ -2928,20 +2933,38 @@ window.openHoopModal=async function(gid,autoPlay){
     return;
   }
   if(autoPlay){
+    // P2: call worker, get results, play animation
     runHoopGame(gid,isP1);
   }else{
+    // P1: game is active (opponent just joined) or waiting — watch for complete
+    const statusMsg=g.status==='active'?'Opponent joined! Game starting...':'Waiting for opponent...';
     document.getElementById('hoopRolling').classList.add('show');
-    document.getElementById('hoopRollLbl').textContent='Waiting for opponent...';
+    document.getElementById('hoopRollLbl').textContent=statusMsg;
     if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
     hoopGameUnsub=onSnapshot(doc(db,'hoop_games',gid),snap=>{
       if(!snap.exists())return;
       const gd=snap.data();
       if(gd.status==='complete'&&gd.p1Results){
+        // Game done — play the animation for P1 too using stored results
         document.getElementById('hoopRolling').classList.remove('show');
         if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
-        showHoopResult(gd,isP1);document.getElementById('btnCloseHoop').style.display='inline-flex';loadBal();
-      }else if(gd.status==='rolling'||gd.status==='active'){
-        document.getElementById('hoopRollLbl').textContent='Game in progress...';
+        const myR=isP1?gd.p1Results:gd.p2Results;
+        const oppR=isP1?gd.p2Results:gd.p1Results;
+        if(hgl){
+          hgl.runGame(myR,oppR).then(()=>{
+            showHoopResult(gd,isP1);
+            document.getElementById('btnCloseHoop').style.display='inline-flex';
+            loadBal();
+          });
+        } else {
+          showHoopResult(gd,isP1);
+          document.getElementById('btnCloseHoop').style.display='inline-flex';
+          loadBal();
+        }
+      }else if(gd.status==='rolling'){
+        document.getElementById('hoopRollLbl').textContent='Calculating shots...';
+      }else if(gd.status==='active'&&gd.player2?.uid){
+        document.getElementById('hoopRollLbl').textContent='Opponent joined! Game starting...';
       }
     });
   }
