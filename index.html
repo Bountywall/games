@@ -2845,30 +2845,36 @@ window.cancelHoopGame=async function(gid,stake){
 };
 
 function startHoopLobby(){
-  if(hoopLobbyUnsub)hoopLobbyUnsub();
-  const q=query(collection(db,'hoop_games'),where('status','in',['waiting','active','rolling']));
+  if(hoopLobbyUnsub) hoopLobbyUnsub();
+  const q=query(collection(db,'hoop_games'),where('status','in',['waiting','active']));
   hoopLobbyUnsub=onSnapshot(q,snap=>{
-    const gs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    const gs=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
     hoopActiveGid=null;
-    gs.forEach(g=>{if(g.player1?.uid===me.uid||g.player2?.uid===me.uid)hoopActiveGid=g.id;});
+    gs.forEach(g=>{
+      if(g.player1?.uid===me.uid||g.player2?.uid===me.uid) hoopActiveGid=g.id;
+    });
+    // Update active banner
     const banner=document.getElementById('hoopActiveBanner');
     if(hoopActiveGid){
       const ag=gs.find(x=>x.id===hoopActiveGid);
-      const inProgress=ag&&(ag.status==='active'||ag.status==='rolling');
-      if(inProgress){
-        document.getElementById('hoopBannerText').textContent='Hoop Frenzy live — stake: '+parseFloat(ag.stake||0).toFixed(3)+' XRP';
+      if(ag&&ag.status==='active'){
+        document.getElementById('hoopBannerText').innerHTML=`Hoop game live — stake: <strong>${parseFloat(ag.stake).toFixed(3)} XRP</strong>`;
         document.getElementById('btnHoopResume').onclick=()=>openHoopModal(hoopActiveGid,false);
         banner.classList.add('show');
-      }else banner.classList.remove('show');
-    }else banner.classList.remove('show');
-    // Auto-open modal for P1 when opponent joins (P1 watches only, doesn't call worker)
+      } else banner.classList.remove('show');
+    } else banner.classList.remove('show');
+    // Auto-open for P1 when opponent joins — same as barrel
     gs.forEach(g=>{
       if(g.status==='active'&&g.player1?.uid===me.uid&&!hoopOpen){
         openHoopModal(g.id,false);
       }
     });
     const lobby=document.getElementById('hoopLobby');
-    if(!gs.length){lobby.innerHTML='<div class="lobby-empty"><span class="lobby-empty-icon">🏀</span>No hoop games right now.<br/>Be the first to create one above.</div>';return;}
+    if(!gs.length){
+      lobby.innerHTML='<div class="lobby-empty"><span class="lobby-empty-icon">🏀</span>No hoop games right now.<br/>Be the first to create one above.</div>';
+      return;
+    }
     lobby.innerHTML=gs.map(g=>{
       const isMe=g.player1?.uid===me.uid||g.player2?.uid===me.uid;
       const isP1=g.player1?.uid===me.uid;
@@ -2878,16 +2884,21 @@ function startHoopLobby(){
       const av=ph?`<img class="game-avatar" src="${ph}" alt=""/>`:`<div class="game-avatar-ph">${name.charAt(0).toUpperCase()}</div>`;
       let badge,actions;
       if(g.status==='waiting'){
-        if(isP1){badge=`<span class="sbadge badge-mine">Your game</span>`;actions=`<button class="btn-cancel" onclick="cancelHoopGame('${g.id}',${stake})">Cancel & Refund</button>`;}
-        else{badge=`<span class="sbadge badge-wait">Open</span>`;actions=`<button class="btn-join" onclick="joinHoopGame('${g.id}',${stake})">Join — ${stake.toFixed(3)} XRP</button>`;}
+        if(isP1){
+          badge=`<span class="sbadge badge-mine">Your game</span>`;
+          actions=`<button class="btn-cancel" onclick="cancelHoopGame('${g.id}',${stake})">Cancel & Refund</button>`;
+        }else{
+          badge=`<span class="sbadge badge-wait">Open</span>`;
+          actions=`<button class="btn-join" onclick="joinHoopGame('${g.id}',${stake})">Join — ${stake.toFixed(3)} XRP</button>`;
+        }
       }else{
         badge=`<span class="sbadge badge-act">In Progress</span>`;
-        if(isMe)actions=`<button class="btn-play" onclick="openHoopModal('${g.id}',false)">View</button>`;
+        if(isMe) actions=`<button class="btn-play" onclick="openHoopModal('${g.id}',false)">View</button>`;
         else actions=`<span style="font-family:var(--mono);font-size:10px;color:var(--ink-light)">Closed</span>`;
       }
       return `<div class="game-card ${isMe?(g.status==='active'?'active-game':'my-game'):''}">
         ${av}<div class="game-info"><div class="game-creator">${name}</div>
-        <div class="game-meta">${badge} &nbsp;·&nbsp; ${stake.toFixed(3)} XRP stake</div></div>
+        <div class="game-meta">${badge} &nbsp;·&nbsp; ${stake.toFixed(3)} XRP stake &nbsp;·&nbsp; Pot: ${(stake*2).toFixed(3)} XRP</div></div>
         <div class="game-stake-box"><div class="game-stake-val">${stake.toFixed(3)}</div><div class="game-stake-label">XRP each</div></div>
         <div class="game-actions">${actions}</div>
       </div>`;
@@ -2895,9 +2906,10 @@ function startHoopLobby(){
   });
 }
 
-window.openHoopModal=async function(gid,autoPlay){
-  if(hoopOpen&&hoopGid===gid)return;
-  hoopGid=gid;hoopOpen=true;
+window.openHoopModal=async function(gid, autoPlay){
+  if(hoopOpen && hoopGid===gid) return;
+  hoopGid=gid; hoopOpen=true;
+  // Reset UI
   document.getElementById('hoopResult').style.display='none';
   document.getElementById('btnCloseHoop').style.display='none';
   document.getElementById('hoopStatus').textContent='';
@@ -2905,7 +2917,7 @@ window.openHoopModal=async function(gid,autoPlay){
   document.getElementById('hoopScore1').textContent='0';
   document.getElementById('hoopScore2').textContent='0';
   initHoopWebGL();
-  if(hgl)hgl.start();
+  if(hgl){ hgl.start(); }
   const sn=await getDoc(doc(db,'hoop_games',gid));
   if(!sn.exists()){toast('Game not found','err');hoopOpen=false;return;}
   const g=sn.data();
@@ -2914,76 +2926,105 @@ window.openHoopModal=async function(gid,autoPlay){
   document.getElementById('hoopp2').textContent=isP1?(g.player2?.displayName||'Opponent'):(g.player1?.displayName||'You');
   document.getElementById('hoopSub').textContent='Stake: '+parseFloat(g.stake).toFixed(3)+' XRP each · Winner takes '+(parseFloat(g.stake)*2*0.97).toFixed(3)+' XRP';
   document.getElementById('hoopModal').classList.add('open');
-  if(g.status==='complete'&&g.p1Results){showHoopResult(g,isP1);document.getElementById('btnCloseHoop').style.display='inline-flex';return;}
-  if(g.status==='rolling'&&!g.p1Results){
-    // Game is being processed — just wait for complete
-    document.getElementById('hoopRolling').classList.add('show');
-    document.getElementById('hoopRollLbl').textContent='Shots being calculated...';
-    document.getElementById('hoopModal').classList.add('open');
-    if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
-    hoopGameUnsub=onSnapshot(doc(db,'hoop_games',gid),snap=>{
-      if(!snap.exists())return;
-      const gd=snap.data();
-      if(gd.status==='complete'&&gd.p1Results){
-        document.getElementById('hoopRolling').classList.remove('show');
-        if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
-        showHoopResult(gd,isP1);document.getElementById('btnCloseHoop').style.display='inline-flex';loadBal();
-      }
-    });
+  // Already complete — show result directly
+  if(g.status==='complete'&&g.p1Results){
+    showHoopResult(g, isP1);
+    document.getElementById('btnCloseHoop').style.display='inline-flex';
     return;
   }
   if(autoPlay){
-    // P2: call worker, get results, play animation
-    runHoopGame(gid,isP1);
-  }else{
-    // P1: game is active (opponent just joined) or waiting — watch for complete
-    const statusMsg=g.status==='active'?'Opponent joined! Game starting...':'Waiting for opponent...';
+    // P2: call worker immediately
+    startHoopShots(gid, isP1);
+  } else {
+    // P1: wait for opponent or wait for result
     document.getElementById('hoopRolling').classList.add('show');
-    document.getElementById('hoopRollLbl').textContent=statusMsg;
+    document.getElementById('hoopRollLbl').textContent='Waiting for opponent to join...';
     if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
-    hoopGameUnsub=onSnapshot(doc(db,'hoop_games',gid),snap=>{
-      if(!snap.exists())return;
+    hoopGameUnsub=onSnapshot(doc(db,'hoop_games',gid),(snap)=>{
+      if(!snap.exists()) return;
       const gd=snap.data();
       if(gd.status==='complete'&&gd.p1Results){
-        // Game done — play the animation for P1 too using stored results
         document.getElementById('hoopRolling').classList.remove('show');
         if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
-        const myR=isP1?gd.p1Results:gd.p2Results;
-        const oppR=isP1?gd.p2Results:gd.p1Results;
-        if(hgl){
-          hgl.runGame(myR,oppR).then(()=>{
-            showHoopResult(gd,isP1);
-            document.getElementById('btnCloseHoop').style.display='inline-flex';
-            loadBal();
-          });
-        } else {
-          showHoopResult(gd,isP1);
-          document.getElementById('btnCloseHoop').style.display='inline-flex';
-          loadBal();
-        }
-      }else if(gd.status==='rolling'){
-        document.getElementById('hoopRollLbl').textContent='Calculating shots...';
-      }else if(gd.status==='active'&&gd.player2?.uid){
-        document.getElementById('hoopRollLbl').textContent='Opponent joined! Game starting...';
+        startHoopReveal(gd, isP1);
+      } else if(gd.status==='active'&&gd.player2?.uid){
+        document.getElementById('hoopRollLbl').textContent='Opponent joined! Starting...';
+        if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+        startHoopShots(gid, isP1);
       }
     });
   }
 };
 
-async function runHoopGame(gid,isP1){
+window.closeHoop=function(){
+  document.getElementById('hoopModal').classList.remove('open');
+  if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+  if(hgl) hgl.stop();
+  const ov=document.getElementById('hoopWinOverlay');
+  if(ov) ov.style.display='none';
+  hoopGid=null; hoopOpen=false;
+  loadBal();
+};
+document.getElementById('hoopModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('hoopModal')&&document.getElementById('hoopResult').style.display!=='none') closeHoop();
+});
+
+// Both P1 and P2 call this — worker lock ensures only first caller credits
+async function startHoopShots(gid, isP1){
   document.getElementById('hoopRolling').classList.remove('show');
+  let result=null;
   try{
     const tk=await getToken();
     const r=await fetch(WORKER_URL+'/api/hoop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:tk,gameId:gid})});
     const data=await r.json();
-    if(!data.ok){document.getElementById('hoopStatus').textContent='Error: '+(data.error||'Failed');document.getElementById('btnCloseHoop').style.display='inline-flex';return;}
-    const res=data.result;
-    const myR=isP1?res.p1Results:res.p2Results;
-    const oppR=isP1?res.p2Results:res.p1Results;
-    if(hgl)await hgl.runGame(myR,oppR);
-    showHoopResult({p1Results:res.p1Results,p2Results:res.p2Results,winner:res.winner,winnings:res.winnings,houseCut:res.houseCut},isP1);
-    document.getElementById('btnCloseHoop').style.display='inline-flex';loadBal();
-  }catch(e){document.getElementById('hoopStatus').textContent='Error: '+e.message;document.getElementById('btnCloseHoop').style.display='inline-flex';}
+    if(!data.ok){
+      document.getElementById('hoopStatus').textContent='Error: '+(data.error||'Failed');
+      document.getElementById('btnCloseHoop').style.display='inline-flex';
+      return;
+    }
+    result=data.result;
+  }catch(e){
+    document.getElementById('hoopStatus').textContent='Error: '+e.message;
+    document.getElementById('btnCloseHoop').style.display='inline-flex';
+    return;
+  }
+  const myR  = isP1 ? result.p1Results : result.p2Results;
+  const oppR = isP1 ? result.p2Results : result.p1Results;
+  if(hgl) await hgl.runGame(myR, oppR);
+  showHoopResult({
+    p1Results:result.p1Results, p2Results:result.p2Results,
+    winner:result.winner, winnings:result.winnings, houseCut:result.houseCut
+  }, isP1);
+  document.getElementById('btnCloseHoop').style.display='inline-flex';
+  loadBal();
+}
+
+// P1 sees complete from Firestore — play animation then show result
+async function startHoopReveal(gData, isP1){
+  const myR  = isP1 ? gData.p1Results : gData.p2Results;
+  const oppR = isP1 ? gData.p2Results : gData.p1Results;
+  if(!myR||!myR.length) return;
+  if(hgl) await hgl.runGame(myR, oppR);
+  showHoopResult(gData, isP1);
+  document.getElementById('btnCloseHoop').style.display='inline-flex';
+  loadBal();
+}
+
+function showHoopResult(g, isP1){
+  const myR  = isP1 ? g.p1Results : g.p2Results;
+  const oppR = isP1 ? g.p2Results : g.p1Results;
+  document.getElementById('hoopScore1').textContent=(myR||[]).filter(Boolean).length;
+  document.getElementById('hoopScore2').textContent=(oppR||[]).filter(Boolean).length;
+  const iWin=(isP1&&g.winner==='player1')||(!isP1&&g.winner==='player2');
+  const el=document.getElementById('hoopResult');
+  el.className='hoop-result '+(iWin?'win':'lose');
+  document.getElementById('hoopResTit').className='res-title '+(iWin?'win':'lose');
+  document.getElementById('hoopResTit').textContent=iWin?'🏆 You Win!':'😔 You Lose';
+  document.getElementById('hoopResDet').textContent=iWin
+    ?'You won '+parseFloat(g.winnings||0).toFixed(3)+' XRP! (House: '+parseFloat(g.houseCut||0).toFixed(3)+' XRP)'
+    :'Opponent won. Better luck next time!';
+  el.style.display='block';
+  if(iWin) setTimeout(spawnHoopWinAnimation, 400);
 }
 
 
