@@ -2382,20 +2382,27 @@ let hgl=null;
 function buildHoopScene(canvas, statusElemId){
   const THREE=window.THREE;
   if(!THREE||!canvas) return null;
-  const W=Math.min(460,window.innerWidth-80);
+
+  // Size canvas to its CSS display width
+  const W=canvas.parentElement ? canvas.parentElement.offsetWidth||360 : 360;
   const H=Math.round(W*0.52);
   canvas.width=W; canvas.height=H;
+
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
   renderer.setSize(W,H);
   renderer.shadowMap.enabled=true;
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.1;
+
   const scene=new THREE.Scene();
   scene.background=new THREE.Color(0x5aa8d8);
   scene.fog=new THREE.Fog(0x88c4e8,14,35);
+
   const cam=new THREE.PerspectiveCamera(68,W/H,0.1,60);
-  cam.position.set(0,1.55,2.0); cam.lookAt(0,2.4,-0.8);
+  cam.position.set(0,1.55,2.0);
+  cam.lookAt(0,2.4,-0.8);
+
   scene.add(new THREE.AmbientLight(0xffeedd,0.95));
   const sun=new THREE.DirectionalLight(0xfffacc,2.2);
   sun.position.set(5,12,6); sun.castShadow=true;
@@ -2405,25 +2412,39 @@ function buildHoopScene(canvas, statusElemId){
   sun.shadow.camera.top=10; sun.shadow.camera.bottom=-10;
   scene.add(sun);
   scene.add(new THREE.HemisphereLight(0x88ccff,0x996633,0.7));
+
   // Court
   const court=new THREE.Mesh(new THREE.PlaneGeometry(14,18),new THREE.MeshLambertMaterial({color:0xc87830}));
   court.rotation.x=-Math.PI/2; court.receiveShadow=true; scene.add(court);
   const plankMat=new THREE.MeshBasicMaterial({color:0xa06020,transparent:true,opacity:0.3});
-  for(let x=-6.5;x<=6.5;x+=0.55){const p=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.01,18),plankMat);p.position.set(x,0.005,0);scene.add(p);}
-  // Walls
+  for(let x=-6.5;x<=6.5;x+=0.55){
+    const p=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.01,18),plankMat);
+    p.position.set(x,0.005,0); scene.add(p);
+  }
+  const lMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.5});
+  [[-2,0],[2,0]].forEach(([x,z])=>{
+    const l=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.01,4.5),lMat);
+    l.position.set(x,0.01,z-0.5); scene.add(l);
+  });
+
+  // Arena
+  scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(16,10,0.3),new THREE.MeshLambertMaterial({color:0x3355aa})),{position:{set(x,y,z){this.x=x;this.y=y;this.z=z;return this;}}}));
   const bw=new THREE.Mesh(new THREE.BoxGeometry(16,10,0.3),new THREE.MeshLambertMaterial({color:0x3355aa}));
   bw.position.set(0,5,-8); scene.add(bw);
   const ad=new THREE.Mesh(new THREE.BoxGeometry(8,1.5,0.05),new THREE.MeshLambertMaterial({color:0xff6600}));
   ad.position.set(0,1.5,-7.7); scene.add(ad);
-  [-7,7].forEach(x=>{const sw=new THREE.Mesh(new THREE.BoxGeometry(0.3,10,18),new THREE.MeshLambertMaterial({color:0x224488}));sw.position.set(x,5,0);scene.add(sw);});
+  [-7,7].forEach(x=>{
+    const sw=new THREE.Mesh(new THREE.BoxGeometry(0.3,10,18),new THREE.MeshLambertMaterial({color:0x224488}));
+    sw.position.set(x,5,0); scene.add(sw);
+  });
   const ceil=new THREE.Mesh(new THREE.PlaneGeometry(14,18),new THREE.MeshLambertMaterial({color:0x1a1a2e}));
   ceil.rotation.x=Math.PI/2; ceil.position.y=9; scene.add(ceil);
   [[-3,8.8,0],[3,8.8,0],[0,8.8,-3],[0,8.8,-6]].forEach(([x,y,z])=>{
     const lf=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.1,0.8),new THREE.MeshBasicMaterial({color:0xffffcc}));
     lf.position.set(x,y,z); scene.add(lf);
-    const al=new THREE.PointLight(0xfff8cc,0.6,8); al.position.set(x,y-0.2,z); scene.add(al);
+    const al=new THREE.PointLight(0xfff8cc,0.6,8);
+    al.position.set(x,y-0.2,z); scene.add(al);
   });
-  // Crowd
   [-7.5,7.5].forEach(sx=>{
     const st=new THREE.Mesh(new THREE.BoxGeometry(1.5,3,14),new THREE.MeshLambertMaterial({color:0x222244}));
     st.position.set(sx,1.5,0); scene.add(st);
@@ -2433,58 +2454,122 @@ function buildHoopScene(canvas, statusElemId){
       hd.position.set(sx+(sx>0?-0.4:0.4),0.7+row*0.85,-3.5+col*0.88); scene.add(hd);
     }
   });
-  // Hoop
-  const RIM_R=0.225,RIM_T=0.025,BALL_R=0.225;
-  const HOOP_WY=2.44,HOOP_WZ=-0.8;
+
+  // Hoop — close and prominent
+  const RIM_R=0.225, RIM_T=0.025, BALL_R=0.225;
+  const POLE_Z=-0.8;  // pole base Z
+  const RIM_Z=POLE_Z; // rim same Z as pole (arm extends overhead)
+  const RIM_Y=2.44;
   const poleMat=new THREE.MeshLambertMaterial({color:0x999999});
   const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,3.05,8),poleMat);
-  pole.position.set(0,1.52,-0.8); pole.castShadow=true; scene.add(pole);
-  const arm=new THREE.Mesh(new THREE.BoxGeometry(0.07,0.07,0.5),poleMat);
-  arm.position.set(0,3.1,-0.8-0.24); scene.add(arm);
+  pole.position.set(0,1.52,POLE_Z); pole.castShadow=true; scene.add(pole);
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(0.07,0.07,0.45),poleMat);
+  arm.position.set(0,3.1,POLE_Z-0.22); scene.add(arm);
   const bd=new THREE.Mesh(new THREE.BoxGeometry(1.7,1.05,0.05),new THREE.MeshLambertMaterial({color:0xf8f8f8,transparent:true,opacity:0.9}));
-  bd.position.set(0,3.1,-0.8); scene.add(bd);
+  bd.position.set(0,3.1,POLE_Z); scene.add(bd);
   const bdE=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.7,1.05,0.05)),new THREE.LineBasicMaterial({color:0xff2200}));
-  bdE.position.set(0,3.1,-0.8); scene.add(bdE);
+  bdE.position.set(0,3.1,POLE_Z); scene.add(bdE);
+  const sq=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(0.58,0.42,0.01)),new THREE.LineBasicMaterial({color:0xff2200}));
+  sq.position.set(0,2.78,POLE_Z+0.03); scene.add(sq);
   const rim=new THREE.Mesh(new THREE.TorusGeometry(RIM_R,RIM_T,10,32),new THREE.MeshLambertMaterial({color:0xff5500}));
-  rim.rotation.x=Math.PI/2; rim.position.set(0,HOOP_WY,HOOP_WZ); rim.castShadow=true; scene.add(rim);
+  rim.rotation.x=Math.PI/2; rim.position.set(0,RIM_Y,RIM_Z-0.02); rim.castShadow=true; scene.add(rim);
+  // Net
   const nMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.75});
   for(let i=0;i<12;i++){
     const a=(i/12)*Math.PI*2;
-    const ns=new THREE.Mesh(new THREE.CylinderGeometry(0.005,0.005,0.38,3),nMat);
-    ns.position.set(Math.cos(a)*0.22,HOOP_WY-0.19,HOOP_WZ+Math.sin(a)*0.22);
-    ns.rotation.x=Math.cos(a)*0.15; ns.rotation.z=-Math.sin(a)*0.15; scene.add(ns);
+    const ns=new THREE.Mesh(new THREE.CylinderGeometry(0.005,0.005,0.36,3),nMat);
+    ns.position.set(Math.cos(a)*0.22,RIM_Y-0.18,RIM_Z-0.02+Math.sin(a)*0.22);
+    ns.rotation.x=Math.cos(a)*0.12; ns.rotation.z=-Math.sin(a)*0.12; scene.add(ns);
   }
   const nb=new THREE.Mesh(new THREE.TorusGeometry(0.13,0.01,4,16),nMat);
-  nb.rotation.x=Math.PI/2; nb.position.set(0,HOOP_WY-0.38,HOOP_WZ); scene.add(nb);
+  nb.rotation.x=Math.PI/2; nb.position.set(0,RIM_Y-0.36,RIM_Z-0.02); scene.add(nb);
+
+  // World-space rim centre (what physics aims at)
+  const RWX=0, RWY=RIM_Y, RWZ=RIM_Z-0.02;
+
   // Ball
   const ballMesh=new THREE.Mesh(new THREE.SphereGeometry(BALL_R,16,12),new THREE.MeshLambertMaterial({color:0xe55a00}));
   ballMesh.castShadow=true; scene.add(ballMesh);
-  const sMat2=new THREE.MeshBasicMaterial({color:0x1a0800});
-  const seam1=new THREE.Mesh(new THREE.TorusGeometry(BALL_R+0.003,0.009,4,22),sMat2);
-  seam1.rotation.x=Math.PI/2; scene.add(seam1);
-  const seam2=new THREE.Mesh(new THREE.TorusGeometry(BALL_R+0.003,0.009,4,22),sMat2); scene.add(seam2);
+  const sMat=new THREE.MeshBasicMaterial({color:0x1a0800});
+  const seams=[];
+  [Math.PI/2,0,0].forEach((rx,i)=>{
+    const s=new THREE.Mesh(new THREE.TorusGeometry(BALL_R+0.003,0.009,4,22),sMat);
+    if(i===0)s.rotation.x=rx; if(i===2)s.rotation.y=Math.PI/2;
+    scene.add(s); seams.push(s);
+  });
   const gshMat=new THREE.MeshBasicMaterial({color:0x000,transparent:true,opacity:0.18});
-  const gshMesh=new THREE.Mesh(new THREE.CircleGeometry(0.28,14),gshMat);
-  gshMesh.rotation.x=-Math.PI/2; gshMesh.position.y=0.008; scene.add(gshMesh);
+  const gsh=new THREE.Mesh(new THREE.CircleGeometry(0.28,14),gshMat);
+  gsh.rotation.x=-Math.PI/2; gsh.position.y=0.008; scene.add(gsh);
   const armM=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.2,0.42),new THREE.MeshLambertMaterial({color:0xc09060}));
   armM.position.set(0.28,-0.3,-0.05); cam.add(armM); scene.add(cam);
   const flashL=new THREE.PointLight(0xffcc44,0,6);
   flashL.position.set(0,0,-0.8); cam.add(flashL);
-  const BSTART={x:0,y:0.9,z:2.0};
-  const BP={x:BSTART.x,y:BSTART.y,z:BSTART.z,vx:0,vy:0,vz:0,rx:0,ry:0,rz:0,arx:0,ary:0,arz:0,active:false,scored:false,willScore:false};
+
+  // Ball start pos
+  const BSX=0, BSY=1.0, BSZ=1.6;
+
+  // ── PHYSICS STATE ──
+  // All physics is self-contained and time-stepped in tick()
+  // playRound just sets willScore + resets, then waits on a promise
+  const BP={
+    x:BSX,y:BSY,z:BSZ,
+    vx:0,vy:0,vz:0,
+    rx:0,ry:0,rz:0,
+    arx:0,ary:0,arz:0,
+    active:false,
+    scored:false,
+    willScore:false,
+    rimHits:0
+  };
+  let roundResolve=null; // called when round ends
+
   function syncBall(){
-    ballMesh.position.set(BP.x,BP.y,BP.z); ballMesh.rotation.set(BP.rx,BP.ry,BP.rz);
-    seam1.position.set(BP.x,BP.y,BP.z); seam1.rotation.x=BP.rx; seam1.rotation.y=BP.ry;
-    seam2.position.set(BP.x,BP.y,BP.z); seam2.rotation.y=BP.ry;
-    gshMesh.position.x=BP.x; gshMesh.position.z=BP.z;
-    gshMesh.material.opacity=Math.max(0.02,0.18-(BP.y-BALL_R)*0.05);
+    ballMesh.position.set(BP.x,BP.y,BP.z);
+    ballMesh.rotation.set(BP.rx,BP.ry,BP.rz);
+    seams.forEach(s=>{s.position.set(BP.x,BP.y,BP.z);s.rotation.x=BP.rx;s.rotation.y=BP.ry;});
+    gsh.position.x=BP.x; gsh.position.z=BP.z;
+    gsh.material.opacity=Math.max(0.02,0.18-(BP.y-BALL_R)*0.04);
   }
+
   function resetBP(){
-    BP.x=BSTART.x;BP.y=BSTART.y;BP.z=BSTART.z;
-    BP.vx=0;BP.vy=0;BP.vz=0;BP.rx=0;BP.ry=0;BP.rz=0;
-    BP.arx=0;BP.ary=0;BP.arz=0;BP.active=false;BP.scored=false;BP.willScore=false;
+    BP.x=BSX;BP.y=BSY;BP.z=BSZ;
+    BP.vx=0;BP.vy=0;BP.vz=0;
+    BP.rx=0;BP.ry=0;BP.rz=0;
+    BP.arx=0;BP.ary=0;BP.arz=0;
+    BP.active=false;BP.scored=false;BP.willScore=false;BP.rimHits=0;
     syncBall();
   }
+
+  // ── LAUNCH — all velocities in world units per second, then converted to per-frame ──
+  // Real basketball physics: gravity ~9.8 m/s². Here 1 world unit ≈ 1 meter.
+  // We use G=9.8 and integrate with dt per tick.
+  // To get a nice arc: choose flight time T, solve vx/vz and vy analytically.
+  // Peak height = start_y + vy²/(2*G), which should be well above rim.
+
+  const GRAV = 9.8; // m/s² in world units
+
+  function launchToward(tx,ty,tz, arcExtra, lateralJitter){
+    // arcExtra: extra seconds of hang time (makes the arc higher)
+    // lateralJitter: random offset in x
+    const jx=(Math.random()-0.5)*lateralJitter;
+    tx+=jx;
+    const dx=tx-BP.x, dy=ty-BP.y, dz=tz-BP.z;
+    // Horizontal distance
+    const horiz=Math.sqrt(dx*dx+dz*dz);
+    // Choose flight time so ball travels at roughly 5-7 m/s horizontal
+    const horizSpeed=5.5;
+    const T=Math.max(0.5, horiz/horizSpeed + arcExtra);
+    BP.vx=dx/T;
+    BP.vz=dz/T;
+    // vy from kinematic equation: y = y0 + vy*T - 0.5*G*T²
+    BP.vy=(dy + 0.5*GRAV*T*T)/T;
+    // Backspin proportional to forward speed
+    BP.arx=-Math.abs(BP.vz)*2.5;
+    BP.ary=(Math.random()-0.5)*0.8;
+    BP.arz=0;
+    BP.active=true;
+  }
+
   const SCORE_SHOTS=['swish','bank','rattle','layup','fadeaway'];
   const MISS_SHOTS=['airball','overthrow','brickfront','brickside','short','rattle_out','backboard_long'];
   let lastSc='',lastMs='';
@@ -2492,105 +2577,193 @@ function buildHoopScene(canvas, statusElemId){
     if(ws){const o=SCORE_SHOTS.filter(s=>s!==lastSc);const t=o[Math.floor(Math.random()*o.length)];lastSc=t;return t;}
     else{const o=MISS_SHOTS.filter(s=>s!==lastMs);const t=o[Math.floor(Math.random()*o.length)];lastMs=t;return t;}
   }
-  function launch(ws,sType){
-    const G=0.016;
-    const RWX=0,RWY=HOOP_WY,RWZ=HOOP_WZ;
-    let tx,ty,tz,frames;
+
+  function launch(ws, sType){
+    BP.willScore=ws;
     if(ws){
       switch(sType){
-        case 'swish':  tx=RWX;ty=RWY+0.02;tz=RWZ;frames=60;break;
-        case 'bank':   tx=RWX+(Math.random()-0.5)*0.1;ty=RWY+0.05;tz=RWZ+0.02;frames=65;break;
-        case 'rattle': tx=RWX+(Math.random()-0.5)*0.04;ty=RWY+0.05;tz=RWZ-(RIM_R-0.03);frames=54;break;
-        case 'layup':  tx=RWX+(Math.random()-0.5)*0.05;ty=RWY+0.03;tz=RWZ;frames=72;break;
-        default:       tx=RWX+(Math.random()>0.5?0.05:-0.05);ty=RWY+0.02;tz=RWZ;frames=58;
+        case 'swish':
+          // Straight in, moderate arc
+          launchToward(RWX, RWY+0.05, RWZ, 0.15, 0.04); break;
+        case 'bank':
+          // Higher arc, ball hits backboard and drops through
+          launchToward(RWX+(Math.random()-0.5)*0.15, RWY+0.3, RWZ+0.18, 0.25, 0.05); break;
+        case 'rattle':
+          // Aimed at front rim edge — rim collision deflects it in
+          launchToward(RWX+(Math.random()-0.5)*0.05, RWY+0.04, RWZ-RIM_R*0.9, 0.1, 0.03); break;
+        case 'layup':
+          // Very high floater arc
+          launchToward(RWX+(Math.random()-0.5)*0.04, RWY+0.05, RWZ, 0.45, 0.03); break;
+        default: // fadeaway
+          launchToward(RWX+(Math.random()>0.5?0.06:-0.06), RWY+0.04, RWZ, 0.12, 0.04); break;
       }
     } else {
       switch(sType){
-        case 'airball':    tx=RWX+(Math.random()>0.5?1:-1)*(RIM_R*2.2+Math.random()*0.5);ty=RWY+Math.random()*0.4;tz=RWZ+(Math.random()-0.5)*0.5;frames=50;break;
-        case 'overthrow':  tx=RWX+(Math.random()-0.5)*0.3;ty=RWY+1.2;tz=RWZ-1.2;frames=48;break;
-        case 'brickfront': tx=RWX+(Math.random()-0.5)*0.05;ty=RWY-0.14;tz=RWZ-RIM_R*1.05;frames=46;break;
-        case 'brickside':  {const sd=Math.random()>0.5?1:-1;tx=RWX+sd*(RIM_R*1.05);ty=RWY-0.1;tz=RWZ+(Math.random()-0.5)*0.08;frames=50;break;}
-        case 'short':      tx=RWX+(Math.random()-0.5)*0.4;ty=RWY-1.2;tz=RWZ+0.8;frames=40;break;
-        case 'rattle_out': tx=RWX+(Math.random()-0.5)*0.06;ty=RWY-0.05;tz=RWZ+0.01;frames=56;break;
-        default:           tx=RWX+(Math.random()-0.5)*0.2;ty=RWY+0.8;tz=RWZ+0.3;frames=52;
+        case 'airball':
+          // Wide — doesn't touch rim at all
+          launchToward(RWX+(Math.random()>0.5?1:-1)*(RIM_R*2.5+Math.random()*0.4), RWY+(Math.random()-0.5)*0.6, RWZ, 0.0, 0); break;
+        case 'overthrow':
+          // Sails over backboard entirely
+          launchToward(RWX+(Math.random()-0.5)*0.3, RWY+1.4, RWZ-1.5, 0.3, 0.1); break;
+        case 'brickfront':
+          // Hits the front face of rim hard — bounces back
+          launchToward(RWX+(Math.random()-0.5)*0.04, RWY-0.12, RWZ-RIM_R*1.1, -0.05, 0.02); break;
+        case 'brickside':
+          // Hits side of rim
+          {const sd=Math.random()>0.5?1:-1;
+          launchToward(RWX+sd*(RIM_R*1.1), RWY-0.1, RWZ, 0.0, 0.02); break;}
+        case 'short':
+          // Doesn't reach rim — falls short onto floor
+          launchToward(RWX+(Math.random()-0.5)*0.3, RWY-1.0, RWZ+0.9, -0.2, 0.1); break;
+        case 'rattle_out':
+          // Enters rim area but hits inner back of rim and pops out
+          launchToward(RWX+(Math.random()-0.5)*0.04, RWY-0.04, RWZ+RIM_R*0.4, 0.08, 0.03); break;
+        default: // backboard_long — hits high on board, bounces long
+          launchToward(RWX+(Math.random()-0.5)*0.2, RWY+0.9, RWZ+0.25, 0.2, 0.1); break;
       }
     }
-    const dx=tx-BP.x,dy=ty-BP.y,dz=tz-BP.z;
-    BP.vx=dx/frames;BP.vz=dz/frames;
-    BP.vy=(dy+0.5*G*frames*frames)/frames;
-    BP.arx=-(Math.abs(BP.vz)+Math.abs(BP.vx))*5.0;
-    BP.ary=(Math.random()-0.5)*0.06;
-    BP.active=true;BP.willScore=ws;
   }
-  function stepPhys(){
-    if(!BP.active)return;
-    const G=0.016,RWX=0,RWY=HOOP_WY,RWZ=HOOP_WZ;
-    BP.vy-=G;BP.x+=BP.vx;BP.y+=BP.vy;BP.z+=BP.vz;
-    BP.rx+=BP.arx;BP.ry+=BP.ary;BP.rz+=BP.arz;
-    BP.arx*=0.992;BP.ary*=0.992;BP.arz*=0.992;
-    const bx=BP.x-RWX,bz=BP.z-RWZ,hd=Math.sqrt(bx*bx+bz*bz);
-    const toR=hd-RIM_R,dyR=BP.y-RWY,dTube=Math.sqrt(toR*toR+dyR*dyR);
-    if(dTube<RIM_T+BALL_R+0.01&&hd>0.01){
-      const nx=bx/hd,nz=bz/hd;
-      const rpx=RWX+nx*RIM_R,rpy=RWY,rpz=RWZ+nz*RIM_R;
-      let cnx=BP.x-rpx,cny=BP.y-rpy,cnz=BP.z-rpz;
+
+  // ── PHYSICS STEP — dt in seconds ──
+  function stepPhys(dt){
+    if(!BP.active) return;
+
+    // Integrate position
+    BP.vy -= GRAV*dt;
+    BP.x += BP.vx*dt;
+    BP.y += BP.vy*dt;
+    BP.z += BP.vz*dt;
+    BP.rx += BP.arx*dt;
+    BP.ry += BP.ary*dt;
+    BP.rz += BP.arz*dt;
+    // Spin decay
+    BP.arx *= Math.pow(0.985, dt*60);
+    BP.ary *= Math.pow(0.985, dt*60);
+
+    // ── RIM COLLISION (torus) ──
+    const bx=BP.x-RWX, bz=BP.z-RWZ;
+    const hd=Math.sqrt(bx*bx+bz*bz);
+    const toR=hd-RIM_R, dyR=BP.y-RWY;
+    const dTube=Math.sqrt(toR*toR+dyR*dyR);
+
+    if(dTube < RIM_T+BALL_R && hd>0.001){
+      const nx=bx/hd, nz=bz/hd;
+      const rpx=RWX+nx*RIM_R, rpy=RWY, rpz=RWZ+nz*RIM_R;
+      let cnx=BP.x-rpx, cny=BP.y-rpy, cnz=BP.z-rpz;
       const cL=Math.sqrt(cnx*cnx+cny*cny+cnz*cnz)||0.001;
-      cnx/=cL;cny/=cL;cnz/=cL;
+      cnx/=cL; cny/=cL; cnz/=cL;
       const vN=BP.vx*cnx+BP.vy*cny+BP.vz*cnz;
       if(vN<0){
-        const R2=0.50;
-        BP.vx-=(1+R2)*vN*cnx;BP.vy-=(1+R2)*vN*cny;BP.vz-=(1+R2)*vN*cnz;
-        BP.vx*=0.75;BP.vz*=0.75;
-        BP.arx+=(Math.random()-0.5)*0.25;BP.ary+=(Math.random()-0.5)*0.12;
-        const pen=(RIM_T+BALL_R+0.005)-dTube;
-        BP.x+=cnx*pen;BP.y+=cny*pen;BP.z+=cnz*pen;
+        const restitution=0.52;
+        BP.vx-=(1+restitution)*vN*cnx;
+        BP.vy-=(1+restitution)*vN*cny;
+        BP.vz-=(1+restitution)*vN*cnz;
+        // Friction on tangential velocity
+        BP.vx*=0.78; BP.vz*=0.78;
+        BP.arx+=(Math.random()-0.5)*3;
+        BP.ary+=(Math.random()-0.5)*1.5;
+        const pen=(RIM_T+BALL_R+0.002)-dTube;
+        BP.x+=cnx*pen; BP.y+=cny*pen; BP.z+=cnz*pen;
+        BP.rimHits++;
       }
     }
-    if(!BP.scored&&BP.willScore&&BP.vy<0&&BP.y>HOOP_WY-0.14&&BP.y<HOOP_WY+0.08&&hd<RIM_R-BALL_R*0.5){
-      BP.scored=true;
+
+    // ── BACKBOARD COLLISION ──
+    // Backboard at z=POLE_Z, spans x=-0.85 to +0.85, y=2.55 to 3.62
+    if(BP.z > POLE_Z-BALL_R && BP.z < POLE_Z+0.05 &&
+       Math.abs(BP.x) < 0.85 && BP.y>2.55 && BP.y<3.62 && BP.vz>0){
+      BP.z=POLE_Z-BALL_R-0.002;
+      BP.vz=-BP.vz*0.55;
+      BP.vx*=0.80;
+      BP.arx+=(Math.random()-0.5)*2;
     }
-    if(BP.y<BALL_R){BP.y=BALL_R;BP.vy=-BP.vy*0.42;BP.vx*=0.70;BP.vz*=0.70;BP.arx*=0.55;BP.arz*=0.55;if(Math.abs(BP.vy)<0.008)BP.vy=0;}
+
+    // ── THROUGH BASKET — only if willScore ──
+    if(!BP.scored && BP.willScore && BP.vy<0 &&
+       BP.y > RWY-0.15 && BP.y < RWY+0.1 &&
+       hd < RIM_R-BALL_R*0.45){
+      BP.scored=true;
+      if(roundResolve){roundResolve('scored');roundResolve=null;}
+    }
+
+    // ── FLOOR ──
+    if(BP.y < BALL_R){
+      BP.y=BALL_R;
+      BP.vy=-BP.vy*0.38;
+      BP.vx*=0.68; BP.vz*=0.68;
+      BP.arx*=0.5; BP.arz*=0.5;
+      if(Math.abs(BP.vy)<0.05) BP.vy=0;
+      // If ball has reached floor and round not yet resolved, it's a miss
+      if(roundResolve && !BP.scored){roundResolve('floor');roundResolve=null;}
+    }
+
+    // Out of bounds behind hoop
+    if(BP.z < RWZ-1.5 && BP.y < RWY-0.5){
+      if(roundResolve){roundResolve('out');roundResolve=null;}
+    }
+
     syncBall();
   }
-  const HINTS={swish:'🎯 SWISH!',bank:'🏦 BANK SHOT!',rattle:'💫 RATTLES IN!',layup:'🕊️ FLOATER!',fadeaway:'↩️ FADEAWAY!',airball:'💨 AIR BALL!',overthrow:'📈 TOO LONG!',brickfront:'💥 BRICK!',brickside:'📐 SIDE RIM!',short:'📉 SHORT!',rattle_out:'🔄 RATTLES OUT!',backboard_long:'🧱 OFF BACKBOARD!'};
+
+  const HINTS={
+    swish:'🎯 SWISH!',bank:'🏦 BANK SHOT!',rattle:'💫 RATTLES IN!',
+    layup:'🕊️ FLOATER!',fadeaway:'↩️ FADEAWAY!',
+    airball:'💨 AIR BALL!',overthrow:'📈 TOO LONG!',
+    brickfront:'💥 BRICK!',brickside:'📐 SIDE RIM!',
+    short:'📉 SHORT!',rattle_out:'🔄 RATTLES OUT!',backboard_long:'🧱 OFF BOARD!'
+  };
   function setS(txt){const el=document.getElementById(statusElemId);if(el)el.textContent=txt;}
   function sl(ms){return new Promise(r=>setTimeout(r,ms));}
-  let aphysics=false;
+
   async function playRound(ws){
-    resetBP();flashL.intensity=1.4;
+    resetBP(); flashL.intensity=1.4;
     const sType=pickType(ws);
-    launch(ws,sType);aphysics=true;
-    for(let f=0;f<280;f++){
-      await sl(16);
-      if(BP.scored)break;
-      if(BP.y<=BALL_R+0.01&&f>90)break;
-      if(BP.z<HOOP_WZ-1.5&&BP.y<HOOP_WY-0.6)break;
-    }
+    launch(ws, sType);
+    // Wait for physics to resolve via promise
+    const result=await new Promise(res=>{
+      roundResolve=res;
+      // Safety timeout 5s
+      setTimeout(()=>{if(roundResolve){roundResolve('timeout');roundResolve=null;}},5000);
+    });
     setS(HINTS[sType]||'');
-    await sl(700);aphysics=false;await sl(150);resetBP();
+    await sl(900); // Let ball bounce/settle visibly
+    BP.active=false;
+    await sl(200);
+    resetBP();
   }
-  let active=true,tVal=0,lastTs=null;
+
+  // ── RENDER LOOP — single RAF, delta-time ──
+  let active=true, tVal=0, lastTs=null;
   function tick(ts){
-    if(!active)return;
+    if(!active) return;
     requestAnimationFrame(tick);
-    // Delta-time capped at 33ms to prevent spiral on tab-switch
-    const dt=lastTs?Math.min((ts-lastTs)/1000,0.033):0.016;
+    const dt=lastTs ? Math.min((ts-lastTs)/1000, 0.05) : 0.016;
     lastTs=ts;
-    // Accumulate in fixed 16ms steps to keep physics deterministic
-    const steps=Math.round(dt/0.016);
-    const N=Math.max(1,Math.min(steps,2));
     tVal+=dt;
-    if(flashL.intensity>0)flashL.intensity*=Math.pow(0.88,N);
-    if(!BP.active&&!aphysics){
-      ballMesh.position.y=BSTART.y+Math.sin(tVal*1.4)*0.028;
-      seam1.position.y=ballMesh.position.y;seam2.position.y=ballMesh.position.y;
-      ballMesh.rotation.y+=0.007*N;seam1.rotation.y+=0.007*N;seam2.rotation.y+=0.007*N;
+    if(flashL.intensity>0) flashL.intensity=Math.max(0,flashL.intensity-dt*8);
+    if(!BP.active){
+      // Idle bob
+      const bobY=BSY+Math.sin(tVal*1.4)*0.025;
+      ballMesh.position.set(BSX,bobY,BSZ);
+      seams.forEach(s=>{s.position.set(BSX,bobY,BSZ);});
+      ballMesh.rotation.y+=dt*0.4;
+      seams.forEach(s=>{s.rotation.y+=dt*0.4;});
+      gsh.position.set(BSX,0.008,BSZ);
+      gsh.material.opacity=0.15;
+    } else {
+      stepPhys(dt);
     }
-    if(aphysics){for(let i=0;i<N;i++)stepPhys();}
     renderer.render(scene,cam);
   }
-  tick();
-  return{playRound,resetBP,setStatus:setS,stop(){active=false;},start(){active=true;tick();}};
+  tick(0);
+
+  return{
+    playRound,
+    resetBP,
+    setStatus:setS,
+    stop(){active=false; lastTs=null;},
+    start(){if(!active){active=true;lastTs=null;tick(performance.now());}}
+  };
 }
 
 function initHoopWebGL(){
@@ -2818,19 +2991,18 @@ let hoopFwScene=null,hoopFwRenderer=null,hoopFwAnim=null;
 function spawnHoopWinAnimation(){
   const THREE=window.THREE;
   if(!THREE)return;
-  // Use scene1 from hgl if available — overlay fireworks on it
-  // Otherwise create a small overlay canvas in the modal
   const modal=document.getElementById('hoopModal');
   let overlay=document.getElementById('hoopWinOverlay');
+  if(overlay){overlay.style.display='block'; overlay.width=overlay.width;} // reset
   if(!overlay){
     overlay=document.createElement('canvas');
     overlay.id='hoopWinOverlay';
-    overlay.style.cssText='position:absolute;top:0;left:0;width:100%;height:180px;pointer-events:none;z-index:10;border-radius:10px;';
-    const bm=modal.querySelector('.battle-modal');
-    if(bm){bm.style.position='relative';bm.appendChild(overlay);}
+    overlay.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;';
+    document.body.appendChild(overlay);
   }
-  const W=overlay.offsetWidth||400,H=180;
-  overlay.width=W;overlay.height=H;
+  const W=window.innerWidth, H=window.innerHeight;
+  overlay.width=W; overlay.height=H;
+  overlay.style.display='block';
   if(hoopFwRenderer){try{hoopFwRenderer.dispose();}catch(e){}}
   const renderer=new THREE.WebGLRenderer({canvas:overlay,antialias:true,alpha:true});
   renderer.setSize(W,H);renderer.setClearColor(0x000000,0);
@@ -2951,6 +3123,8 @@ window.closeHoop=function(){
   document.getElementById('hoopModal').classList.remove('open');
   if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
   if(hgl)hgl.stop();
+  const ov=document.getElementById('hoopWinOverlay');
+  if(ov)ov.style.display='none';
   hoopGid=null;hoopOpen=false;loadBal();
 };
 document.getElementById('hoopModal').addEventListener('click',e=>{
