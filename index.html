@@ -533,6 +533,36 @@
     .dstat-label{font-family:var(--mono);font-size:8px;
       color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;}
 
+    /* ── HOOP FRENZY ── */
+    #hoopContent{display:none;}
+    #hoopContent.active{display:block;}
+    .hoop-page-header{
+      background:linear-gradient(135deg,#0d1b2e,#1a3a6b,#0a2d6b);
+      border-radius:16px;padding:24px 28px;margin-bottom:28px;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:16px;position:relative;overflow:hidden;}
+    .hoop-page-header::before{content:'🏀';position:absolute;right:20px;top:50%;
+      transform:translateY(-50%);font-size:80px;opacity:0.07;pointer-events:none;}
+    .hoop-page-title{font-family:var(--serif);font-size:26px;color:white;margin-bottom:4px;}
+    .hoop-page-sub{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.4);line-height:1.6;}
+    .hoop-page-back{display:inline-flex;align-items:center;gap:6px;
+      font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.5);
+      background:none;border:none;cursor:pointer;padding:0;margin-bottom:8px;transition:color 0.15s;}
+    .hoop-page-back:hover{color:white;}
+    .hoop-create-card{background:white;border:1px solid var(--border);border-radius:16px;
+      padding:24px 28px;margin-bottom:28px;box-shadow:0 2px 16px rgba(30,58,95,0.06);}
+    .hoop-create-head{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+    .hoop-create-icon{width:32px;height:32px;border-radius:8px;
+      background:linear-gradient(135deg,var(--blue-50),var(--blue-100));
+      border:1px solid var(--blue-200);display:flex;align-items:center;justify-content:center;font-size:16px;}
+    .hoop-lobby{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
+    .hoop-result{text-align:center;padding:14px;border-radius:12px;margin-bottom:16px;display:none;}
+    .hoop-result.win{background:var(--green-bg);border:1px solid var(--green-border);}
+    .hoop-result.lose{background:var(--red-bg);border:1px solid var(--red-border);}
+    .game-entry-card-banner-hoop{position:absolute;inset:0;
+      background:linear-gradient(135deg,#0d1b2e,#1a3a6b);
+      display:flex;align-items:center;justify-content:center;gap:14px;}
+
     @media(max-width:640px){
       .home-hero{padding:24px 20px;}
       .games-grid{grid-template-columns:1fr;}
@@ -634,6 +664,13 @@
         <span class="drawer-nav-badge">Live</span>
       </a>
     </li>
+    <li>
+      <a href="#" id="drawerNavHoop" onclick="navTo('hoop');closeDrawer();">
+        <span class="drawer-nav-icon">🏀</span>
+        Hoop Frenzy
+        <span class="drawer-nav-badge">Live</span>
+      </a>
+    </li>
   </ul>
   <div class="drawer-bottom">
     <button class="drawer-signout" id="drawerSignOut" style="display:none">
@@ -652,7 +689,7 @@
       <polygon fill="#000" points="33.391,411.826 0,411.826 0,512 445.217,512 445.217,478.609 33.391,478.609"/>
       <polygon fill="#000" points="411.826,33.391 411.826,0 0,0 0,100.174 33.391,100.174 33.391,33.391"/>
     </svg>
-    <span class="logo-sub">games</span>
+    <span class="logo-sub">dice</span>
   </a>
   <div class="hbal" id="hbal">
     <div class="hbal-chip" id="btnDeposit" title="Open Wallet">
@@ -798,9 +835,62 @@
           </button>
         </div>
       </div>
+      <!-- Hoop Frenzy Card -->
+      <div class="game-entry-card" onclick="navTo('hoop')">
+        <div class="game-entry-card-banner">
+          <div class="game-entry-card-banner-hoop">
+            <!-- Basketball SVG -->
+            <svg width="38" height="38" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-8deg)">
+              <circle cx="50" cy="50" r="46" fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+              <path d="M50 4 Q50 50 50 96" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" fill="none"/>
+              <path d="M4 50 Q50 50 96 50" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" fill="none"/>
+              <path d="M15 20 Q50 55 85 80" stroke="rgba(255,255,255,0.2)" stroke-width="2" fill="none"/>
+              <path d="M15 80 Q50 45 85 20" stroke="rgba(255,255,255,0.2)" stroke-width="2" fill="none"/>
+            </svg>
+            <!-- Hoop/basket SVG -->
+            <svg width="52" height="52" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <!-- Backboard -->
+              <rect x="25" y="5" width="50" height="32" rx="2" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+              <rect x="36" y="12" width="28" height="18" rx="1" fill="none" stroke="rgba(255,80,0,0.7)" stroke-width="2"/>
+              <!-- Pole -->
+              <rect x="47" y="37" width="6" height="28" fill="rgba(255,255,255,0.25)"/>
+              <!-- Rim -->
+              <ellipse cx="50" cy="66" rx="22" ry="5" fill="none" stroke="rgba(255,120,0,0.9)" stroke-width="3"/>
+              <!-- Net lines -->
+              <line x1="28" y1="66" x2="32" y2="88" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="50" y1="71" x2="50" y2="92" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="72" y1="66" x2="68" y2="88" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="36" y1="68" x2="37" y2="90" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+              <line x1="64" y1="68" x2="63" y2="90" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+              <path d="M32 88 Q50 95 68 88" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            </svg>
+            <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(10deg);opacity:0.7">
+              <circle cx="50" cy="50" r="46" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+              <path d="M50 4 Q50 50 50 96" stroke="rgba(255,255,255,0.25)" stroke-width="2.5" fill="none"/>
+              <path d="M4 50 Q50 50 96 50" stroke="rgba(255,255,255,0.25)" stroke-width="2.5" fill="none"/>
+            </svg>
+          </div>
+          <div class="game-entry-card-glow"></div>
+          <div class="game-entry-card-live"><span class="live-dot"></span>Live</div>
+        </div>
+        <div class="game-entry-card-body">
+          <div class="game-entry-card-title">Hoop Frenzy 🏀</div>
+          <div class="game-entry-card-desc">
+            3 rounds, best of 3. Both players shoot — swish, bank, rattle or brick. Server-side RNG, fireworks on win.
+          </div>
+          <div class="game-entry-card-tags">
+            <span class="game-tag game-tag-blue">2 Players</span>
+            <span class="game-tag game-tag-xrp">XRP Stakes</span>
+            <span class="game-tag game-tag-green">3 Rounds</span>
+          </div>
+          <button class="btn-play-now">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play Now
+          </button>
+        </div>
+      </div>
     </div>
   </div>
-  <div id="gameContent">
     <!-- Dark header banner for dice page -->
     <div class="dice-page-header">
       <div class="dice-page-header-left">
@@ -940,6 +1030,104 @@
       <button class="btn-close-battle" id="btnCloseBarrel" style="display:none" onclick="closeBarrel()">Close</button>
     </div>
     <div class="bstatus" id="barrelStatus"></div>
+  </div>
+</div>
+
+  <!-- HOOP FRENZY SCREEN -->
+  <div id="hoopContent">
+    <div class="hoop-page-header">
+      <div>
+        <button class="hoop-page-back" onclick="navTo('home')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Games
+        </button>
+        <div class="hoop-page-title">🏀 Hoop Frenzy</div>
+        <div class="hoop-page-sub">3 rounds · Best of 3 wins · Server-side RNG · 3% house cut</div>
+      </div>
+    </div>
+
+    <div class="active-banner" id="hoopActiveBanner">
+      <div class="banner-dot"></div>
+      <div class="banner-text" id="hoopBannerText">Your hoop game is live.</div>
+      <button class="btn-play" id="btnHoopResume" style="padding:8px 16px;font-size:12px;">View</button>
+    </div>
+
+    <div class="section-label">Create a Game</div>
+    <div class="hoop-create-card">
+      <div class="hoop-create-head">
+        <div class="hoop-create-icon">🏀</div>
+        <div class="create-card-title">New Hoop Frenzy</div>
+      </div>
+      <div class="create-row">
+        <div class="input-group">
+          <label class="input-label">Your stake (XRP)</label>
+          <input class="stake-input" id="hoopStakeInput" type="number" min="0.1" max="100" step="0.1" placeholder="e.g. 1.0"/>
+          <div class="stake-hint" id="hoopStakeHint">Best of 3 rounds. Auto-plays when opponent joins.</div>
+        </div>
+        <button class="btn-create" id="btnHoopCreate">🏀 Create Game</button>
+      </div>
+    </div>
+
+    <div class="section-label">Open Games</div>
+    <div class="hoop-lobby" id="hoopLobby">
+      <div class="lobby-empty"><span class="lobby-empty-icon">🏀</span>No hoop games right now.<br/>Be the first to create one above.</div>
+    </div>
+  </div>
+</main>
+
+<!-- HOOP FRENZY MODAL -->
+<div class="modal-overlay" id="hoopModal">
+  <div class="battle-modal" style="max-width:640px;">
+    <div class="battle-title">🏀 Hoop Frenzy</div>
+    <div class="battle-sub" id="hoopSub">Best of 3 rounds — highest wins takes the pot.</div>
+
+    <div class="players-row" style="margin-bottom:12px;">
+      <div class="player-side"><div class="player-side-name p1c" id="hoopp1">You</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Your shots</div></div>
+      <div class="vs-txt">VS</div>
+      <div class="player-side"><div class="player-side-name p2c" id="hoopp2">Opponent</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">Their shots</div></div>
+    </div>
+
+    <!-- Score tracker -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:14px;">
+      <div style="text-align:center;">
+        <div id="hoopScore1" style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--blue-600);">0</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">YOUR SCORE</div>
+      </div>
+      <div style="font-family:var(--serif);font-size:18px;color:var(--ink-light);">—</div>
+      <div style="text-align:center;">
+        <div id="hoopScore2" style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--red);">0</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink-light);">THEIR SCORE</div>
+      </div>
+    </div>
+
+    <!-- Two WebGL scenes stacked -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+      <div style="position:relative;width:100%;">
+        <div style="position:absolute;top:7px;left:10px;z-index:2;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.75);background:rgba(0,0,0,0.45);padding:2px 8px;border-radius:4px;pointer-events:none;">YOUR SHOT</div>
+        <canvas id="hoopCanvas1" style="width:100%;border-radius:10px;border:2px solid var(--blue-200);display:block;"></canvas>
+        <div id="hoopStatus1" style="position:absolute;top:7px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:12px;color:#ffcc00;letter-spacing:2px;text-shadow:0 0 8px #ffcc0088;background:rgba(0,0,0,0.5);padding:3px 14px;border-radius:20px;white-space:nowrap;pointer-events:none;">STANDBY</div>
+      </div>
+      <div style="position:relative;width:100%;">
+        <div style="position:absolute;top:7px;left:10px;z-index:2;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.75);background:rgba(0,0,0,0.45);padding:2px 8px;border-radius:4px;pointer-events:none;">OPPONENT'S SHOT</div>
+        <canvas id="hoopCanvas2" style="width:100%;border-radius:10px;border:2px solid var(--red-border);display:block;"></canvas>
+        <div id="hoopStatus2" style="position:absolute;top:7px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:12px;color:#ffcc00;letter-spacing:2px;text-shadow:0 0 8px #ffcc0088;background:rgba(0,0,0,0.5);padding:3px 14px;border-radius:20px;white-space:nowrap;pointer-events:none;">STANDBY</div>
+      </div>
+    </div>
+
+    <div class="rolling-indicator" id="hoopRolling">
+      <div class="roll-spinner"></div>
+      <div class="roll-lbl" id="hoopRollLbl">Waiting for opponent...</div>
+    </div>
+
+    <div class="hoop-result" id="hoopResult">
+      <div class="res-title" id="hoopResTit">—</div>
+      <div class="res-detail" id="hoopResDet">—</div>
+    </div>
+
+    <div class="battle-btns">
+      <button class="btn-close-battle" id="btnCloseHoop" style="display:none" onclick="closeHoop()">Close</button>
+    </div>
+    <div class="bstatus" id="hoopStatus"></div>
   </div>
 </div>
 
@@ -1150,19 +1338,23 @@ window.navTo = function(screen) {
   document.getElementById('homeScreen').classList.toggle('active', screen === 'home');
   document.getElementById('gameContent').classList.toggle('active', screen === 'dice');
   document.getElementById('barrelContent').classList.toggle('active', screen === 'barrel');
-  // Update drawer active state
+  document.getElementById('hoopContent').classList.toggle('active', screen === 'hoop');
   const navHome   = document.getElementById('drawerNavHome');
   const navDice   = document.getElementById('drawerNavDice');
   const navBarrel = document.getElementById('drawerNavBarrel');
+  const navHoop   = document.getElementById('drawerNavHoop');
   if(navHome)   navHome.className   = screen === 'home'   ? 'active' : '';
   if(navDice)   navDice.className   = screen === 'dice'   ? 'active' : '';
   if(navBarrel) navBarrel.className = screen === 'barrel' ? 'active' : '';
-  document.title = screen === 'dice' ? 'BountyWall — Dice Arena'
+  if(navHoop)   navHoop.className   = screen === 'hoop'   ? 'active' : '';
+  document.title = screen === 'dice'   ? 'BountyWall — Dice Arena'
     : screen === 'barrel' ? 'BountyWall — Barrel Showdown'
+    : screen === 'hoop'   ? 'BountyWall — Hoop Frenzy'
     : 'BountyWall — Games';
   if(screen === 'dice'   && me && !lobbyUnsub)       startLobby();
   if(screen === 'barrel' && me && !barrelLobbyUnsub){ startBarrelLobby(); }
-  if(screen === 'dice' || screen === 'barrel') updateBalUI();
+  if(screen === 'hoop'   && me && !hoopLobbyUnsub)   startHoopLobby();
+  if(screen === 'dice' || screen === 'barrel' || screen === 'hoop') updateBalUI();
   window.scrollTo(0,0);
 };
 
@@ -1685,6 +1877,8 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('loginScreen').classList.add('active');
     document.getElementById('homeScreen').classList.remove('active');
     document.getElementById('gameContent').classList.remove('active');
+    document.getElementById('barrelContent').classList.remove('active');
+    document.getElementById('hoopContent').classList.remove('active');
     document.getElementById('hbal').classList.remove('show');
     document.getElementById('drawerUser').classList.remove('show');
     document.getElementById('drawerSignOut').style.display='none';
@@ -2197,6 +2391,524 @@ function showBarrelResult(gd, isP1, result){
 }
 
 // Draw idle scenes when barrel screen is shown — handled in navTo above
+
+// ══════════════════════════════════════════════════════════════
+// HOOP FRENZY
+// ══════════════════════════════════════════════════════════════
+let hoopLobbyUnsub=null, hoopGameUnsub=null;
+let hoopOpen=false, hoopGid=null, hoopActiveGid=null;
+let hgl=null; // {scene1, scene2, ...}
+
+// ── BUILD ONE BASKETBALL SCENE ──
+function buildHoopScene(canvas, statusElemId){
+  const THREE=window.THREE;
+  if(!THREE||!canvas) return null;
+  const W=Math.min(460,window.innerWidth-80);
+  const H=Math.round(W*0.52);
+  canvas.width=W; canvas.height=H;
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setSize(W,H);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.1;
+
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x5aa8d8);
+  scene.fog=new THREE.Fog(0x88c4e8,14,35);
+
+  const cam=new THREE.PerspectiveCamera(68,W/H,0.1,60);
+  cam.position.set(0,1.55,2.8); cam.lookAt(0,2.2,-1.5);
+
+  scene.add(new THREE.AmbientLight(0xffeedd,0.95));
+  const sun=new THREE.DirectionalLight(0xfffacc,2.2);
+  sun.position.set(5,12,6); sun.castShadow=true;
+  sun.shadow.mapSize.width=512; sun.shadow.mapSize.height=512;
+  sun.shadow.camera.near=0.5; sun.shadow.camera.far=40;
+  sun.shadow.camera.left=-10; sun.shadow.camera.right=10;
+  sun.shadow.camera.top=10; sun.shadow.camera.bottom=-10;
+  scene.add(sun);
+  scene.add(new THREE.HemisphereLight(0x88ccff,0x996633,0.7));
+
+  // Floor
+  const courtMat=new THREE.MeshLambertMaterial({color:0xc87830});
+  const court=new THREE.Mesh(new THREE.PlaneGeometry(14,18),courtMat);
+  court.rotation.x=-Math.PI/2; court.receiveShadow=true; scene.add(court);
+  const plankMat=new THREE.MeshBasicMaterial({color:0xa06020,transparent:true,opacity:0.3});
+  for(let x=-6.5;x<=6.5;x+=0.55){
+    const p=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.01,18),plankMat);
+    p.position.set(x,0.005,0); scene.add(p);
+  }
+  const lMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.5});
+  [[-2,0.01,0.2],[2,0.01,0.2]].forEach(([x,y,z])=>{
+    const l=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.01,4),lMat);
+    l.position.set(x,y,z); scene.add(l);
+  });
+
+  // Arena walls
+  const wallMat=new THREE.MeshLambertMaterial({color:0x3355aa});
+  const bw=new THREE.Mesh(new THREE.BoxGeometry(16,10,0.3),wallMat);
+  bw.position.set(0,5,-8); scene.add(bw);
+  const adMat=new THREE.MeshLambertMaterial({color:0xff6600});
+  const ad=new THREE.Mesh(new THREE.BoxGeometry(8,1.5,0.05),adMat);
+  ad.position.set(0,1.5,-7.7); scene.add(ad);
+  [-7,7].forEach(x=>{
+    const sw=new THREE.Mesh(new THREE.BoxGeometry(0.3,10,18),new THREE.MeshLambertMaterial({color:0x224488}));
+    sw.position.set(x,5,0); scene.add(sw);
+  });
+  const cMat=new THREE.MeshLambertMaterial({color:0x1a1a2e});
+  const ceil=new THREE.Mesh(new THREE.PlaneGeometry(14,18),cMat);
+  ceil.rotation.x=Math.PI/2; ceil.position.y=9; scene.add(ceil);
+  [[-3,8.8,0],[3,8.8,0],[0,8.8,-3],[0,8.8,-6]].forEach(([x,y,z])=>{
+    const lf=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.1,0.8),new THREE.MeshBasicMaterial({color:0xffffcc}));
+    lf.position.set(x,y,z); scene.add(lf);
+    const al=new THREE.PointLight(0xfff8cc,0.6,8);
+    al.position.set(x,y-0.2,z); scene.add(al);
+  });
+
+  // Crowd
+  const sM=new THREE.MeshLambertMaterial({color:0x222244});
+  [-7.5,7.5].forEach(sx=>{
+    const st=new THREE.Mesh(new THREE.BoxGeometry(1.5,3,14),sM);
+    st.position.set(sx,1.5,0); scene.add(st);
+    const cols=[0xff4444,0x4488ff,0xffff00,0xff8800,0xffffff,0x44ff88];
+    for(let row=0;row<3;row++) for(let col=0;col<9;col++){
+      const h=new THREE.Mesh(new THREE.SphereGeometry(0.18,6,4),
+        new THREE.MeshLambertMaterial({color:cols[(row*9+col)%cols.length]}));
+      h.position.set(sx+(sx>0?-0.4:0.4),0.7+row*0.85,-3.5+col*0.88);
+      scene.add(h);
+    }
+  });
+
+  // Hoop
+  const RIM_R=0.225, RIM_T=0.025, BALL_R=0.225;
+  const HOOP_Y=2.44, HOOP_Z=-0.02;
+  const HOOP_WZ=-1.8+HOOP_Z, HOOP_WY=HOOP_Y;
+  const poleMat=new THREE.MeshLambertMaterial({color:0x999999});
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,3.05,8),poleMat);
+  pole.position.set(0,1.52,-1.8); pole.castShadow=true; scene.add(pole);
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(0.07,0.07,0.5),poleMat);
+  arm.position.set(0,3.1,-1.8-0.24); scene.add(arm);
+  const bdMat=new THREE.MeshLambertMaterial({color:0xf8f8f8,transparent:true,opacity:0.9});
+  const bd=new THREE.Mesh(new THREE.BoxGeometry(1.7,1.05,0.05),bdMat);
+  bd.position.set(0,3.1,-1.8); scene.add(bd);
+  const bdE=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.7,1.05,0.05)),new THREE.LineBasicMaterial({color:0xff2200}));
+  bdE.position.set(0,3.1,-1.8); scene.add(bdE);
+  const rimMat=new THREE.MeshLambertMaterial({color:0xff5500});
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(RIM_R,RIM_T,10,32),rimMat);
+  rim.rotation.x=Math.PI/2; rim.position.set(0,HOOP_WY,HOOP_WZ);
+  rim.castShadow=true; scene.add(rim);
+  // Net
+  const nMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.75});
+  for(let i=0;i<12;i++){
+    const a=(i/12)*Math.PI*2;
+    const ns=new THREE.Mesh(new THREE.CylinderGeometry(0.005,0.005,0.38,3),nMat);
+    ns.position.set(Math.cos(a)*0.22,HOOP_WY-0.19,HOOP_WZ+Math.sin(a)*0.22);
+    ns.rotation.x=Math.cos(a)*0.15; ns.rotation.z=-Math.sin(a)*0.15;
+    scene.add(ns);
+  }
+  const nb=new THREE.Mesh(new THREE.TorusGeometry(0.13,0.01,4,16),nMat);
+  nb.rotation.x=Math.PI/2; nb.position.set(0,HOOP_WY-0.38,HOOP_WZ); scene.add(nb);
+
+  // Ball
+  const bMat=new THREE.MeshLambertMaterial({color:0xe55a00});
+  const ballMesh=new THREE.Mesh(new THREE.SphereGeometry(BALL_R,16,12),bMat);
+  ballMesh.castShadow=true; scene.add(ballMesh);
+  const sMat2=new THREE.MeshBasicMaterial({color:0x1a0800});
+  const seams=[new THREE.Mesh(new THREE.TorusGeometry(BALL_R+0.003,0.009,4,22),sMat2)];
+  seams[0].rotation.x=Math.PI/2; scene.add(seams[0]);
+  const seam2=new THREE.Mesh(new THREE.TorusGeometry(BALL_R+0.003,0.009,4,22),sMat2); scene.add(seam2);
+  seams.push(seam2);
+  // Shadow
+  const gshMat=new THREE.MeshBasicMaterial({color:0x000,transparent:true,opacity:0.18});
+  const gshMesh=new THREE.Mesh(new THREE.CircleGeometry(0.28,14),gshMat);
+  gshMesh.rotation.x=-Math.PI/2; gshMesh.position.y=0.008; scene.add(gshMesh);
+  // Arm stub
+  const armM=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.2,0.42),new THREE.MeshLambertMaterial({color:0xc09060}));
+  armM.position.set(0.28,-0.3,-0.05); cam.add(armM); scene.add(cam);
+  const flashL=new THREE.PointLight(0xffcc44,0,6);
+  flashL.position.set(0,0,-0.8); cam.add(flashL);
+
+  const BSTART={x:0,y:0.9,z:2.0};
+  let BP={x:BSTART.x,y:BSTART.y,z:BSTART.z,vx:0,vy:0,vz:0,rx:0,ry:0,rz:0,arx:0,ary:0,arz:0,active:false,scored:false,willScore:false};
+
+  function syncBall(){
+    ballMesh.position.set(BP.x,BP.y,BP.z);
+    ballMesh.rotation.set(BP.rx,BP.ry,BP.rz);
+    seams.forEach(s=>{s.position.set(BP.x,BP.y,BP.z);s.rotation.x=BP.rx;s.rotation.y=BP.ry;s.rotation.z=BP.rz;});
+    gshMesh.position.x=BP.x; gshMesh.position.z=BP.z;
+    gshMesh.material.opacity=Math.max(0.02,0.18-(BP.y-BALL_R)*0.05);
+  }
+
+  function resetBP(){
+    BP.x=BSTART.x;BP.y=BSTART.y;BP.z=BSTART.z;
+    BP.vx=0;BP.vy=0;BP.vz=0;BP.rx=0;BP.ry=0;BP.rz=0;
+    BP.arx=0;BP.ary=0;BP.arz=0;BP.active=false;BP.scored=false;BP.willScore=false;
+    syncBall();
+  }
+
+  const SCORE_SHOTS=['swish','bank','rattle','layup','fadeaway'];
+  const MISS_SHOTS=['airball','overthrow','brickfront','brickside','short','rattle_out','backboard_long'];
+  let lastSc='',lastMs='';
+
+  function pickType(ws){
+    if(ws){const o=SCORE_SHOTS.filter(s=>s!==lastSc);const t=o[Math.floor(Math.random()*o.length)];lastSc=t;return t;}
+    else{const o=MISS_SHOTS.filter(s=>s!==lastMs);const t=o[Math.floor(Math.random()*o.length)];lastMs=t;return t;}
+  }
+
+  function launch(ws, sType){
+    const G=0.016;
+    let tx,ty,tz,frames;
+    const RWX=0,RWY=HOOP_WY,RWZ=HOOP_WZ;
+    if(ws){
+      switch(sType){
+        case 'swish':   tx=RWX;ty=RWY+0.02;tz=RWZ;frames=60;break;
+        case 'bank':    tx=RWX+(Math.random()-0.5)*0.1;ty=RWY+0.05;tz=RWZ+0.02;frames=65;break;
+        case 'rattle':  tx=RWX+(Math.random()-0.5)*0.04;ty=RWY+0.05;tz=RWZ-(RIM_R-0.03);frames=54;break;
+        case 'layup':   tx=RWX+(Math.random()-0.5)*0.05;ty=RWY+0.03;tz=RWZ;frames=72;break;
+        default:        tx=RWX+(Math.random()>0.5?0.05:-0.05);ty=RWY+0.02;tz=RWZ;frames=58;
+      }
+    } else {
+      switch(sType){
+        case 'airball':       tx=RWX+(Math.random()>0.5?1:-1)*(RIM_R*2.2+Math.random()*0.5);ty=RWY+Math.random()*0.4;tz=RWZ+(Math.random()-0.5)*0.5;frames=50;break;
+        case 'overthrow':     tx=RWX+(Math.random()-0.5)*0.3;ty=RWY+1.2;tz=RWZ-1.2;frames=48;break;
+        case 'brickfront':    tx=RWX+(Math.random()-0.5)*0.05;ty=RWY-0.14;tz=RWZ-RIM_R*1.05;frames=46;break;
+        case 'brickside':     {const sd=Math.random()>0.5?1:-1;tx=RWX+sd*(RIM_R*1.05);ty=RWY-0.1;tz=RWZ+(Math.random()-0.5)*0.08;frames=50;break;}
+        case 'short':         tx=RWX+(Math.random()-0.5)*0.4;ty=RWY-1.2;tz=RWZ+0.8;frames=40;break;
+        case 'rattle_out':    tx=RWX+(Math.random()-0.5)*0.06;ty=RWY-0.05;tz=RWZ+0.01;frames=56;break;
+        default:              tx=RWX+(Math.random()-0.5)*0.2;ty=RWY+0.8;tz=RWZ+0.3;frames=52;
+      }
+    }
+    const dx=tx-BP.x,dy=ty-BP.y,dz=tz-BP.z;
+    BP.vx=dx/frames; BP.vz=dz/frames;
+    BP.vy=(dy+0.5*G*frames*frames)/frames;
+    BP.arx=-(Math.abs(BP.vz)+Math.abs(BP.vx))*5.0;
+    BP.ary=(Math.random()-0.5)*0.06;
+    BP.active=true; BP.willScore=ws;
+  }
+
+  let shake=0;
+  function stepPhysics(){
+    if(!BP.active) return;
+    const G=0.016;
+    BP.vy-=G;
+    BP.x+=BP.vx;BP.y+=BP.vy;BP.z+=BP.vz;
+    BP.rx+=BP.arx;BP.ry+=BP.ary;BP.rz+=BP.arz;
+    BP.arx*=0.992;BP.ary*=0.992;BP.arz*=0.992;
+    const RWX=0,RWY=HOOP_WY,RWZ=HOOP_WZ;
+    const bx=BP.x-RWX,bz=BP.z-RWZ;
+    const hd=Math.sqrt(bx*bx+bz*bz);
+    const toR=hd-RIM_R, dyR=BP.y-RWY;
+    const dTube=Math.sqrt(toR*toR+dyR*dyR);
+    if(dTube<RIM_T+BALL_R+0.01&&hd>0.01){
+      const nx=bx/hd,nz=bz/hd;
+      const rpx=RWX+nx*RIM_R,rpy=RWY,rpz=RWZ+nz*RIM_R;
+      let cnx=BP.x-rpx,cny=BP.y-rpy,cnz=BP.z-rpz;
+      const cL=Math.sqrt(cnx*cnx+cny*cny+cnz*cnz)||0.001;
+      cnx/=cL;cny/=cL;cnz/=cL;
+      const vN=BP.vx*cnx+BP.vy*cny+BP.vz*cnz;
+      if(vN<0){
+        const R2=0.50;
+        BP.vx-=(1+R2)*vN*cnx;BP.vy-=(1+R2)*vN*cny;BP.vz-=(1+R2)*vN*cnz;
+        BP.vx*=0.75;BP.vz*=0.75;
+        BP.arx+=(Math.random()-0.5)*0.25;BP.ary+=(Math.random()-0.5)*0.12;
+        const pen=(RIM_T+BALL_R+0.005)-dTube;
+        BP.x+=cnx*pen;BP.y+=cny*pen;BP.z+=cnz*pen;
+        shake=0.22;
+      }
+    }
+    if(!BP.scored&&BP.willScore&&BP.vy<0&&BP.y>RWY-0.14&&BP.y<RWY+0.08&&hd<RIM_R-BALL_R*0.5){
+      BP.scored=true; shake=0.3;
+    }
+    if(BP.y<BALL_R){
+      BP.y=BALL_R;BP.vy=-BP.vy*0.42;BP.vx*=0.70;BP.vz*=0.70;
+      BP.arx*=0.55;BP.arz*=0.55;if(Math.abs(BP.vy)<0.008)BP.vy=0;
+    }
+    syncBall();
+  }
+
+  const HINTS={swish:'🎯 SWISH!',bank:'🏦 BANK SHOT!',rattle:'💫 RATTLES IN!',layup:'🕊️ FLOATER!',fadeaway:'↩️ FADEAWAY!',airball:'💨 AIR BALL!',overthrow:'📈 TOO LONG!',brickfront:'💥 BRICK!',brickside:'📐 SIDE RIM!',short:'📉 SHORT!',rattle_out:'🔄 RATTLES OUT!',backboard_long:'🧱 OFF BACKBOARD!'};
+
+  function setS(txt){const el=document.getElementById(statusElemId);if(el)el.textContent=txt;}
+
+  function sl(ms){return new Promise(r=>setTimeout(r,ms));}
+
+  async function playRound(ws){
+    resetBP(); flashL.intensity=1.4; shake=0.4;
+    const sType=pickType(ws);
+    launch(ws,sType);
+    activePhysics=true;
+    for(let f=0;f<280;f++){
+      await sl(16);
+      if(BP.scored) break;
+      if(BP.y<=BALL_R+0.01&&f>90) break;
+      if(BP.z<HOOP_WZ-1.5&&BP.y<HOOP_WY-0.6) break;
+    }
+    setS(HINTS[sType]||'');
+    await sl(700);
+    activePhysics=false;
+    await sl(150);
+    resetBP();
+    return BP.scored||ws; // return true if scored
+  }
+
+  let activePhysics=false;
+  let tVal=0;
+  function tick(){
+    if(!active) return;
+    requestAnimationFrame(tick);
+    tVal+=0.016;
+    if(shake>0){cam.position.x=(Math.random()-0.5)*shake*0.05;shake*=0.78;}
+    if(flashL.intensity>0) flashL.intensity*=0.88;
+    if(!BP.active&&activePhysics===false){
+      ballMesh.position.y=BSTART.y+Math.sin(tVal*1.4)*0.028;
+      seams.forEach(s=>s.position.y=ballMesh.position.y);
+      ballMesh.rotation.y+=0.007;
+      seams.forEach(s=>s.rotation.y=ballMesh.rotation.y);
+    }
+    if(activePhysics) stepPhysics();
+    renderer.render(scene,cam);
+  }
+
+  let active=true;
+  tick();
+  return {
+    playRound,
+    resetBP,
+    setStatus:setS,
+    stop(){active=false;},
+    start(){active=true;tick();}
+  };
+}
+
+function initHoopWebGL(){
+  if(hgl) return;
+  const THREE=window.THREE;
+  if(!THREE) return;
+  const c1=document.getElementById('hoopCanvas1');
+  const c2=document.getElementById('hoopCanvas2');
+  if(!c1||!c2) return;
+  const s1=buildHoopScene(c1,'hoopStatus1');
+  const s2=buildHoopScene(c2,'hoopStatus2');
+  hgl={s1,s2,
+    async runGame(myResults, oppResults){
+      // myResults and oppResults are bool arrays [r1,r2,r3]
+      let myScore=0,oppScore=0;
+      for(let r=0;r<3;r++){
+        document.getElementById('hoopRolling').classList.remove('show');
+        // Show round
+        s1.setStatus('⚡ ROUND '+(r+1));
+        s2.setStatus('⚡ ROUND '+(r+1));
+        await new Promise(res=>setTimeout(res,700));
+        s1.setStatus('⚡ 3'); s2.setStatus('⚡ 3'); await new Promise(res=>setTimeout(res,850));
+        s1.setStatus('⚡ 2'); s2.setStatus('⚡ 2'); await new Promise(res=>setTimeout(res,850));
+        s1.setStatus('⚡ 1'); s2.setStatus('⚡ 1'); await new Promise(res=>setTimeout(res,850));
+        s1.setStatus('🏀 SHOOT!'); s2.setStatus('🏀 SHOOT!');
+        await new Promise(res=>setTimeout(res,200));
+        // Both scenes play simultaneously
+        await Promise.all([
+          s1.playRound(myResults[r]),
+          s2.playRound(oppResults[r])
+        ]);
+        if(myResults[r]) myScore++;
+        if(oppResults[r]) oppScore++;
+        document.getElementById('hoopScore1').textContent=myScore;
+        document.getElementById('hoopScore2').textContent=oppScore;
+        await new Promise(res=>setTimeout(res,700));
+      }
+      return {myScore,oppScore};
+    },
+    stop(){s1.stop();s2.stop();},
+    start(){s1.start();s2.start();}
+  };
+}
+
+// ── HOOP LOBBY ──
+document.getElementById('btnHoopCreate').addEventListener('click',async()=>{
+  const stake=parseFloat(document.getElementById('hoopStakeInput').value);
+  if(!stake||stake<0.1){toast('Min stake 0.1 XRP','err');return;}
+  if(stake>100){toast('Max stake 100 XRP','err');return;}
+  if(stake>bal){toast('Insufficient balance','err');return;}
+  if(hoopActiveGid){toast('You already have an active hoop game','err');return;}
+  const b=document.getElementById('btnHoopCreate');
+  b.disabled=true; b.textContent='Creating...';
+  try{
+    const nb=parseFloat((bal-stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:nb},{merge:true});
+    bal=nb; updateBalUI();
+    const gr=doc(collection(db,'hoop_games'));
+    await setDoc(gr,{status:'waiting',stake,player1:{uid:me.uid,displayName:me.displayName||'Player',photoURL:me.photoURL||''},player2:null,createdAt:serverTimestamp()});
+    hoopActiveGid=gr.id;
+    document.getElementById('hoopStakeInput').value='';
+    toast('Hoop game created! Waiting for opponent...','ok');
+  }catch(e){
+    bal=parseFloat((bal+stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:bal},{merge:true});
+    updateBalUI(); toast('Error creating game.','err');
+  }
+  b.disabled=false; b.textContent='🏀 Create Game';
+});
+
+window.joinHoopGame=async function(gid,stake){
+  if(stake>bal){toast('Need '+stake.toFixed(3)+' XRP to join','err');return;}
+  if(!confirm('Join hoop game and stake '+stake.toFixed(3)+' XRP?'))return;
+  try{
+    const nb=parseFloat((bal-stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:nb},{merge:true});
+    bal=nb; updateBalUI();
+    await updateDoc(doc(db,'hoop_games',gid),{status:'active',player2:{uid:me.uid,displayName:me.displayName||'Player',photoURL:me.photoURL||''}});
+    hoopActiveGid=gid;
+    openHoopModal(gid,true);
+  }catch(e){toast('Error joining.','err');}
+};
+
+window.cancelHoopGame=async function(gid,stake){
+  if(!confirm('Cancel and get '+stake.toFixed(3)+' XRP back?'))return;
+  try{
+    await deleteDoc(doc(db,'hoop_games',gid));
+    const tk=await getToken();
+    if(tk) await fetch(WORKER_URL+'/api/refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:tk,amount:stake})});
+    hoopActiveGid=null; toast('Cancelled. Stake returned.','ok'); await loadBal();
+  }catch(e){toast('Error cancelling.','err');}
+};
+
+function startHoopLobby(){
+  if(hoopLobbyUnsub) hoopLobbyUnsub();
+  const q=query(collection(db,'hoop_games'),where('status','in',['waiting','active']));
+  hoopLobbyUnsub=onSnapshot(q,snap=>{
+    const gs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    hoopActiveGid=null;
+    gs.forEach(g=>{if(g.player1?.uid===me.uid||g.player2?.uid===me.uid) hoopActiveGid=g.id;});
+    const banner=document.getElementById('hoopActiveBanner');
+    if(hoopActiveGid){
+      const ag=gs.find(x=>x.id===hoopActiveGid);
+      if(ag&&ag.status==='active'){
+        document.getElementById('hoopBannerText').textContent='Hoop Frenzy live — stake: '+parseFloat(ag.stake).toFixed(3)+' XRP';
+        document.getElementById('btnHoopResume').onclick=()=>openHoopModal(hoopActiveGid,false);
+        banner.classList.add('show');
+      } else banner.classList.remove('show');
+    } else banner.classList.remove('show');
+    gs.forEach(g=>{if(g.status==='active'&&g.player1?.uid===me.uid&&!hoopOpen) openHoopModal(g.id,false);});
+    const lobby=document.getElementById('hoopLobby');
+    if(!gs.length){lobby.innerHTML='<div class="lobby-empty"><span class="lobby-empty-icon">🏀</span>No hoop games right now.<br/>Be the first to create one above.</div>';return;}
+    lobby.innerHTML=gs.map(g=>{
+      const isMe=g.player1?.uid===me.uid||g.player2?.uid===me.uid;
+      const isP1=g.player1?.uid===me.uid;
+      const stake=parseFloat(g.stake||0);
+      const name=g.player1?.displayName||'Unknown';
+      const ph=g.player1?.photoURL;
+      const av=ph?`<img class="game-avatar" src="${ph}" alt=""/>`:`<div class="game-avatar-ph">${name.charAt(0).toUpperCase()}</div>`;
+      let badge,actions;
+      if(g.status==='waiting'){
+        if(isP1){badge=`<span class="sbadge badge-mine">Your game</span>`;actions=`<button class="btn-cancel" onclick="cancelHoopGame('${g.id}',${stake})">Cancel & Refund</button>`;}
+        else{badge=`<span class="sbadge badge-wait">Open</span>`;actions=`<button class="btn-join" onclick="joinHoopGame('${g.id}',${stake})">Join — ${stake.toFixed(3)} XRP</button>`;}
+      } else {
+        badge=`<span class="sbadge badge-act">In Progress</span>`;
+        if(isMe) actions=`<button class="btn-play" onclick="openHoopModal('${g.id}',false)">View</button>`;
+        else actions=`<span style="font-family:var(--mono);font-size:10px;color:var(--ink-light)">Closed</span>`;
+      }
+      return `<div class="game-card ${isMe?(g.status==='active'?'active-game':'my-game'):''}">
+        ${av}<div class="game-info"><div class="game-creator">${name}</div>
+        <div class="game-meta">${badge} &nbsp;·&nbsp; ${stake.toFixed(3)} XRP stake</div></div>
+        <div class="game-stake-box"><div class="game-stake-val">${stake.toFixed(3)}</div><div class="game-stake-label">XRP each</div></div>
+        <div class="game-actions">${actions}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+window.openHoopModal=async function(gid,autoPlay){
+  if(hoopOpen&&hoopGid===gid) return;
+  hoopGid=gid; hoopOpen=true;
+  document.getElementById('hoopResult').style.display='none';
+  document.getElementById('btnCloseHoop').style.display='none';
+  document.getElementById('hoopStatus').textContent='';
+  document.getElementById('hoopRolling').classList.remove('show');
+  document.getElementById('hoopScore1').textContent='0';
+  document.getElementById('hoopScore2').textContent='0';
+  initHoopWebGL();
+  if(hgl) hgl.start();
+  const sn=await getDoc(doc(db,'hoop_games',gid));
+  if(!sn.exists()){toast('Game not found','err');hoopOpen=false;return;}
+  const g=sn.data();
+  const isP1=g.player1?.uid===me.uid;
+  document.getElementById('hoopp1').textContent=isP1?(me.displayName||'You'):(g.player2?.displayName||'Opponent');
+  document.getElementById('hoopp2').textContent=isP1?(g.player2?.displayName||'Opponent'):(g.player1?.displayName||'You');
+  document.getElementById('hoopSub').textContent='Stake: '+parseFloat(g.stake).toFixed(3)+' XRP each · Winner takes '+(parseFloat(g.stake)*2*0.97).toFixed(3)+' XRP';
+  document.getElementById('hoopModal').classList.add('open');
+
+  if(g.status==='complete'&&g.p1Results){
+    showHoopResult(g,isP1); document.getElementById('btnCloseHoop').style.display='inline-flex'; return;
+  }
+
+  if(autoPlay){
+    runHoopGame(gid,isP1);
+  } else {
+    document.getElementById('hoopRolling').classList.add('show');
+    document.getElementById('hoopRollLbl').textContent='Waiting for opponent...';
+    if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+    hoopGameUnsub=onSnapshot(doc(db,'hoop_games',gid),snap=>{
+      if(!snap.exists()) return;
+      const gd=snap.data();
+      if(gd.status==='complete'&&gd.p1Results){
+        document.getElementById('hoopRolling').classList.remove('show');
+        if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+        showHoopResult(gd,isP1);
+        document.getElementById('btnCloseHoop').style.display='inline-flex';
+        loadBal();
+      } else if(gd.status==='active'&&gd.player2?.uid){
+        document.getElementById('hoopRollLbl').textContent='Opponent joined! Starting...';
+        if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+        runHoopGame(gid,isP1);
+      }
+    });
+  }
+};
+
+async function runHoopGame(gid,isP1){
+  document.getElementById('hoopRolling').classList.remove('show');
+  try{
+    const tk=await getToken();
+    const r=await fetch(WORKER_URL+'/api/hoop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:tk,gameId:gid})});
+    const data=await r.json();
+    if(!data.ok){document.getElementById('hoopStatus').textContent='Error: '+(data.error||'Failed');document.getElementById('btnCloseHoop').style.display='inline-flex';return;}
+    const res=data.result;
+    const myRes=isP1?res.p1Results:res.p2Results;
+    const oppRes=isP1?res.p2Results:res.p1Results;
+    if(hgl) await hgl.runGame(myRes,oppRes);
+    showHoopResult({p1Results:res.p1Results,p2Results:res.p2Results,winner:res.winner,winnings:res.winnings,houseCut:res.houseCut},isP1);
+    document.getElementById('btnCloseHoop').style.display='inline-flex';
+    loadBal();
+  }catch(e){document.getElementById('hoopStatus').textContent='Error: '+e.message;document.getElementById('btnCloseHoop').style.display='inline-flex';}
+}
+
+function showHoopResult(g,isP1){
+  const myRes=isP1?g.p1Results:g.p2Results;
+  const oppRes=isP1?g.p2Results:g.p1Results;
+  const myScore=(myRes||[]).filter(Boolean).length;
+  const oppScore=(oppRes||[]).filter(Boolean).length;
+  document.getElementById('hoopScore1').textContent=myScore;
+  document.getElementById('hoopScore2').textContent=oppScore;
+  const iWin=(isP1&&g.winner==='player1')||(!isP1&&g.winner==='player2');
+  const el=document.getElementById('hoopResult');
+  el.className='hoop-result '+(iWin?'win':'lose');
+  document.getElementById('hoopResTit').className='res-title '+(iWin?'win':'lose');
+  document.getElementById('hoopResTit').textContent=iWin?'🏆 You Win!':'😔 You Lose';
+  document.getElementById('hoopResDet').textContent=iWin
+    ?'You won '+parseFloat(g.winnings||0).toFixed(3)+' XRP! (House: '+parseFloat(g.houseCut||0).toFixed(3)+' XRP)'
+    :'Opponent won. Better luck next time!';
+  el.style.display='block';
+}
+
+window.closeHoop=function(){
+  document.getElementById('hoopModal').classList.remove('open');
+  if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+  if(hgl) hgl.stop();
+  hoopGid=null; hoopOpen=false; loadBal();
+};
+document.getElementById('hoopModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('hoopModal')&&document.getElementById('hoopResult').style.display!=='none') closeHoop();
+});
 
 </script>
 </body>
