@@ -2395,7 +2395,7 @@ function buildHoopScene(canvas, statusElemId){
   scene.background=new THREE.Color(0x5aa8d8);
   scene.fog=new THREE.Fog(0x88c4e8,14,35);
   const cam=new THREE.PerspectiveCamera(68,W/H,0.1,60);
-  cam.position.set(0,1.55,2.8); cam.lookAt(0,2.2,-1.5);
+  cam.position.set(0,1.55,2.0); cam.lookAt(0,2.4,-0.8);
   scene.add(new THREE.AmbientLight(0xffeedd,0.95));
   const sun=new THREE.DirectionalLight(0xfffacc,2.2);
   sun.position.set(5,12,6); sun.castShadow=true;
@@ -2435,16 +2435,16 @@ function buildHoopScene(canvas, statusElemId){
   });
   // Hoop
   const RIM_R=0.225,RIM_T=0.025,BALL_R=0.225;
-  const HOOP_WY=2.44,HOOP_WZ=-1.8-0.02;
+  const HOOP_WY=2.44,HOOP_WZ=-0.8;
   const poleMat=new THREE.MeshLambertMaterial({color:0x999999});
   const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,3.05,8),poleMat);
-  pole.position.set(0,1.52,-1.8); pole.castShadow=true; scene.add(pole);
+  pole.position.set(0,1.52,-0.8); pole.castShadow=true; scene.add(pole);
   const arm=new THREE.Mesh(new THREE.BoxGeometry(0.07,0.07,0.5),poleMat);
-  arm.position.set(0,3.1,-1.8-0.24); scene.add(arm);
+  arm.position.set(0,3.1,-0.8-0.24); scene.add(arm);
   const bd=new THREE.Mesh(new THREE.BoxGeometry(1.7,1.05,0.05),new THREE.MeshLambertMaterial({color:0xf8f8f8,transparent:true,opacity:0.9}));
-  bd.position.set(0,3.1,-1.8); scene.add(bd);
+  bd.position.set(0,3.1,-0.8); scene.add(bd);
   const bdE=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.7,1.05,0.05)),new THREE.LineBasicMaterial({color:0xff2200}));
-  bdE.position.set(0,3.1,-1.8); scene.add(bdE);
+  bdE.position.set(0,3.1,-0.8); scene.add(bdE);
   const rim=new THREE.Mesh(new THREE.TorusGeometry(RIM_R,RIM_T,10,32),new THREE.MeshLambertMaterial({color:0xff5500}));
   rim.rotation.x=Math.PI/2; rim.position.set(0,HOOP_WY,HOOP_WZ); rim.castShadow=true; scene.add(rim);
   const nMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.75});
@@ -2569,18 +2569,24 @@ function buildHoopScene(canvas, statusElemId){
     setS(HINTS[sType]||'');
     await sl(700);aphysics=false;await sl(150);resetBP();
   }
-  let active=true,tVal=0;
-  function tick(){
+  let active=true,tVal=0,lastTs=null;
+  function tick(ts){
     if(!active)return;
     requestAnimationFrame(tick);
-    tVal+=0.016;
-    if(flashL.intensity>0)flashL.intensity*=0.88;
+    // Delta-time capped at 33ms to prevent spiral on tab-switch
+    const dt=lastTs?Math.min((ts-lastTs)/1000,0.033):0.016;
+    lastTs=ts;
+    // Accumulate in fixed 16ms steps to keep physics deterministic
+    const steps=Math.round(dt/0.016);
+    const N=Math.max(1,Math.min(steps,2));
+    tVal+=dt;
+    if(flashL.intensity>0)flashL.intensity*=Math.pow(0.88,N);
     if(!BP.active&&!aphysics){
       ballMesh.position.y=BSTART.y+Math.sin(tVal*1.4)*0.028;
       seam1.position.y=ballMesh.position.y;seam2.position.y=ballMesh.position.y;
-      ballMesh.rotation.y+=0.007;seam1.rotation.y+=0.007;seam2.rotation.y+=0.007;
+      ballMesh.rotation.y+=0.007*N;seam1.rotation.y+=0.007*N;seam2.rotation.y+=0.007*N;
     }
-    if(aphysics)stepPhys();
+    if(aphysics){for(let i=0;i<N;i++)stepPhys();}
     renderer.render(scene,cam);
   }
   tick();
@@ -2768,6 +2774,162 @@ async function runHoopGame(gid,isP1){
   }catch(e){document.getElementById('hoopStatus').textContent='Error: '+e.message;document.getElementById('btnCloseHoop').style.display='inline-flex';}
 }
 
+
+// ── HOOP FRENZY WIN ANIMATION ──
+function makeXMRCoinHoop(){
+  const THREE=window.THREE;
+  const g=new THREE.Group();
+  const r=0.20;
+  const topMat=new THREE.MeshLambertMaterial({color:0xf2651c,emissive:0x7a2a00,emissiveIntensity:0.3});
+  const topH=new THREE.Mesh(new THREE.CylinderGeometry(r,r,0.045,32),topMat);
+  topH.rotation.x=Math.PI/2; g.add(topH);
+  g.add(new THREE.Mesh(new THREE.TorusGeometry(r,0.012,8,32),new THREE.MeshLambertMaterial({color:0xc04800})));
+  const botH=new THREE.Mesh(new THREE.CylinderGeometry(r*0.82,r*0.82,0.048,32),new THREE.MeshLambertMaterial({color:0x4d4d4d}));
+  botH.rotation.x=Math.PI/2; g.add(botH);
+  const sc=0.0028;
+  const uS=new THREE.Shape();
+  uS.moveTo((2.629-50)*sc*1.3,(66-50)*sc*1.3);
+  uS.quadraticCurveTo((0-50)*sc*1.3,(58.2-50)*sc*1.3,(0-50)*sc*1.3,(50-50)*sc*1.3);
+  uS.bezierCurveTo((0-50)*sc*1.3,(22.4-50)*sc*1.3,(22.4-50)*sc*1.3,(0-50)*sc*1.3,(50-50)*sc*1.3,(0-50)*sc*1.3);
+  uS.bezierCurveTo((77.6-50)*sc*1.3,(0-50)*sc*1.3,(100-50)*sc*1.3,(22.4-50)*sc*1.3,(100-50)*sc*1.3,(50-50)*sc*1.3);
+  uS.quadraticCurveTo((100-50)*sc*1.3,(58.2-50)*sc*1.3,(97.37-50)*sc*1.3,(66-50)*sc*1.3);
+  uS.lineTo((82-50)*sc*1.3,(66-50)*sc*1.3);uS.lineTo((82-50)*sc*1.3,(22-50)*sc*1.3);
+  uS.lineTo((50-50)*sc*1.3,(58.5-50)*sc*1.3);uS.lineTo((18-50)*sc*1.3,(22-50)*sc*1.3);
+  uS.lineTo((18-50)*sc*1.3,(66-50)*sc*1.3);uS.closePath();
+  const uM=new THREE.Mesh(new THREE.ShapeGeometry(uS),new THREE.MeshBasicMaterial({color:0xf2651c,side:THREE.DoubleSide}));
+  uM.position.z=0.026; g.add(uM);
+  const uMb=uM.clone();uMb.position.z=-0.026;uMb.rotation.y=Math.PI;g.add(uMb);
+  const lS=new THREE.Shape();
+  lS.moveTo((7.29-50)*sc*1.3,(76-50)*sc*1.3);
+  lS.quadraticCurveTo((22-50)*sc*1.3,(100-50)*sc*1.3,(50-50)*sc*1.3,(100-50)*sc*1.3);
+  lS.quadraticCurveTo((78-50)*sc*1.3,(100-50)*sc*1.3,(92.71-50)*sc*1.3,(76-50)*sc*1.3);
+  lS.lineTo((72-50)*sc*1.3,(76-50)*sc*1.3);lS.lineTo((72-50)*sc*1.3,(48-50)*sc*1.3);
+  lS.lineTo((50-50)*sc*1.3,(74-50)*sc*1.3);lS.lineTo((28-50)*sc*1.3,(48-50)*sc*1.3);
+  lS.lineTo((28-50)*sc*1.3,(76-50)*sc*1.3);lS.closePath();
+  const lM=new THREE.Mesh(new THREE.ShapeGeometry(lS),new THREE.MeshBasicMaterial({color:0x4d4d4d,side:THREE.DoubleSide}));
+  lM.position.z=0.027; g.add(lM);
+  const lMb=lM.clone();lMb.position.z=-0.027;lMb.rotation.y=Math.PI;g.add(lMb);
+  g.add(new THREE.PointLight(0xff6622,1.8,2.5));
+  return g;
+}
+
+let hoopFwScene=null,hoopFwRenderer=null,hoopFwAnim=null;
+
+function spawnHoopWinAnimation(){
+  const THREE=window.THREE;
+  if(!THREE)return;
+  // Use scene1 from hgl if available — overlay fireworks on it
+  // Otherwise create a small overlay canvas in the modal
+  const modal=document.getElementById('hoopModal');
+  let overlay=document.getElementById('hoopWinOverlay');
+  if(!overlay){
+    overlay=document.createElement('canvas');
+    overlay.id='hoopWinOverlay';
+    overlay.style.cssText='position:absolute;top:0;left:0;width:100%;height:180px;pointer-events:none;z-index:10;border-radius:10px;';
+    const bm=modal.querySelector('.battle-modal');
+    if(bm){bm.style.position='relative';bm.appendChild(overlay);}
+  }
+  const W=overlay.offsetWidth||400,H=180;
+  overlay.width=W;overlay.height=H;
+  if(hoopFwRenderer){try{hoopFwRenderer.dispose();}catch(e){}}
+  const renderer=new THREE.WebGLRenderer({canvas:overlay,antialias:true,alpha:true});
+  renderer.setSize(W,H);renderer.setClearColor(0x000000,0);
+  hoopFwRenderer=renderer;
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(60,W/H,0.1,50);
+  cam.position.set(0,2,8);cam.lookAt(0,2,0);
+  scene.add(new THREE.AmbientLight(0xffffff,0.5));
+
+  // Particle system
+  const MAX_P=800;
+  const pPos=new Float32Array(MAX_P*3);
+  const pCol=new Float32Array(MAX_P*3);
+  const pGeo=new THREE.BufferGeometry();
+  pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+  pGeo.setAttribute('color',new THREE.BufferAttribute(pCol,3));
+  const pMesh=new THREE.Points(pGeo,new THREE.PointsMaterial({size:0.15,vertexColors:true,transparent:true,depthWrite:false}));
+  scene.add(pMesh);
+
+  const particles=[];
+  const coins=[];
+  const confetti=[];
+
+  // Launch bursts
+  for(let b=0;b<8;b++){
+    setTimeout(()=>{
+      const bx=(Math.random()-0.5)*6,by=1+Math.random()*3,bz=(Math.random()-0.5)*2;
+      const col=new THREE.Color().setHSL(Math.random(),1,0.6);
+      for(let i=0;i<50;i++){
+        const a=Math.random()*Math.PI*2,el=(Math.random()-0.5)*Math.PI;
+        const spd=0.06+Math.random()*0.1;
+        particles.push({x:bx,y:by,z:bz,vx:Math.cos(a)*Math.cos(el)*spd,vy:Math.sin(el)*spd+0.02,vz:Math.sin(a)*Math.cos(el)*spd,life:1.0,decay:0.01+Math.random()*0.01,r:col.r,g:col.g,b:col.b});
+      }
+      const fl=new THREE.PointLight(col,5,6);fl.position.set(bx,by,bz);scene.add(fl);setTimeout(()=>scene.remove(fl),300);
+    },b*300);
+  }
+
+  // XMR coins
+  for(let i=0;i<10;i++){
+    setTimeout(()=>{
+      const coin=makeXMRCoinHoop();
+      coin.position.set((Math.random()-0.5)*5,0,(Math.random()-0.5)*2);
+      scene.add(coin);
+      coins.push({mesh:coin,vx:(Math.random()-0.5)*0.05,vy:0.07+Math.random()*0.08,vz:(Math.random()-0.5)*0.03,spin:0.08+Math.random()*0.12,life:1.0});
+    },i*200);
+  }
+
+  // Confetti
+  const cCols=[0xff2244,0x44aaff,0xffdd00,0x44ff88,0xff88ff,0xffffff,0xff8800];
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const cMat=new THREE.MeshBasicMaterial({color:cCols[Math.floor(Math.random()*cCols.length)],side:THREE.DoubleSide,transparent:true});
+      const cm=new THREE.Mesh(new THREE.PlaneGeometry(0.12+Math.random()*0.1,0.07+Math.random()*0.06),cMat);
+      cm.position.set((Math.random()-0.5)*7,4+Math.random()*2,(Math.random()-0.5)*3);
+      cm.rotation.set(Math.random()*6,Math.random()*6,Math.random()*6);
+      scene.add(cm);
+      confetti.push({mesh:cm,vx:(Math.random()-0.5)*0.04,vy:-0.02-Math.random()*0.03,vz:(Math.random()-0.5)*0.02,rx:Math.random()*0.12-0.06,ry:Math.random()*0.18-0.09,rz:Math.random()*0.1-0.05,life:1.0});
+    },i*55);
+  }
+
+  let animActive=true;
+  hoopFwAnim=animActive;
+  function fwTick(){
+    if(!animActive)return;
+    requestAnimationFrame(fwTick);
+    // Update particles
+    particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.z+=p.vz;p.vy-=0.002;p.life-=p.decay;});
+    let pi=0;
+    particles.filter(p=>p.life>0).forEach(p=>{
+      if(pi>=MAX_P)return;
+      pPos[pi*3]=p.x;pPos[pi*3+1]=p.y;pPos[pi*3+2]=p.z;
+      pCol[pi*3]=p.r*p.life;pCol[pi*3+1]=p.g*p.life;pCol[pi*3+2]=p.b*p.life;pi++;
+    });
+    for(let i=pi;i<MAX_P;i++){pPos[i*3+1]=-999;}
+    pGeo.attributes.position.needsUpdate=true;pGeo.attributes.color.needsUpdate=true;
+    // Coins
+    for(let i=coins.length-1;i>=0;i--){
+      const c=coins[i];
+      c.mesh.position.x+=c.vx;c.mesh.position.y+=c.vy;c.mesh.position.z+=c.vz;
+      c.vy-=0.003;c.mesh.rotation.y+=c.spin;c.life-=0.007;
+      if(c.life<=0||c.mesh.position.y<-2){scene.remove(c.mesh);coins.splice(i,1);}
+    }
+    // Confetti
+    for(let i=confetti.length-1;i>=0;i--){
+      const c=confetti[i];
+      c.mesh.position.x+=c.vx+Math.sin(c.mesh.position.y*2)*0.006;
+      c.mesh.position.y+=c.vy;c.mesh.position.z+=c.vz;
+      c.mesh.rotation.x+=c.rx;c.mesh.rotation.y+=c.ry;c.mesh.rotation.z+=c.rz;
+      c.life-=0.004;c.mesh.material.opacity=Math.max(0,c.life);
+      if(c.life<=0||c.mesh.position.y<-1){scene.remove(c.mesh);confetti.splice(i,1);}
+    }
+    renderer.render(scene,cam);
+    if(particles.filter(p=>p.life>0).length===0&&coins.length===0&&confetti.length===0){
+      animActive=false;overlay.style.display='none';
+    }
+  }
+  fwTick();
+}
+
 function showHoopResult(g,isP1){
   const myR=isP1?g.p1Results:g.p2Results;
   const oppR=isP1?g.p2Results:g.p1Results;
@@ -2782,6 +2944,7 @@ function showHoopResult(g,isP1){
     ?'You won '+parseFloat(g.winnings||0).toFixed(3)+' XRP!'
     :'Opponent won. Better luck next time!';
   el.style.display='block';
+  if(iWin) setTimeout(spawnHoopWinAnimation, 300);
 }
 
 window.closeHoop=function(){
