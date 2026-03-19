@@ -2853,7 +2853,7 @@ window.openHoopModal=async function(gid,autoPlay){
       if(gd.status==='complete'&&gd.p1Results){
         document.getElementById('hoopRolling').classList.remove('show');
         if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
-        runHoopGame(gid,isP1);
+        showHoopResult(gd,isP1);document.getElementById('btnCloseHoop').style.display='inline-flex';loadBal();
       }else if(gd.status==='active'&&gd.player2?.uid){
         document.getElementById('hoopRollLbl').textContent='Opponent joined! Starting...';
         if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
