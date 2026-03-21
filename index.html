@@ -2366,9 +2366,10 @@ function showBarrelResult(gd, isP1, result){
 function buildHoopScene(targetCanvas, statusElemId) {
   const THREE = window.THREE;
   if (!THREE || !targetCanvas) return null;
-  const W = 560, H = 314;
-  targetCanvas.width = W; targetCanvas.height = H;
-  targetCanvas.style.width='100%'; targetCanvas.style.height='auto';
+
+  const modalW = Math.min(460, window.innerWidth - 80);
+  const modalH = Math.round(modalW * 0.56);
+  targetCanvas.width = modalW; targetCanvas.height = modalH;
 
   const renderer=new THREE.WebGLRenderer({canvas:targetCanvas,antialias:true});
   renderer.setSize(W,H);
@@ -2852,7 +2853,7 @@ function buildHoopScene(targetCanvas, statusElemId) {
 
   // ── GAME STATE ──
   let t=0, phase='idle', round=0, scores=[0,0], shake=0;
-  function setStatus(s){ const el=document.getElementById(statusElemId); if(el) el.textContent=s; }
+  function setStatus(s){ const _el=document.getElementById(statusElemId); if(_el) _el.textContent=s; }
 
   // ── BALL PHYSICS ──
   const B={
@@ -3140,11 +3141,10 @@ function buildHoopScene(targetCanvas, statusElemId) {
     resetBall();
   }
 
-  let _mirrorCanvas = null;
-  let _running = false;
+  let active = true;
 
   function animate(){
-    if(!_running) return;
+    if(!active) return;
     requestAnimationFrame(animate);
     t+=0.016;
 
@@ -3189,17 +3189,12 @@ function buildHoopScene(targetCanvas, statusElemId) {
     }
 
     renderer.render(scene,camera);
-    if(_mirrorCanvas){
-      const _ctx=_mirrorCanvas.getContext("2d");
-      if(_ctx) _ctx.drawImage(renderer.domElement,0,0,_mirrorCanvas.width,_mirrorCanvas.height);
-    }
   }
 
-  function startScene(){ if(!_running){ _running=true; animate(); } }
-  function stopScene(){ _running=false; }
+  // Start loop immediately — same as barrel
+  animate();
 
-  async function runShots(results, mirrorCanvas) {
-    _mirrorCanvas = mirrorCanvas || null;
+  async function runShots(results, scoreElemId) {
     phase = 'playing';
     setStatus('GET READY...');
     await new Promise(r=>setTimeout(r,500));
@@ -3210,10 +3205,10 @@ function buildHoopScene(targetCanvas, statusElemId) {
       setStatus('SHOT '+(i+1)+'/'+results.length+'  •  '+score+' pts');
       await doShot(results[i]);
       if(results[i]) score++;
+      if(scoreElemId){ const se=document.getElementById(scoreElemId); if(se) se.textContent=score; }
       setStatus(results[i]?'🏀  '+score+' pts':'·  '+score+' pts');
       await new Promise(r=>setTimeout(r,280));
     }
-    _mirrorCanvas = null;
     setStatus('DONE! '+score+'/'+results.length+' 🏀');
     phase='idle';
     return score;
@@ -3223,8 +3218,8 @@ function buildHoopScene(targetCanvas, statusElemId) {
     runShots,
     setStatus,
     spawnWin(){ fw.spawn(); },
-    start(){ startScene(); },
-    stop(){ stopScene(); }
+    stop(){ active=false; },
+    start(){ active=true; animate(); }
   };
 }
 
@@ -3233,28 +3228,29 @@ let hgl=null; // single scene — mirrors to canvas2 for opponent shots
 let hoopLobbyUnsub=null, hoopGameUnsub=null;
 let hoopOpen=false, hoopGid=null, hoopActiveGid=null;
 
-function initHoopWebGL(){
+function initHoopWebGL() {
   if(hgl) return;
-  const THREE=window.THREE; if(!THREE) return;
+  const THREE = window.THREE;
+  if(!THREE){ console.warn('Three.js not loaded'); return; }
   const c1=document.getElementById('hoopCanvas1');
   const c2=document.getElementById('hoopCanvas2');
-  if(!c1) return;
-  // Set canvas2 size and draw dark placeholder
-  if(c2){
-    c2.width=560; c2.height=314;
-    c2.style.width='100%'; c2.style.height='auto';
-    const ctx=c2.getContext('2d');
-    if(ctx){
-      ctx.fillStyle='#3a6090';
-      ctx.fillRect(0,0,560,314);
-      ctx.fillStyle='rgba(255,204,0,0.7)';
-      ctx.font='bold 14px monospace';
-      ctx.textAlign='center';
-      ctx.fillText('OPPONENT SHOTS — UP NEXT',280,157);
-    }
-  }
-  hgl=buildHoopScene(c1,'hoopStatus1');
-  if(hgl) hgl.start();
+  if(!c1||!c2) return;
+  const s1=buildHoopScene(c1,'hoopStatus1');
+  const s2=buildHoopScene(c2,'hoopStatus2');
+  if(!s1||!s2) return;
+  hgl = { s1, s2,
+    async runGame(myR, oppR){
+      // Run both simultaneously — same as barrel
+      const [myScore, oppScore] = await Promise.all([
+        s1.runShots(myR, 'hoopScore1'),
+        s2.runShots(oppR, 'hoopScore2'),
+      ]);
+      return { myScore, oppScore };
+    },
+    spawnWin(){ s1.spawnWin(); },
+    stop(){ s1.stop(); s2.stop(); },
+    start(){ s1.start(); s2.start(); }
+  };
 }
 
 // ── Create ──
@@ -3386,7 +3382,7 @@ window.openHoopModal=async function(gid,autoShoot){
   await new Promise(r=>requestAnimationFrame(r));
   initHoopWebGL();
   if(!hgl){
-    document.getElementById('hoopStatus').textContent='3D engine failed to load. Try refreshing.';
+    document.getElementById('hoopStatus').textContent='3D engine failed to load.';
     document.getElementById('btnCloseHoop').style.display='inline-flex';
     return;
   }
@@ -3467,54 +3463,27 @@ async function startHoopGame(gid,isP1){
 }
 
 // ── Play animations: both scenes simultaneously like barrel ──
-async function runHoopAnimation(result,isP1){
-  if(!hgl1||!hgl2) return;
+async function runHoopAnimation(result, isP1){
+  if(!hgl) return;
   const myR  = isP1 ? result.p1Results : result.p2Results;
   const oppR = isP1 ? result.p2Results : result.p1Results;
-  const total = myR.length;
 
-  // Countdown on both simultaneously
-  await Promise.all([hgl1.countdown(), hgl2.countdown()]);
+  // Update score display after each shot — poll during animation
+  let done = false;
+  const scorePoller = setInterval(()=>{
+    const s1el=document.getElementById('hoopScore1');
+    const s2el=document.getElementById('hoopScore2');
+    // scores updated inside runShots via DOM — just keep polling
+  },500);
 
-  // Play all shots simultaneously — each scene's RAF loop is independent
-  let myScore=0, oppScore=0;
-  const myPromise = (async()=>{
-    for(let i=0;i<total;i++){
-      hgl1.setStatus('SHOT '+(i+1)+'/'+total+'  •  '+myScore+' pts');
-      await doShotScene(hgl1, myR[i]);
-      if(myR[i]) myScore++;
-      hgl1.setStatus(myR[i]?'🏀  '+myScore+' pts':'·  '+myScore+' pts');
-      document.getElementById('hoopScore1').textContent=myScore;
-      document.getElementById('hoopShotCount').textContent=(i+1)+'/'+total;
-      await new Promise(r=>setTimeout(r,280));
-    }
-    hgl1.setStatus('DONE! '+myScore+'/'+total+' 🏀');
-    return myScore;
-  })();
-  const oppPromise = (async()=>{
-    for(let i=0;i<total;i++){
-      hgl2.setStatus('SHOT '+(i+1)+'/'+total+'  •  '+oppScore+' pts');
-      await doShotScene(hgl2, oppR[i]);
-      if(oppR[i]) oppScore++;
-      hgl2.setStatus(oppR[i]?'🏀  '+oppScore+' pts':'·  '+oppScore+' pts');
-      document.getElementById('hoopScore2').textContent=oppScore;
-      await new Promise(r=>setTimeout(r,280));
-    }
-    hgl2.setStatus('DONE! '+oppScore+'/'+total+' 🏀');
-    return oppScore;
-  })();
-  await Promise.all([myPromise, oppPromise]);
+  const {myScore, oppScore} = await hgl.runGame(myR, oppR);
+  clearInterval(scorePoller);
+
+  document.getElementById('hoopScore1').textContent=myScore;
+  document.getElementById('hoopScore2').textContent=oppScore;
+  document.getElementById('hoopShotCount').textContent=myR.length+'/'+myR.length;
 }
 
-// Trigger a shot on a specific scene instance
-// Each scene has its own doShot scoped inside buildHoopScene
-// We can't call it directly — instead we use the runShots API one shot at a time
-// Since each scene's physics/RAF is isolated, they truly run in parallel
-async function doShotScene(scene, scored){
-  // runShots plays shots sequentially inside its own scene
-  // We just need to trigger one shot — use a 1-element array
-  await scene.runShots([scored]);
-}
 
 function showHoopResult(g,isP1){
   const myR  = isP1 ? g.p1Results : g.p2Results;
