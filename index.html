@@ -3140,6 +3140,8 @@ async function doShot(willScore){
   resetBall();
 }
 
+  let _mirrorCanvas = null;
+
 function animate(){
   if(!_running) return;
   requestAnimationFrame(animate);
@@ -3186,13 +3188,19 @@ function animate(){
   }
 
   renderer.render(scene,camera);
+  // Mirror to second canvas if needed
+  if(_mirrorCanvas){
+    const ctx=_mirrorCanvas.getContext("2d");
+    if(ctx) ctx.drawImage(renderer.domElement,0,0,_mirrorCanvas.width,_mirrorCanvas.height);
+  }
 }
 
   let _running = false;
   function startScene(){ if(!_running){ _running=true; animate(); } }
   function stopScene(){ _running=false; }
 
-  async function runShots(results) {
+  async function runShots(results, mirrorCanvas) {
+    _mirrorCanvas = mirrorCanvas || null;
     phase = 'playing';
     setStatus('GET READY...');
     await new Promise(r=>setTimeout(r,500));
@@ -3206,6 +3214,7 @@ function animate(){
       setStatus(results[i]?'🏀  '+score+' pts':'·  '+score+' pts');
       await new Promise(r=>setTimeout(r,280));
     }
+    _mirrorCanvas = null;
     setStatus('DONE! '+score+'/'+results.length+' 🏀');
     phase='idle';
     return score;
@@ -3221,20 +3230,17 @@ function animate(){
 }
 
 
-let hgl1=null, hgl2=null;
+let hgl=null; // single scene — mirrors to canvas2 for opponent shots
 let hoopLobbyUnsub=null, hoopGameUnsub=null;
 let hoopOpen=false, hoopGid=null, hoopActiveGid=null;
 
 function initHoopWebGL(){
-  if(hgl1&&hgl2) return;
+  if(hgl) return;
   const THREE=window.THREE; if(!THREE) return;
   const c1=document.getElementById('hoopCanvas1');
-  const c2=document.getElementById('hoopCanvas2');
-  if(!c1||!c2) return;
-  if(!hgl1) hgl1=buildHoopScene(c1,'hoopStatus1');
-  if(!hgl2) hgl2=buildHoopScene(c2,'hoopStatus2');
-  if(hgl1) hgl1.start();
-  if(hgl2) hgl2.start();
+  if(!c1) return;
+  hgl=buildHoopScene(c1,'hoopStatus1');
+  if(hgl) hgl.start();
 }
 
 // ── Create ──
@@ -3365,7 +3371,7 @@ window.openHoopModal=async function(gid,autoShoot){
   // Give browser one frame to render the modal before reading canvas size
   await new Promise(r=>requestAnimationFrame(r));
   initHoopWebGL();
-  if(!hgl1||!hgl2){
+  if(!hgl){
     document.getElementById('hoopStatus').textContent='3D engine failed to load. Try refreshing.';
     document.getElementById('btnCloseHoop').style.display='inline-flex';
     return;
@@ -3512,7 +3518,7 @@ function showHoopResult(g,isP1){
     ?'You scored '+myScore+'/20 vs '+oppScore+'! Won '+parseFloat(g.winnings||0).toFixed(3)+' XRP!'
     :'You scored '+myScore+'/20 vs '+oppScore+'. Better luck next time!';
   el.style.display='block';
-  if(iWin&&hgl1) setTimeout(()=>hgl1.spawnWin(),400);
+  if(iWin&&hgl) setTimeout(()=>hgl.spawnWin(),400);
 }
 
 </script>
