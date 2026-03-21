@@ -1494,24 +1494,15 @@ window.joinGame=async function(gid,stake){
 window.cancelGame=async function(gid,stake){
   if(!confirm('Cancel and get '+stake.toFixed(3)+' XRP back?'))return;
   try{
-    await deleteDoc(doc(db,'games',gid));
-    // Read fresh balance from Firestore (rules only allow decrease via client)
-    // so we use the PHP deposit endpoint to credit the refund
-    // Actually — read current balance and write refund via merge
-    const snap=await getDoc(doc(db,'game_balances',me.uid));
-    const currentBal=snap.exists()?parseFloat(snap.data().balance||0):0;
-    const refundedBal=parseFloat((currentBal+stake).toFixed(6));
-    // Use PHP to do the refund since client rules block balance increases
     const t=await getToken();
-    if(t){
-      await php('game_refund.php',{amount:stake});
-    }
-    bal=refundedBal; updateBalUI();
-    activeGid=null; updateBanner([]);
+    if(!t) throw new Error('Not logged in');
+    const r=await fetch(WORKER_URL+'/api/refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:t,gameId:gid,collection:'games'})});
+    const data=await r.json();
+    if(!data.ok) throw new Error(data.error||'Refund failed');
+    activeGid=null; updateBanner([]); bal=data.balance; updateBalUI();
     toast('Cancelled. Stake returned.','ok');
-    await loadBal(); // reload to confirm
   }catch(e){
-    toast('Error cancelling.','err');
+    toast('Error: '+e.message,'err');
     console.error(e);
   }
 };
@@ -2172,13 +2163,13 @@ window.joinBarrelGame=async function(gid,stake){
 window.cancelBarrelGame=async function(gid,stake){
   if(!confirm('Cancel and get '+stake.toFixed(3)+' XRP back?'))return;
   try{
-    await deleteDoc(doc(db,'barrel_games',gid));
     const t=await getToken();
-    if(t) await fetch(WORKER_URL+'/api/refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:t,amount:stake})});
-    barrelActiveGid=null;
-    toast('Cancelled. Stake returned.','ok');
-    await loadBal();
-  }catch(e){toast('Error cancelling.','err');}
+    if(!t) throw new Error('Not logged in');
+    const r=await fetch(WORKER_URL+'/api/refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:t,gameId:gid,collection:'barrel_games'})});
+    const data=await r.json();
+    if(!data.ok) throw new Error(data.error||'Refund failed');
+    barrelActiveGid=null; bal=data.balance; updateBalUI(); toast('Cancelled. Stake returned.','ok');
+  }catch(e){toast('Error: '+e.message,'err');}
 };
 
 function startBarrelLobby(){
@@ -3314,12 +3305,14 @@ window.joinHoopGame=async function(gid,stake){
 window.cancelHoopGame=async function(gid,stake){
   if(!confirm('Cancel and get '+stake.toFixed(3)+' XRP back?'))return;
   try{
-    await deleteDoc(doc(db,'hoop_games',gid));
     const tk=await getToken();
-    if(tk) await fetch(WORKER_URL+'/api/refund',{method:'POST',
+    if(!tk) throw new Error('Not logged in');
+    const r=await fetch(WORKER_URL+'/api/refund',{method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({idToken:tk,amount:stake})});
-    hoopActiveGid=null; toast('Cancelled. Stake returned.','ok'); await loadBal();
+      body:JSON.stringify({idToken:tk,gameId:gid,collection:'hoop_games'})});
+    const data=await r.json();
+    if(!data.ok) throw new Error(data.error||'Refund failed');
+    hoopActiveGid=null; bal=data.balance; updateBalUI(); toast('Cancelled. Stake returned.','ok');
   }catch(e){toast('Error: '+e.message,'err');}
 };
 
