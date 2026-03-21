@@ -2377,7 +2377,6 @@ function buildHoopScene(targetCanvas, statusElemId) {
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.15;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 
   const scene=new THREE.Scene();
   scene.background=new THREE.Color(0x3a6090);
@@ -3142,6 +3141,9 @@ function buildHoopScene(targetCanvas, statusElemId) {
   }
 
   let active = true;
+
+  const _idleAxis=new THREE.Vector3(0,1,0.28).normalize();
+  const _idleQ=new THREE.Quaternion().setFromAxisAngle(_idleAxis,0.007);
 
   function animate(){
     if(!active) return;
