@@ -552,6 +552,28 @@
     }
 
     /* ── BARREL SHOWDOWN ── */
+
+    /* ── HOOP FRENZY ── */
+    #hoopContent{display:none;}
+    #hoopContent.active{display:block;}
+    .hoop-page-header{background:linear-gradient(135deg,#0d1b2e,#1a3a6b,#0a2d6b);border-radius:16px;padding:24px 28px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;position:relative;overflow:hidden;}
+    .hoop-page-header::before{content:'🏀';position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:80px;opacity:0.06;pointer-events:none;}
+    .hoop-page-title{font-family:var(--serif);font-size:26px;color:white;margin-bottom:4px;}
+    .hoop-page-sub{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.4);line-height:1.6;}
+    .hoop-page-back{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.5);background:none;border:none;cursor:pointer;padding:0;margin-bottom:8px;transition:color 0.15s;}
+    .hoop-page-back:hover{color:white;}
+    .hoop-result{text-align:center;padding:14px;border-radius:12px;margin-bottom:16px;display:none;}
+    .hoop-result.win{background:var(--green-bg);border:1px solid var(--green-border);}
+    .hoop-result.lose{background:var(--red-bg);border:1px solid var(--red-border);}
+    .hoop-create-card{background:white;border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:28px;box-shadow:0 2px 16px rgba(30,58,95,0.06);}
+    .hoop-create-head{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+    .hoop-create-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue-50),var(--blue-100));border:1px solid var(--blue-200);display:flex;align-items:center;justify-content:center;font-size:16px;}
+    .hoop-lobby{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
+    .hoop-score-row{display:flex;gap:10px;justify-content:center;margin-bottom:12px;}
+    .hoop-score-box{text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;}
+    .hoop-score-num{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--blue-600);}
+    .hoop-score-num.opp{color:var(--red);}
+    .hoop-score-lbl{font-family:var(--mono);font-size:9px;color:var(--ink-light);margin-top:2px;}
     #barrelContent{display:none;}
     #barrelContent.active{display:block;}
     .barrel-page-header{
@@ -631,6 +653,13 @@
       <a href="#" id="drawerNavBarrel" onclick="navTo('barrel');closeDrawer();">
         <span class="drawer-nav-icon">🪣</span>
         Barrel Showdown
+        <span class="drawer-nav-badge">Live</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" id="drawerNavHoop" onclick="navTo('hoop');closeDrawer();">
+        <span class="drawer-nav-icon">🏀</span>
+        Hoop Frenzy
         <span class="drawer-nav-badge">Live</span>
       </a>
     </li>
@@ -798,6 +827,52 @@
           </button>
         </div>
       </div>
+      <!-- Hoop Frenzy Card -->
+      <div class="game-entry-card" onclick="navTo('hoop')">
+        <div class="game-entry-card-banner">
+          <div class="game-entry-card-banner-dice" style="gap:18px;background:linear-gradient(135deg,#0d1b2e,#1a3a6b);">
+            <svg width="34" height="34" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-10deg)">
+              <circle cx="50" cy="50" r="46" fill="rgba(229,90,0,0.9)" stroke="rgba(0,0,0,0.3)" stroke-width="2"/>
+              <path d="M50 4 Q50 50 50 96" stroke="rgba(0,0,0,0.5)" stroke-width="3" fill="none"/>
+              <path d="M4 50 Q50 50 96 50" stroke="rgba(0,0,0,0.5)" stroke-width="3" fill="none"/>
+              <path d="M10 22 Q50 56 90 78" stroke="rgba(0,0,0,0.35)" stroke-width="2.5" fill="none"/>
+              <path d="M10 78 Q50 44 90 22" stroke="rgba(0,0,0,0.35)" stroke-width="2.5" fill="none"/>
+            </svg>
+            <svg width="50" height="54" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="2" width="84" height="52" rx="3" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.45)" stroke-width="2"/>
+              <rect x="26" y="12" width="48" height="30" rx="2" fill="none" stroke="rgba(255,80,0,0.85)" stroke-width="2"/>
+              <rect x="44" y="54" width="12" height="14" fill="rgba(255,255,255,0.3)"/>
+              <ellipse cx="50" cy="74" rx="28" ry="6" fill="none" stroke="rgba(255,120,0,1)" stroke-width="3.5"/>
+              <line x1="22" y1="74" x2="27" y2="108" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+              <line x1="50" y1="80" x2="50" y2="110" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+              <line x1="78" y1="74" x2="73" y2="108" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+              <line x1="34" y1="76" x2="36" y2="108" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+              <line x1="66" y1="76" x2="64" y2="108" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+              <path d="M27 108 Q50 116 73 108" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+            </svg>
+            <svg width="34" height="34" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(8deg);opacity:0.75">
+              <circle cx="50" cy="50" r="46" fill="rgba(229,90,0,0.7)" stroke="rgba(0,0,0,0.2)" stroke-width="2"/>
+              <path d="M50 4 Q50 50 50 96" stroke="rgba(0,0,0,0.4)" stroke-width="3" fill="none"/>
+              <path d="M4 50 Q50 50 96 50" stroke="rgba(0,0,0,0.4)" stroke-width="3" fill="none"/>
+            </svg>
+          </div>
+          <div class="game-entry-card-glow"></div>
+          <div class="game-entry-card-live"><span class="live-dot"></span>Live</div>
+        </div>
+        <div class="game-entry-card-body">
+          <div class="game-entry-card-title">Hoop Frenzy 🏀</div>
+          <div class="game-entry-card-desc">20 shots each. Most baskets wins. Real physics — backboard, rim, spring net. Server RNG.</div>
+          <div class="game-entry-card-tags">
+            <span class="game-tag game-tag-blue">2 Players</span>
+            <span class="game-tag game-tag-xrp">XRP Stakes</span>
+            <span class="game-tag game-tag-green">20 Shots</span>
+          </div>
+          <button class="btn-play-now">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play Now
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   <div id="gameContent">
@@ -940,6 +1015,87 @@
       <button class="btn-close-battle" id="btnCloseBarrel" style="display:none" onclick="closeBarrel()">Close</button>
     </div>
     <div class="bstatus" id="barrelStatus"></div>
+  </div>
+</div>
+
+  <!-- HOOP FRENZY SCREEN -->
+  <div id="hoopContent">
+    <div class="hoop-page-header">
+      <div>
+        <button class="hoop-page-back" onclick="navTo('home')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Games
+        </button>
+        <div class="hoop-page-title">🏀 Hoop Frenzy</div>
+        <div class="hoop-page-sub">20 shots each · Most baskets wins · Server-side RNG · 3% house cut</div>
+      </div>
+    </div>
+    <div class="active-banner" id="hoopActiveBanner">
+      <div class="banner-dot"></div>
+      <div class="banner-text" id="hoopBannerText">Your hoop game is live.</div>
+      <button class="btn-play" id="btnHoopResume" style="padding:8px 16px;font-size:12px;">View</button>
+    </div>
+    <div class="section-label">Create a Game</div>
+    <div class="hoop-create-card">
+      <div class="hoop-create-head">
+        <div class="hoop-create-icon">🏀</div>
+        <div class="create-card-title">New Hoop Frenzy</div>
+      </div>
+      <div class="create-row">
+        <div class="input-group">
+          <label class="input-label">Your stake (XRP)</label>
+          <input class="stake-input" id="hoopStakeInput" type="number" min="0.1" max="100" step="0.1" placeholder="e.g. 1.0"/>
+          <div class="stake-hint">20 shots each. Most baskets wins. Auto-plays when opponent joins.</div>
+        </div>
+        <button class="btn-create" id="btnHoopCreate">🏀 Create Game</button>
+      </div>
+    </div>
+    <div class="section-label">Open Games</div>
+    <div class="hoop-lobby" id="hoopLobby">
+      <div class="lobby-empty"><span class="lobby-empty-icon">🏀</span>No hoop games right now.<br/>Be the first to create one above.</div>
+    </div>
+  </div>
+</main>
+
+<!-- HOOP FRENZY MODAL -->
+<div class="modal-overlay" id="hoopModal">
+  <div class="battle-modal" style="max-width:660px;">
+    <div class="battle-title">🏀 Hoop Frenzy</div>
+    <div class="battle-sub" id="hoopSub">20 shots each — most baskets wins.</div>
+    <div class="players-row" style="margin-bottom:10px;">
+      <div class="player-side"><div class="player-side-name p1c" id="hoopp1">You</div></div>
+      <div class="vs-txt">VS</div>
+      <div class="player-side"><div class="player-side-name p2c" id="hoopp2">Opponent</div></div>
+    </div>
+    <div class="hoop-score-row">
+      <div class="hoop-score-box"><div class="hoop-score-num" id="hoopScore1">0</div><div class="hoop-score-lbl">YOUR SCORE</div></div>
+      <div style="display:flex;align-items:center;font-family:var(--mono);font-size:10px;color:var(--ink-light);padding:0 6px;" id="hoopShotCount">0/20</div>
+      <div class="hoop-score-box"><div class="hoop-score-num opp" id="hoopScore2">0</div><div class="hoop-score-lbl">THEIR SCORE</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+      <div style="position:relative;">
+        <div style="position:absolute;top:7px;left:10px;z-index:2;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.75);background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:4px;pointer-events:none;">YOUR SHOTS</div>
+        <canvas id="hoopCanvas1" style="width:100%;border-radius:10px;border:2px solid var(--blue-200);display:block;"></canvas>
+        <div id="hoopStatus1" style="position:absolute;top:7px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:12px;color:#ffcc00;letter-spacing:2px;text-shadow:0 0 8px #ffcc0088;background:rgba(0,0,0,0.55);padding:3px 14px;border-radius:20px;white-space:nowrap;pointer-events:none;">STANDBY</div>
+      </div>
+      <div style="position:relative;">
+        <div style="position:absolute;top:7px;left:10px;z-index:2;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.75);background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:4px;pointer-events:none;">OPPONENT'S SHOTS</div>
+        <canvas id="hoopCanvas2" style="width:100%;border-radius:10px;border:2px solid var(--red-border);display:block;"></canvas>
+        <div id="hoopStatus2" style="position:absolute;top:7px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:12px;color:#ffcc00;letter-spacing:2px;text-shadow:0 0 8px #ffcc0088;background:rgba(0,0,0,0.55);padding:3px 14px;border-radius:20px;white-space:nowrap;pointer-events:none;">STANDBY</div>
+      </div>
+    </div>
+    <div class="rolling-indicator" id="hoopRolling">
+      <div class="roll-spinner"></div>
+      <div class="roll-lbl" id="hoopRollLbl">Waiting for opponent...</div>
+    </div>
+    <div class="hoop-result" id="hoopResult">
+      <div class="res-title" id="hoopResTit">—</div>
+      <div class="res-detail" id="hoopResDet">—</div>
+    </div>
+    <div class="battle-btns">
+      <button class="btn-close-battle" id="btnCloseHoop" style="display:none" onclick="closeHoop()">Close</button>
+    </div>
+    <div class="bstatus" id="hoopStatus"></div>
   </div>
 </div>
 
@@ -1150,19 +1306,24 @@ window.navTo = function(screen) {
   document.getElementById('homeScreen').classList.toggle('active', screen === 'home');
   document.getElementById('gameContent').classList.toggle('active', screen === 'dice');
   document.getElementById('barrelContent').classList.toggle('active', screen === 'barrel');
+  document.getElementById('hoopContent').classList.toggle('active', screen === 'hoop');
   // Update drawer active state
   const navHome   = document.getElementById('drawerNavHome');
   const navDice   = document.getElementById('drawerNavDice');
   const navBarrel = document.getElementById('drawerNavBarrel');
+  const navHoop   = document.getElementById('drawerNavHoop');
   if(navHome)   navHome.className   = screen === 'home'   ? 'active' : '';
   if(navDice)   navDice.className   = screen === 'dice'   ? 'active' : '';
   if(navBarrel) navBarrel.className = screen === 'barrel' ? 'active' : '';
-  document.title = screen === 'dice' ? 'BountyWall — Dice Arena'
+  if(navHoop)   navHoop.className   = screen === 'hoop'   ? 'active' : '';
+  document.title = screen === 'dice'   ? 'BountyWall — Dice Arena'
     : screen === 'barrel' ? 'BountyWall — Barrel Showdown'
+    : screen === 'hoop'   ? 'BountyWall — Hoop Frenzy'
     : 'BountyWall — Games';
   if(screen === 'dice'   && me && !lobbyUnsub)       startLobby();
   if(screen === 'barrel' && me && !barrelLobbyUnsub){ startBarrelLobby(); }
-  if(screen === 'dice' || screen === 'barrel') updateBalUI();
+  if(screen === 'hoop'   && me && !hoopLobbyUnsub){ startHoopLobby(); }
+  if(screen === 'dice' || screen === 'barrel' || screen === 'hoop') updateBalUI();
   window.scrollTo(0,0);
 };
 
@@ -2197,6 +2358,1104 @@ function showBarrelResult(gd, isP1, result){
 }
 
 // Draw idle scenes when barrel screen is shown — handled in navTo above
+
+// ══════════════════════════════════════════════════════════
+// HOOP FRENZY
+// ══════════════════════════════════════════════════════════
+
+function buildHoopScene(targetCanvas, statusElemId) {
+  const THREE = window.THREE;
+  if (!THREE || !targetCanvas) return null;
+
+  const FW = targetCanvas.parentElement ? (targetCanvas.parentElement.offsetWidth||380) : 380;
+  const FH = Math.round(FW * 0.56);
+  targetCanvas.width = FW; targetCanvas.height = FH;
+
+const renderer=new THREE.WebGLRenderer({canvas:targetCanvas,antialias:true});
+renderer.setSize(FW,FH);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.setPixelRatio(1);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x3a6090);
+scene.fog=new THREE.FogExp2(0x4a7aaa,0.045);
+
+// ── CAMERA — close and dramatic ──
+const camera=new THREE.PerspectiveCamera(70,W/H,0.1,60);
+camera.position.set(0,1.6,-5.5);
+camera.lookAt(0,2.5,-8.6);
+
+// ── LIGHTING ──
+scene.add(new THREE.AmbientLight(0xfff0dd,0.8));
+const sun=new THREE.DirectionalLight(0xfff8e8,2.8);
+sun.position.set(4,14,5);
+sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.near=0.5; sun.shadow.camera.far=45;
+sun.shadow.camera.left=-12; sun.shadow.camera.right=12;
+sun.shadow.camera.top=12; sun.shadow.camera.bottom=-12;
+sun.shadow.bias=-0.0015;
+scene.add(sun);
+scene.add(new THREE.HemisphereLight(0x99bbff,0xaa7733,0.65));
+// Rim accent light
+const rimAccent=new THREE.PointLight(0xff8833,1.2,4);
+rimAccent.position.set(0,3.2,-1.8);
+scene.add(rimAccent);
+
+// ── COURT FLOOR — glossy hardwood ──
+const courtMat=new THREE.MeshPhongMaterial({
+  color:0xc07828,shininess:80,specular:0x553311});
+const court=new THREE.Mesh(new THREE.PlaneGeometry(16,22),courtMat);
+court.rotation.x=-Math.PI/2; court.receiveShadow=true; scene.add(court);
+// Plank lines
+const plankMat=new THREE.MeshBasicMaterial({color:0x8a4e10,transparent:true,opacity:0.30});
+for(let x=-7.5;x<=7.5;x+=0.52){
+  const pl=new THREE.Mesh(new THREE.BoxGeometry(0.50,0.008,22),plankMat);
+  pl.position.set(x,0.004,0); scene.add(pl);
+}
+// Court lines
+const lnMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.5});
+[[-2.1,0,4.0,0.05],[2.1,0,4.0,0.05],[0,-1.6,0.05,4.0]].forEach(([x,z,w,d])=>{
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,0.008,d),lnMat);
+  m.position.set(x,0.005,z); scene.add(m);
+});
+const ftArc=new THREE.Mesh(new THREE.TorusGeometry(2.1,0.028,5,32,Math.PI),lnMat);
+ftArc.rotation.x=Math.PI/2; ftArc.rotation.z=Math.PI;
+ftArc.position.set(0,0.006,-1.6); scene.add(ftArc);
+
+// ── WALLS ──
+const wallMat=new THREE.MeshLambertMaterial({color:0x1e3366});
+const backWall=new THREE.Mesh(new THREE.BoxGeometry(18,12,0.3),wallMat);
+backWall.position.set(0,6,-9); scene.add(backWall);
+// Ad board
+const adMat=new THREE.MeshLambertMaterial({color:0xff5500});
+const ad=new THREE.Mesh(new THREE.BoxGeometry(9,1.4,0.06),adMat);
+ad.position.set(0,1.4,-8.7); scene.add(ad);
+const adTxt=new THREE.Mesh(new THREE.BoxGeometry(8.6,1.0,0.07),
+  new THREE.MeshLambertMaterial({color:0xffcc00}));
+adTxt.position.set(0,1.4,-8.66); scene.add(adTxt);
+[-8.5,8.5].forEach(x=>{
+  const sw=new THREE.Mesh(new THREE.BoxGeometry(0.3,12,22),
+    new THREE.MeshLambertMaterial({color:0x162855}));
+  sw.position.set(x,6,0); scene.add(sw);
+});
+const ceil=new THREE.Mesh(new THREE.PlaneGeometry(16,22),
+  new THREE.MeshLambertMaterial({color:0x0d1525}));
+ceil.rotation.x=Math.PI/2; ceil.position.y=10; scene.add(ceil);
+// Arena spotlights
+[[-3.5,9.5,1],[3.5,9.5,1],[0,9.5,-2],[0,9.5,-5]].forEach(([x,y,z])=>{
+  const lf=new THREE.Mesh(new THREE.BoxGeometry(0.9,0.12,0.9),
+    new THREE.MeshBasicMaterial({color:0xffffee}));
+  lf.position.set(x,y,z); scene.add(lf);
+  const al=new THREE.PointLight(0xfff5cc,0.7,10);
+  al.position.set(x,y-0.3,z); scene.add(al);
+});
+
+// ── CROWD ──
+const standMat=new THREE.MeshLambertMaterial({color:0x1a1a33});
+const crowdCols=[0xff3333,0x3366ff,0xffff00,0xff8800,0xffffff,0x44ff88,0xff44cc];
+[-8.2,8.2].forEach(sx=>{
+  const stand=new THREE.Mesh(new THREE.BoxGeometry(1.8,3.5,16),standMat);
+  stand.position.set(sx,1.75,0); scene.add(stand);
+  for(let row=0;row<4;row++) for(let col=0;col<11;col++){
+    const c=crowdCols[(row*11+col)%crowdCols.length];
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.16,6,4),
+      new THREE.MeshLambertMaterial({color:c}));
+    head.position.set(sx+(sx>0?-0.45:0.45),0.5+row*0.82,-4.5+col*0.9);
+    scene.add(head);
+    // Body
+    const body=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.5,0.18),
+      new THREE.MeshLambertMaterial({color:c}));
+    body.position.set(sx+(sx>0?-0.45:0.45),0.12+row*0.82,-4.5+col*0.9);
+    scene.add(body);
+  }
+});
+
+// ── HOOP CONSTANTS ──
+const RIM_RADIUS  = 0.228;
+const RIM_TUBE    = 0.024;
+const BALL_RADIUS = 0.228;
+const NET_SEGS    = 14;
+const NET_RINGS   = 7;
+
+// Hoop group position
+const HOOP_POS = {x:0, y:0, z:-8.655};
+// In local hoop space:
+const RIM_LOCAL_Y = 2.44;
+const RIM_LOCAL_Z = 0.0;    // rim is at front (toward player)
+const BB_LOCAL_Y  = 3.12;    // backboard center Y
+const BB_LOCAL_Z  = -0.30;   // backboard is behind rim (away from player)
+const BB_W=1.75, BB_H=1.08;
+
+// World-space derived
+const RIM_WX = HOOP_POS.x;
+const RIM_WY = HOOP_POS.y + RIM_LOCAL_Y;
+const RIM_WZ = HOOP_POS.z + RIM_LOCAL_Z;
+const BB_WY  = HOOP_POS.y + BB_LOCAL_Y;
+// Backboard world Z front face (toward player)
+const BB_WZ_FACE = HOOP_POS.z + BB_LOCAL_Z + 0.04;
+
+function makeHoop(){
+  const g=new THREE.Group();
+  const rimMat=new THREE.MeshPhongMaterial({color:0xff4400,shininess:90,specular:0x331100});
+
+  // Backboard — flush against the back wall (no pole, no arm)
+  const bdMat=new THREE.MeshPhongMaterial({color:0xf0f0f0,shininess:150,specular:0x888888,transparent:true,opacity:0.94});
+  const bd=new THREE.Mesh(new THREE.BoxGeometry(BB_W,BB_H,0.09),bdMat);
+  bd.position.set(0,BB_LOCAL_Y,BB_LOCAL_Z); bd.castShadow=true; bd.receiveShadow=true; g.add(bd);
+  const bdEdge=new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(BB_W,BB_H,0.09)),
+    new THREE.LineBasicMaterial({color:0xee1100,linewidth:2}));
+  bdEdge.position.copy(bd.position); g.add(bdEdge);
+  const sq=new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(0.60,0.44,0.01)),
+    new THREE.LineBasicMaterial({color:0xee1100,linewidth:1}));
+  sq.position.set(0,BB_LOCAL_Y-0.32,BB_LOCAL_Z+0.05); g.add(sq);
+
+  // Rim bracket — orange, thin, only visible part between board and rim
+  const bktLen=Math.abs(RIM_LOCAL_Z-(BB_LOCAL_Z+0.045));
+  const bkt=new THREE.Mesh(new THREE.BoxGeometry(0.035,0.035,bktLen),rimMat);
+  bkt.position.set(0,RIM_LOCAL_Y,BB_LOCAL_Z+0.045+bktLen*0.5); g.add(bkt);
+
+  // Rim
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(RIM_RADIUS,RIM_TUBE,12,36),rimMat);
+  rim.rotation.x=Math.PI/2;
+  rim.position.set(0,RIM_LOCAL_Y,RIM_LOCAL_Z);
+  rim.castShadow=true; g.add(rim);
+
+  return g;
+}
+
+const hoop=makeHoop();
+hoop.position.set(HOOP_POS.x, HOOP_POS.y, -8.655);
+scene.add(hoop);
+
+// ── SPRING NET ──
+const netNodes=[], netLinks=[];
+const RING_RADII  =[RIM_RADIUS,0.21,0.18,0.155,0.13,0.105,0.08,0.05];
+const RING_Y_OFF  =[0,-0.065,-0.125,-0.185,-0.245,-0.305,-0.365,-0.415];
+
+for(let ring=0;ring<=NET_RINGS;ring++){
+  for(let seg=0;seg<NET_SEGS;seg++){
+    const a=(seg/NET_SEGS)*Math.PI*2;
+    const r=RING_RADII[ring];
+    netNodes.push({
+      x:RIM_WX+Math.cos(a)*r, y:RIM_WY+RING_Y_OFF[ring], z:RIM_WZ+Math.sin(a)*r,
+      vx:0,vy:0,vz:0,
+      ox:RIM_WX+Math.cos(a)*r, oy:RIM_WY+RING_Y_OFF[ring], oz:RIM_WZ+Math.sin(a)*r,
+      fixed:ring===0
+    });
+  }
+}
+const BOTTOM_N=netNodes.length;
+netNodes.push({
+  x:RIM_WX, y:RIM_WY+RING_Y_OFF[NET_RINGS]-0.03, z:RIM_WZ,
+  vx:0,vy:0,vz:0,
+  ox:RIM_WX, oy:RIM_WY+RING_Y_OFF[NET_RINGS]-0.03, oz:RIM_WZ, fixed:false
+});
+function addLink(a,b,k=240,damp=0.65){
+  const n1=netNodes[a],n2=netNodes[b];
+  const dx=n1.ox-n2.ox,dy=n1.oy-n2.oy,dz=n1.oz-n2.oz;
+  netLinks.push({a,b,rest:Math.sqrt(dx*dx+dy*dy+dz*dz),k,damp});
+}
+for(let r=0;r<=NET_RINGS;r++) for(let s=0;s<NET_SEGS;s++){
+  const i=r*NET_SEGS+s, nx=r*NET_SEGS+(s+1)%NET_SEGS;
+  addLink(i,nx);
+  if(r<NET_RINGS){ addLink(i,(r+1)*NET_SEGS+s); addLink(i,(r+1)*NET_SEGS+(s+1)%NET_SEGS); }
+  if(r===NET_RINGS) addLink(i,BOTTOM_N,200,0.5);
+}
+const netLineMat=new THREE.LineBasicMaterial({color:0xeeeeee,transparent:true,opacity:0.85});
+const netLineGeo=new THREE.BufferGeometry();
+const netLinePos=new Float32Array(netLinks.length*6);
+netLineGeo.setAttribute('position',new THREE.BufferAttribute(netLinePos,3));
+scene.add(new THREE.LineSegments(netLineGeo,netLineMat));
+
+function updateNet(){
+  for(let l=0;l<netLinks.length;l++){
+    const {a,b}=netLinks[l];
+    const na=netNodes[a],nb=netNodes[b];
+    netLinePos[l*6]=na.x;netLinePos[l*6+1]=na.y;netLinePos[l*6+2]=na.z;
+    netLinePos[l*6+3]=nb.x;netLinePos[l*6+4]=nb.y;netLinePos[l*6+5]=nb.z;
+  }
+  netLineGeo.attributes.position.needsUpdate=true;
+}
+updateNet();
+
+function stepNet(){
+  const DT=0.016;
+  for(const lk of netLinks){
+    const na=netNodes[lk.a],nb=netNodes[lk.b];
+    const dx=nb.x-na.x,dy=nb.y-na.y,dz=nb.z-na.z;
+    const dist=Math.sqrt(dx*dx+dy*dy+dz*dz)||0.0001;
+    const f=lk.k*(dist-lk.rest)/dist;
+    const dvx=(nb.vx-na.vx)*lk.damp/dist;
+    const dvy=(nb.vy-na.vy)*lk.damp/dist;
+    const dvz=(nb.vz-na.vz)*lk.damp/dist;
+    const fx=(f*dx+dvx)*DT, fy=(f*dy+dvy)*DT, fz=(f*dz+dvz)*DT;
+    if(!na.fixed){na.vx+=fx;na.vy+=fy;na.vz+=fz;}
+    if(!nb.fixed){nb.vx-=fx;nb.vy-=fy;nb.vz-=fz;}
+  }
+  for(const n of netNodes){
+    if(n.fixed) continue;
+    n.vy-=0.55*DT;
+    n.vx*=0.968;n.vy*=0.968;n.vz*=0.968;
+    n.x+=n.vx*DT;n.y+=n.vy*DT;n.z+=n.vz*DT;
+    n.vx+=(n.ox-n.x)*0.75*DT;
+    n.vy+=(n.oy-n.y)*0.75*DT;
+    n.vz+=(n.oz-n.z)*0.75*DT;
+  }
+  updateNet();
+}
+function netImpulse(bx,by,bz,str){
+  for(const n of netNodes){
+    if(n.fixed) continue;
+    const dx=n.x-bx,dy=n.y-by,dz=n.z-bz;
+    const d=Math.sqrt(dx*dx+dy*dy+dz*dz);
+    if(d<0.4){ const s=str*(1-d/0.4); n.vx+=dx/d*s;n.vy+=dy/d*s;n.vz+=dz/d*s; }
+  }
+}
+
+// ── BALL — Phong with specular highlight ──
+function makeBall(){
+  const g=new THREE.Group();
+  const bMat=new THREE.MeshPhongMaterial({
+    color:0xde5200, shininess:60, specular:0x441100,
+    emissive:0x1a0500});
+  const body=new THREE.Mesh(new THREE.SphereGeometry(BALL_RADIUS,22,16),bMat);
+  body.castShadow=true; body.receiveShadow=true; g.add(body);
+  const sMat=new THREE.MeshBasicMaterial({color:0x110400});
+  [[Math.PI/2,0,0],[0,0,0],[0,Math.PI/2,0]].forEach(([rx,ry,rz])=>{
+    const s=new THREE.Mesh(new THREE.TorusGeometry(BALL_RADIUS+0.003,0.009,4,26),sMat);
+    s.rotation.set(rx,ry,rz); g.add(s);
+  });
+  [0.44,-0.44].forEach(rz=>{
+    const sc=new THREE.Mesh(new THREE.TorusGeometry(BALL_RADIUS+0.003,0.007,4,26,Math.PI),sMat);
+    sc.rotation.z=rz; g.add(sc);
+  });
+  return g;
+}
+const ball=makeBall();
+const BALL_START={x:0,y:0.9,z:-5.8};
+ball.position.set(BALL_START.x,BALL_START.y,BALL_START.z);
+scene.add(ball);
+
+// Ball glow (subtle)
+const ballGlow=new THREE.PointLight(0xff6600,0.8,1.2);
+ball.add(ballGlow);
+
+// Ground shadow blob
+const gshMat=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.22});
+const gsh=new THREE.Mesh(new THREE.CircleGeometry(0.3,16),gshMat);
+gsh.rotation.x=-Math.PI/2; gsh.position.set(0,0.006,BALL_START.z); scene.add(gsh);
+
+// Arm stub (FPS feel)
+const armMesh=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.22,0.45),
+  new THREE.MeshPhongMaterial({color:0xb88050,shininess:30}));
+armMesh.position.set(0.3,-0.32,-0.06); camera.add(armMesh);
+const handMesh=new THREE.Mesh(new THREE.SphereGeometry(0.11,8,6),
+  new THREE.MeshPhongMaterial({color:0xc89060,shininess:20}));
+handMesh.position.set(0.3,-0.41,-0.3); camera.add(handMesh);
+scene.add(camera);
+
+// Flash lights
+const flashL=new THREE.PointLight(0xffcc44,0,7);
+flashL.position.set(0,0,-0.8); camera.add(flashL);
+const hoopFlash=new THREE.PointLight(0x00ffaa,0,6);
+hoopFlash.position.set(RIM_WX,RIM_WY+0.2,RIM_WZ); scene.add(hoopFlash);
+const missFlash=new THREE.PointLight(0xff3300,0,5);
+missFlash.position.set(RIM_WX,RIM_WY,RIM_WZ); scene.add(missFlash);
+const bbFlash=new THREE.PointLight(0xff8800,0,4);
+bbFlash.position.set(RIM_WX,BB_WY,BB_WZ_FACE); scene.add(bbFlash);
+
+// ── SCOREBOARD ──
+const sbMat=new THREE.MeshPhongMaterial({color:0x0a0a1a,emissive:0x000022,shininess:30});
+const sb=new THREE.Mesh(new THREE.BoxGeometry(3.8,1.0,0.12),sbMat);
+sb.position.set(0,7.5,-5.5); scene.add(sb);
+const sbGlow=new THREE.Mesh(new THREE.BoxGeometry(3.9,1.1,0.09),
+  new THREE.MeshBasicMaterial({color:0xffaa00,transparent:true,opacity:0.12}));
+sbGlow.position.set(0,7.5,-5.52); scene.add(sbGlow);
+
+// ── XMR COIN FACTORY (restored from v3) ──
+function makeXMRCoin(){
+  const g=new THREE.Group();
+  const r=0.20;
+  const topMat=new THREE.MeshLambertMaterial({color:0xf2651c,emissive:0x7a2a00,emissiveIntensity:0.3});
+  const topHalf=new THREE.Mesh(new THREE.CylinderGeometry(r,r,0.045,32),topMat);
+  topHalf.rotation.x=Math.PI/2; g.add(topHalf);
+  g.add(new THREE.Mesh(new THREE.TorusGeometry(r,0.012,8,32),
+    new THREE.MeshLambertMaterial({color:0xc04800})));
+  const botMat=new THREE.MeshLambertMaterial({color:0x4d4d4d,emissive:0x111111});
+  const botHalf=new THREE.Mesh(new THREE.CylinderGeometry(r*0.82,r*0.82,0.048,32),botMat);
+  botHalf.rotation.x=Math.PI/2; g.add(botHalf);
+  const sc=0.0028, logoMat=new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide});
+  const uShape=new THREE.Shape();
+  uShape.moveTo((2.629-50)*sc*1.3,(66-50)*sc*1.3);
+  uShape.quadraticCurveTo((0-50)*sc*1.3,(58.2-50)*sc*1.3,(0-50)*sc*1.3,(50-50)*sc*1.3);
+  uShape.bezierCurveTo((0-50)*sc*1.3,(22.4-50)*sc*1.3,(22.4-50)*sc*1.3,(0-50)*sc*1.3,(50-50)*sc*1.3,(0-50)*sc*1.3);
+  uShape.bezierCurveTo((77.6-50)*sc*1.3,(0-50)*sc*1.3,(100-50)*sc*1.3,(22.4-50)*sc*1.3,(100-50)*sc*1.3,(50-50)*sc*1.3);
+  uShape.quadraticCurveTo((100-50)*sc*1.3,(58.2-50)*sc*1.3,(97.37-50)*sc*1.3,(66-50)*sc*1.3);
+  uShape.lineTo((82-50)*sc*1.3,(66-50)*sc*1.3);
+  uShape.lineTo((82-50)*sc*1.3,(22-50)*sc*1.3);
+  uShape.lineTo((50-50)*sc*1.3,(58.5-50)*sc*1.3);
+  uShape.lineTo((18-50)*sc*1.3,(22-50)*sc*1.3);
+  uShape.lineTo((18-50)*sc*1.3,(66-50)*sc*1.3);
+  uShape.closePath();
+  const uM=new THREE.Mesh(new THREE.ShapeGeometry(uShape),
+    new THREE.MeshBasicMaterial({color:0xf2651c,side:THREE.DoubleSide}));
+  uM.position.z=0.026; g.add(uM);
+  const uMB=uM.clone(); uMB.position.z=-0.026; uMB.rotation.y=Math.PI; g.add(uMB);
+  const lShape=new THREE.Shape();
+  lShape.moveTo((7.29-50)*sc*1.3,(76-50)*sc*1.3);
+  lShape.quadraticCurveTo((22-50)*sc*1.3,(100-50)*sc*1.3,(50-50)*sc*1.3,(100-50)*sc*1.3);
+  lShape.quadraticCurveTo((78-50)*sc*1.3,(100-50)*sc*1.3,(92.71-50)*sc*1.3,(76-50)*sc*1.3);
+  lShape.lineTo((72-50)*sc*1.3,(76-50)*sc*1.3);
+  lShape.lineTo((72-50)*sc*1.3,(48-50)*sc*1.3);
+  lShape.lineTo((50-50)*sc*1.3,(74-50)*sc*1.3);
+  lShape.lineTo((28-50)*sc*1.3,(48-50)*sc*1.3);
+  lShape.lineTo((28-50)*sc*1.3,(76-50)*sc*1.3);
+  lShape.closePath();
+  const lM=new THREE.Mesh(new THREE.ShapeGeometry(lShape),
+    new THREE.MeshBasicMaterial({color:0x4d4d4d,side:THREE.DoubleSide}));
+  lM.position.z=0.027; g.add(lM);
+  const lMB=lM.clone(); lMB.position.z=-0.027; lMB.rotation.y=Math.PI; g.add(lMB);
+  g.add(new THREE.PointLight(0xff6622,1.8,2.5));
+  return g;
+}
+
+// ── BIG MESSAGE ──
+function showBigMessage(text,color,duration=900){
+  const el=document.getElementById('bigMsg');
+  el.textContent=text; el.style.color=color;
+  el.style.textShadow=`0 0 40px ${color},0 0 80px ${color}`;
+  el.style.transition='none'; el.style.opacity='0';
+  el.style.transform='scale(0.3) rotate(-8deg)';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    el.style.transition='opacity 0.14s ease-out,transform 0.2s cubic-bezier(0.17,0.67,0.4,1.6)';
+    el.style.opacity='1'; el.style.transform='scale(1) rotate(0deg)';
+    setTimeout(()=>{
+      el.style.transition='opacity 0.22s ease-in,transform 0.22s ease-in';
+      el.style.opacity='0'; el.style.transform='scale(1.3) rotate(5deg)';
+    },duration);
+  }));
+}
+
+// ── FIREWORKS + XMR COINS (full restore) ──
+class Fireworks{
+  constructor(){this.particles=[];this.coins=[];this.confetti=[];this.active=false;}
+
+  spawn(){
+    this.active=true;
+    // Firework bursts
+    for(let b=0;b<7;b++) setTimeout(()=>{
+      const bx=(Math.random()-0.5)*5, by=2.5+Math.random()*3.5, bz=-1-Math.random()*4;
+      const col=new THREE.Color().setHSL(Math.random(),1,0.6);
+      for(let i=0;i<48;i++){
+        const a=Math.random()*Math.PI*2, el=(Math.random()-0.5)*Math.PI;
+        const spd=0.06+Math.random()*0.11;
+        this.particles.push({x:bx,y:by,z:bz,
+          vx:Math.cos(a)*Math.cos(el)*spd,vy:Math.sin(el)*spd+0.02,vz:Math.sin(a)*Math.cos(el)*spd,
+          life:1,decay:0.010+Math.random()*0.012,r:col.r,g:col.g,b:col.b});
+      }
+      const fl=new THREE.PointLight(col,5,8); fl.position.set(bx,by,bz); scene.add(fl);
+      setTimeout(()=>scene.remove(fl),350);
+    },b*320);
+
+    // Confetti
+    const cCols=[0xff2244,0x44aaff,0xffdd00,0x44ff88,0xff88ff,0xffffff,0xff8800];
+    for(let i=0;i<65;i++) setTimeout(()=>{
+      const cm=new THREE.Mesh(
+        new THREE.PlaneGeometry(0.08+Math.random()*0.09,0.05+Math.random()*0.05),
+        new THREE.MeshBasicMaterial({color:cCols[Math.floor(Math.random()*cCols.length)],side:THREE.DoubleSide}));
+      cm.position.set((Math.random()-0.5)*6,4.5+Math.random()*2.5,(Math.random()-0.5)*5);
+      cm.rotation.set(Math.random()*6,Math.random()*6,Math.random()*6);
+      scene.add(cm);
+      this.confetti.push({mesh:cm,vx:(Math.random()-0.5)*0.045,vy:-0.018-Math.random()*0.028,
+        vz:(Math.random()-0.5)*0.022,rx:0.1+Math.random()*0.12,ry:0.08+Math.random()*0.14,
+        rz:0.06+Math.random()*0.10,life:1});
+    },i*55);
+
+    // XMR coins flying up
+    for(let i=0;i<14;i++) setTimeout(()=>{
+      const coin=makeXMRCoin();
+      coin.position.set((Math.random()-0.5)*3.5, 0.3+Math.random()*0.5, -0.5+(Math.random()-0.5)*2);
+      scene.add(coin);
+      this.coins.push({mesh:coin,
+        vx:(Math.random()-0.5)*0.07,vy:0.09+Math.random()*0.11,vz:(Math.random()-0.5)*0.05,
+        spin:0.12+Math.random()*0.16,life:1});
+    },i*160);
+  }
+
+  spawnScore(){
+    const cols=[[0,1,0.5],[0.13,1,0.58],[0.17,1,0.52],[0.1,0.9,0.65]];
+    for(let i=0;i<42;i++){
+      const col=new THREE.Color().setHSL(...cols[i%cols.length]);
+      const a=Math.random()*Math.PI*2, el=(Math.random()-0.2)*Math.PI;
+      const spd=0.045+Math.random()*0.08;
+      this.particles.push({x:RIM_WX,y:RIM_WY,z:RIM_WZ,
+        vx:Math.cos(a)*Math.cos(el)*spd,vy:Math.abs(Math.sin(el)*spd)+0.04,vz:Math.sin(a)*Math.cos(el)*spd,
+        life:1,decay:0.020+Math.random()*0.014,r:col.r,g:col.g,b:col.b});
+    }
+  }
+
+  spawnImpact(bx,by,bz,count=22){
+    for(let i=0;i<count;i++){
+      const col=new THREE.Color().setHSL(0.04+Math.random()*0.06,1,0.62);
+      const a=Math.random()*Math.PI*2, el=(Math.random()-0.5)*Math.PI;
+      const spd=0.025+Math.random()*0.055;
+      this.particles.push({x:bx,y:by,z:bz,
+        vx:Math.cos(a)*Math.cos(el)*spd,vy:Math.abs(Math.sin(el)*spd)+0.008,vz:Math.sin(a)*Math.cos(el)*spd,
+        life:0.85,decay:0.028+Math.random()*0.02,r:col.r,g:col.g,b:col.b});
+    }
+  }
+
+  update(){
+    this.particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.z+=p.vz;p.vy-=0.0028;p.life-=p.decay;});
+    this.particles=this.particles.filter(p=>p.life>0);
+    this.confetti.forEach(c=>{
+      c.mesh.position.x+=c.vx+Math.sin(c.mesh.position.y*2.5)*0.009;
+      c.mesh.position.y+=c.vy; c.mesh.position.z+=c.vz;
+      c.mesh.rotation.x+=c.rx; c.mesh.rotation.y+=c.ry; c.mesh.rotation.z+=c.rz;
+      c.life-=0.0045;
+      c.mesh.material.opacity=Math.max(0,c.life); c.mesh.material.transparent=true;
+    });
+    const dC=this.confetti.filter(c=>c.life<=0||c.mesh.position.y<-3);
+    dC.forEach(c=>scene.remove(c.mesh));
+    this.confetti=this.confetti.filter(c=>c.life>0&&c.mesh.position.y>-3);
+    this.coins.forEach(c=>{
+      c.mesh.position.x+=c.vx; c.mesh.position.y+=c.vy; c.mesh.position.z+=c.vz;
+      c.vy-=0.0038; c.mesh.rotation.y+=c.spin; c.mesh.rotation.x+=c.spin*0.25;
+      c.life-=0.007;
+    });
+    const dCo=this.coins.filter(c=>c.life<=0||c.mesh.position.y<-2);
+    dCo.forEach(c=>scene.remove(c.mesh));
+    this.coins=this.coins.filter(c=>c.life>0&&c.mesh.position.y>-2);
+    if(!this.particles.length&&!this.confetti.length&&!this.coins.length) this.active=false;
+  }
+  clear(){
+    [...this.coins,...this.confetti].forEach(c=>scene.remove(c.mesh));
+    this.coins=[];this.particles=[];this.confetti=[];this.active=false;
+  }
+}
+
+// Particle system
+const MAX_P=800;
+const pPos=new Float32Array(MAX_P*3), pCol=new Float32Array(MAX_P*3);
+const pGeo=new THREE.BufferGeometry();
+pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+pGeo.setAttribute('color',new THREE.BufferAttribute(pCol,3));
+scene.add(new THREE.Points(pGeo,
+  new THREE.PointsMaterial({size:0.13,vertexColors:true,transparent:true,depthWrite:false})));
+const fw=new Fireworks();
+
+// ── GAME STATE ──
+let t=0, phase='idle', shake=0;
+function setStatus(s){ const _el=document.getElementById(statusElemId); if(_el) _el.textContent=s; }
+
+// ── BALL PHYSICS ──
+const B={
+  x:0,y:0,z:0, vx:0,vy:0,vz:0,
+  spinX:1,spinY:0,spinZ:0, spinSpd:0,
+  active:false, scored:false, bbHit:false,
+  bounces:0
+};
+const _spinQ=new THREE.Quaternion();
+
+function resetBall(){
+  Object.assign(B,{
+    x:BALL_START.x,y:BALL_START.y,z:BALL_START.z,
+    vx:0,vy:0,vz:0, spinX:1,spinY:0,spinZ:0,spinSpd:0,
+    active:false,scored:false,bbHit:false,bounces:0
+  });
+  ball.position.set(B.x,B.y,B.z);
+  ball.quaternion.set(0,0,0,1);
+  gsh.position.set(B.x,0.006,B.z);
+  gsh.material.opacity=0.22;
+}
+
+function applySpin(){
+  if(B.spinSpd<0.0005) return;
+  const halfA=B.spinSpd*0.016*0.5;
+  const s=Math.sin(halfA);
+  _spinQ.set(B.spinX*s,B.spinY*s,B.spinZ*s,Math.cos(halfA));
+  ball.quaternion.premultiply(_spinQ);
+}
+
+function stepBall(){
+  if(!B.active) return;
+  const G=0.0155;
+  const DRAG=0.9992;
+  const prevY=B.y;
+  B.vy-=G;
+  B.vx*=DRAG; B.vz*=DRAG;
+  B.x+=B.vx; B.y+=B.vy; B.z+=B.vz;
+  B.spinSpd*=0.9965;
+  applySpin();
+
+  // ── BACKBOARD COLLISION — full box with corners/edges ──
+  const bbHalfW = BB_W*0.5, bbHalfH = BB_H*0.5, bbHalfD = 0.035;
+  const bbLx = B.x - RIM_WX;        // local x relative to board center
+  const bbLy = B.y - BB_WY;         // local y
+  const bbLz = B.z - BB_WZ_FACE;    // local z (0 = front face)
+
+  // Closest point on board box to ball center
+  const cpx = Math.max(-bbHalfW, Math.min(bbHalfW, bbLx));
+  const cpy = Math.max(-bbHalfH, Math.min(bbHalfH, bbLy));
+  const cpz = Math.max(-bbHalfD*2, Math.min(0, bbLz)); // front face to back
+
+  const dcx=bbLx-cpx, dcy=bbLy-cpy, dcz=bbLz-cpz;
+  const dcDist=Math.sqrt(dcx*dcx+dcy*dcy+dcz*dcz);
+
+  if(!B.bbHit && dcDist < BALL_RADIUS && dcDist > 0.001){
+    // Collision normal = direction from closest point to ball center
+    const nx=dcx/dcDist, ny=dcy/dcDist, nz=dcz/dcDist;
+    const vDot=B.vx*nx+B.vy*ny+B.vz*nz;
+    if(vDot < 0){
+      // Push ball out
+      const pen=BALL_RADIUS-dcDist;
+      B.x+=nx*pen; B.y+=ny*pen; B.z+=nz*pen;
+      // Reflect with restitution
+      const refl=0.52;
+      B.vx-=(1+refl)*vDot*nx;
+      B.vy-=(1+refl)*vDot*ny;
+      B.vz-=(1+refl)*vDot*nz;
+      // Friction on tangential components
+      B.vx*=0.80; B.vz*=0.80;
+      // Corner/edge hits get extra spin and chaotic bounce
+      const isCorner=(Math.abs(bbLx)>bbHalfW*0.85 || Math.abs(bbLy)>bbHalfH*0.85);
+      if(isCorner){
+        B.vx+=(Math.random()-0.5)*0.04;
+        B.vy+=(Math.random()-0.5)*0.02;
+        B.spinSpd+=2.5;
+      } else {
+        B.spinSpd+=1.8;
+      }
+      B.spinX+=(Math.random()-0.5)*0.4; B.spinZ+=(Math.random()-0.5)*0.4;
+      const sL=Math.sqrt(B.spinX*B.spinX+B.spinZ*B.spinZ)||1; B.spinX/=sL; B.spinZ/=sL;
+      B.bbHit=true;
+      fw.spawnImpact(B.x,B.y,B.z, isCorner?28:18);
+      bbFlash.intensity= isCorner?4.5:3.0; shake= isCorner?0.24:0.16;
+      netImpulse(B.x,B.y-0.4,B.z,1.2);
+    }
+  }
+  if(B.bbHit && dcDist > BALL_RADIUS*2.2) B.bbHit=false;
+
+  // ── RIM TORUS COLLISION ──
+  const bx=B.x-RIM_WX, bz=B.z-RIM_WZ;
+  const hd=Math.sqrt(bx*bx+bz*bz);
+  const toRim=hd-RIM_RADIUS;
+  const dyRim=B.y-RIM_WY;
+  const dTube=Math.sqrt(toRim*toRim+dyRim*dyRim);
+  if(dTube < RIM_TUBE+BALL_RADIUS+0.014 && hd>0.008){
+    const nx=bx/hd, nz=bz/hd;
+    const rpx=RIM_WX+nx*RIM_RADIUS, rpy=RIM_WY, rpz=RIM_WZ+nz*RIM_RADIUS;
+    let cnx=B.x-rpx,cny=B.y-rpy,cnz=B.z-rpz;
+    const cL=Math.sqrt(cnx*cnx+cny*cny+cnz*cnz)||0.001;
+    cnx/=cL;cny/=cL;cnz/=cL;
+    const vDot=B.vx*cnx+B.vy*cny+B.vz*cnz;
+    if(vDot<0){
+      const R=0.50;
+      B.vx-=(1+R)*vDot*cnx; B.vy-=(1+R)*vDot*cny; B.vz-=(1+R)*vDot*cnz;
+      B.vx*=0.72; B.vz*=0.72;
+      const pen=(RIM_TUBE+BALL_RADIUS+0.004)-dTube;
+      B.x+=cnx*pen; B.y+=cny*pen; B.z+=cnz*pen;
+      B.spinSpd+=1.6;
+      B.spinX+=(Math.random()-0.5)*0.5; B.spinZ+=(Math.random()-0.5)*0.5;
+      const sL2=Math.sqrt(B.spinX*B.spinX+B.spinZ*B.spinZ)||1; B.spinX/=sL2; B.spinZ/=sL2;
+      netImpulse(rpx,rpy-0.1,rpz,2.2);
+      fw.spawnImpact(rpx,rpy,rpz,16);
+      missFlash.intensity=2.0; shake=0.20;
+    }
+  }
+
+  // ── SCORE DETECTION — geometric rim plane crossing ──
+  // Ball scores ONLY if it crosses RIM_WY downward AND center is inside opening
+  if(!B.scored && prevY>=RIM_WY && B.y<RIM_WY){
+    const frac=(prevY-RIM_WY)/(prevY-B.y);
+    const cx=B.x-B.vx*(1-frac), cz=B.z-B.vz*(1-frac);
+    const chd=Math.sqrt((cx-RIM_WX)*(cx-RIM_WX)+(cz-RIM_WZ)*(cz-RIM_WZ));
+    if(chd < RIM_RADIUS*0.7){
+      B.scored=true;
+      netImpulse(cx,RIM_WY,cz,6.5);
+      fw.spawnScore();
+      hoopFlash.intensity=5.0; shake=0.38;
+    }
+  }
+
+  // ── SIDE WALLS ──
+  if(B.x > 7.0-BALL_RADIUS){ B.x=7.0-BALL_RADIUS; B.vx=-Math.abs(B.vx)*0.55; shake=0.06; }
+  if(B.x < -7.0+BALL_RADIUS){ B.x=-7.0+BALL_RADIUS; B.vx=Math.abs(B.vx)*0.55; shake=0.06; }
+
+  // ── BACK WALL ──
+  if(B.z < -8.5+BALL_RADIUS){ B.z=-8.5+BALL_RADIUS; B.vz=Math.abs(B.vz)*0.45; shake=0.05; }
+
+  // ── FLOOR — realistic multi-bounce ──
+  if(B.y < BALL_RADIUS){
+    B.y=BALL_RADIUS;
+    const restitution = B.bounces===0 ? 0.52 : B.bounces===1 ? 0.44 : 0.36;
+    B.vy=-B.vy*restitution;
+    B.vx*=0.74; B.vz*=0.74;
+    B.spinSpd*=0.62;
+    B.bounces++;
+    if(Math.abs(B.vy)<0.014) B.vy=0;
+    if(B.bounces<=2){
+      fw.spawnImpact(B.x,BALL_RADIUS,B.z,6);
+      shake=Math.max(shake,0.05);
+    }
+  }
+
+  ball.position.set(B.x,B.y,B.z);
+  gsh.position.x=B.x; gsh.position.z=B.z;
+  gsh.material.opacity=Math.max(0.02,0.22-(B.y-BALL_RADIUS)*0.055);
+  // Shadow shrinks with height
+  const shScale=Math.max(0.3,1.0-B.y*0.15);
+  gsh.scale.set(shScale,1,shScale);
+}
+
+// ── SHOT LAUNCH ──
+function launchBall(willScore, shotType){
+  const G=0.0155;
+  let tx=RIM_WX, ty=RIM_WY, tz=RIM_WZ, frames=55;
+
+  switch(shotType){
+    // ── SCORE SHOTS — all aimed at exact rim center ──
+    case 'lowbank':
+      tx=RIM_WX; tz=BB_WZ_FACE+0.01; ty=BB_WY-0.42; frames=46; break;
+    case 'curvein':
+      tx=RIM_WX; tz=RIM_WZ; ty=RIM_WY; frames=58; break;
+    case 'backboard':
+      tx=RIM_WX; tz=BB_WZ_FACE+0.01; ty=BB_WY-0.22; frames=55; break;
+    case 'lefty':
+      tx=RIM_WX; tz=RIM_WZ; ty=RIM_WY; frames=60; break;
+    case 'righty':
+      tx=RIM_WX; tz=RIM_WZ; ty=RIM_WY; frames=60; break;
+    case 'floater':
+      tx=RIM_WX; tz=RIM_WZ; ty=RIM_WY; frames=80; break;
+    case 'corkscrew':
+      tx=RIM_WX; tz=RIM_WZ; ty=RIM_WY; frames=65; break;
+    // ── MISS SHOTS — aimed clearly away from rim opening ──
+    case 'bank':
+      tx=RIM_WX+(Math.random()-0.5)*0.22; tz=BB_WZ_FACE+0.02; ty=BB_WY-0.18; frames=50; break;
+    case 'layup':
+      tx=RIM_WX+(Math.random()-0.5)*0.04; tz=RIM_WZ+0.02; ty=RIM_WY+0.12; frames=76; break;
+    case 'airball':
+      tx=RIM_WX+(Math.random()>0.5?1:-1)*(0.85+Math.random()*0.2);
+      tz=RIM_WZ; ty=RIM_WY+0.25; frames=54; break;
+    case 'short':
+      tx=RIM_WX+(Math.random()-0.5)*0.25; tz=RIM_WZ+0.65; ty=RIM_WY-0.45; frames=44; break;
+    case 'long':
+      tx=RIM_WX+(Math.random()-0.5)*0.22; tz=RIM_WZ-0.6; ty=RIM_WY+0.14; frames=64; break;
+    case 'bbmiss':
+      tx=RIM_WX+(Math.random()>0.5?0.6:-0.6); tz=BB_WZ_FACE+0.02; ty=BB_WY+0.22; frames=48; break;
+    case 'spinleft':
+      tx=RIM_WX-0.45; tz=BB_WZ_FACE+0.02; ty=BB_WY-0.15; frames=52; break;
+    case 'spinright':
+      tx=RIM_WX+0.45; tz=BB_WZ_FACE+0.02; ty=BB_WY-0.15; frames=52; break;
+    case 'sniper':
+      // Fast flat shot aimed at front rim face — hits rim and bounces back
+      tx=RIM_WX; tz=RIM_WZ+RIM_RADIUS*1.2; ty=RIM_WY+0.005; frames=40; break;
+    case 'tipin':
+      tx=RIM_WX+(Math.random()-0.5)*0.15; tz=RIM_WZ+RIM_RADIUS*0.8; ty=RIM_WY-0.05; frames=28; break;
+    case 'bullet':
+      // Fast flat laser — aimed at rim face, too flat to drop through
+      tx=RIM_WX; tz=RIM_WZ+RIM_RADIUS*1.0; ty=RIM_WY+0.01; frames=32; break;
+  }
+
+  const dx=tx-B.x, dy=ty-B.y, dz=tz-B.z;
+  B.vx=dx/frames; B.vz=dz/frames;
+  B.vy=(dy+0.5*G*frames*frames)/frames;
+
+  // Default backspin
+  const vm=Math.sqrt(B.vx*B.vx+B.vz*B.vz);
+  if(vm>0.001){ B.spinX=-B.vz/vm; B.spinY=0; B.spinZ=B.vx/vm; }
+  else { B.spinX=1; B.spinY=0; B.spinZ=0; }
+  B.spinSpd=(Math.abs(B.vx)+Math.abs(B.vz))*13.5;
+
+  // Per-shot spin overrides
+  switch(shotType){
+    case 'curvein':
+      B.spinX=0.3;B.spinY=0.9;B.spinZ=0.3;
+      {const c=Math.sqrt(B.spinX*B.spinX+B.spinY*B.spinY+B.spinZ*B.spinZ);B.spinX/=c;B.spinY/=c;B.spinZ/=c;}
+      B.spinSpd=18; break;
+    case 'lefty': B.spinX=0;B.spinY=1;B.spinZ=0;B.spinSpd=26; break;
+    case 'righty': B.spinX=0;B.spinY=-1;B.spinZ=0;B.spinSpd=26; break;
+    case 'floater': B.spinX=1;B.spinY=0.1;B.spinZ=0;B.spinSpd=10; break;
+    case 'corkscrew': B.spinX=0.577;B.spinY=0.577;B.spinZ=0.577;B.spinSpd=30; break;
+    case 'backboard':
+      B.spinX=0.7;B.spinY=0.5;B.spinZ=0.5;
+      {const c=Math.sqrt(B.spinX*B.spinX+B.spinY*B.spinY+B.spinZ*B.spinZ);B.spinX/=c;B.spinY/=c;B.spinZ/=c;}
+      B.spinSpd=14; break;
+    case 'lowbank': B.spinSpd=16; break;
+    case 'sniper': B.spinX=1;B.spinY=0;B.spinZ=0;B.spinSpd=6; break;
+    case 'tipin': B.spinX=0;B.spinY=1;B.spinZ=0;B.spinSpd=4; break;
+    case 'bullet': B.spinX=1;B.spinY=0;B.spinZ=0;B.spinSpd=4; break;
+  }
+  B.active=true;
+}
+
+// ── CONFIRMED SHOT POOLS — exactly as approved in testing ──
+const SCORE_SHOTS=['lowbank','curvein','lefty','righty','corkscrew'];
+const MISS_SHOTS=['airball','short','long','bbmiss','spinleft','spinright','sniper','tipin','bullet'];
+let lastScore='',lastMiss='';
+function pickShot(willScore){
+  const pool=willScore?SCORE_SHOTS:MISS_SHOTS;
+  const last=willScore?lastScore:lastMiss;
+  const opts=pool.filter(s=>s!==last);
+  const pick=opts[Math.floor(Math.random()*opts.length)];
+  if(willScore) lastScore=pick; else lastMiss=pick;
+  return pick;
+}
+
+let physActive=false;
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+async function doCountdown(){
+  for(let n=3;n>=1;n--){ setStatus('⚡ '+n); await sleep(850); }
+  setStatus('🏀 SHOOT!'); await sleep(200);
+}
+
+async function doShot(willScore){
+  shake=0.45; flashL.intensity=1.6;
+  resetBall();
+  launchBall(willScore, pickShot(willScore));
+  physActive=true;
+
+  // Wait: scored, hit floor enough times, or timed out
+  for(let f=0;f<320;f++){
+    await sleep(16);
+    if(B.scored && f>20) break;
+    if(!B.scored && B.bounces>=2 && B.y<=BALL_RADIUS+0.01) break;
+    if(B.z < RIM_WZ-2.0 && B.y < RIM_WY-1.2) break;
+  }
+
+  const missWords=['MISS!','BRICK!','NO GOOD!','CLANK!','WIDE!'];
+  if(willScore) showBigMessage('SWISH! 🏀','#00ffcc',1100);
+  else showBigMessage(missWords[Math.floor(Math.random()*missWords.length)]+' ❌','#ff4422',900);
+
+  await sleep(950);
+  physActive=false;
+  await sleep(120);
+  resetBall();
+}
+
+  // Start the RAF loop for this scene
+  animate();
+
+  // ── Public API ──
+  async function runShots(results) {
+    phase = 'playing';
+    let score = 0;
+    for(let i=0;i<results.length;i++){
+      setStatus('SHOT '+(i+1)+'/'+results.length+'  •  '+score+' pts');
+      await doShot(results[i]);
+      if(results[i]) score++;
+      setStatus(results[i]
+        ? '🏀  '+score+' pts  •  '+(i+1)+'/'+results.length
+        : '·  '+score+' pts  •  '+(i+1)+'/'+results.length);
+      await sleep(280);
+    }
+    setStatus('DONE! '+score+'/'+results.length+' 🏀');
+    phase = 'idle';
+    return score;
+  }
+
+  async function countdown() {
+    setStatus('GET READY...');
+    await sleep(500);
+    for(const n of [3,2,1]){ setStatus('⚡ '+n); await sleep(850); }
+    setStatus('🏀 SHOOT!'); await sleep(200);
+  }
+
+  return {
+    countdown,
+    runShots,
+    setStatus,
+    spawnWin(){ fw.spawn(); }
+  };
+}
+
+let hgl1=null, hgl2=null;
+let hoopLobbyUnsub=null, hoopGameUnsub=null;
+let hoopOpen=false, hoopGid=null, hoopActiveGid=null;
+
+function initHoopWebGL(){
+  if(hgl1&&hgl2) return;
+  const THREE=window.THREE; if(!THREE) return;
+  const c1=document.getElementById('hoopCanvas1');
+  const c2=document.getElementById('hoopCanvas2');
+  if(!c1||!c2) return;
+  hgl1=buildHoopScene(c1,'hoopStatus1');
+  hgl2=buildHoopScene(c2,'hoopStatus2');
+}
+
+// ── Create ──
+document.getElementById('btnHoopCreate').addEventListener('click',async()=>{
+  const stake=parseFloat(document.getElementById('hoopStakeInput').value);
+  if(!stake||stake<0.1){toast('Min stake 0.1 XRP','err');return;}
+  if(stake>100){toast('Max stake 100 XRP','err');return;}
+  if(stake>bal){toast('Insufficient balance','err');return;}
+  if(hoopActiveGid){toast('You already have an active hoop game','err');return;}
+  const btn=document.getElementById('btnHoopCreate');
+  btn.disabled=true; btn.textContent='Creating...';
+  try{
+    const nb=parseFloat((bal-stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:nb},{merge:true});
+    bal=nb; updateBalUI();
+    const gr=doc(collection(db,'hoop_games'));
+    await setDoc(gr,{status:'waiting',stake,
+      player1:{uid:me.uid,displayName:me.displayName||'Player',photoURL:me.photoURL||''},
+      player2:null,createdAt:serverTimestamp()});
+    hoopActiveGid=gr.id;
+    document.getElementById('hoopStakeInput').value='';
+    toast('Hoop game created! Waiting for opponent...','ok');
+  }catch(e){
+    bal=parseFloat((bal+stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:bal},{merge:true});
+    updateBalUI(); toast('Error: '+e.message,'err');
+  }
+  btn.disabled=false; btn.textContent='🏀 Create Game';
+});
+
+// ── Join ──
+window.joinHoopGame=async function(gid,stake){
+  if(stake>bal){toast('Need '+stake.toFixed(3)+' XRP to join','err');return;}
+  if(!confirm('Join and stake '+stake.toFixed(3)+' XRP?'))return;
+  try{
+    const nb=parseFloat((bal-stake).toFixed(6));
+    await setDoc(doc(db,'game_balances',me.uid),{balance:nb},{merge:true});
+    bal=nb; updateBalUI();
+    await updateDoc(doc(db,'hoop_games',gid),{status:'active',
+      player2:{uid:me.uid,displayName:me.displayName||'Player',photoURL:me.photoURL||''}});
+    hoopActiveGid=gid;
+    openHoopModal(gid,true);
+  }catch(e){toast('Error: '+e.message,'err');}
+};
+
+// ── Cancel ──
+window.cancelHoopGame=async function(gid,stake){
+  if(!confirm('Cancel and get '+stake.toFixed(3)+' XRP back?'))return;
+  try{
+    await deleteDoc(doc(db,'hoop_games',gid));
+    const tk=await getToken();
+    if(tk) await fetch(WORKER_URL+'/api/refund',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({idToken:tk,amount:stake})});
+    hoopActiveGid=null; toast('Cancelled. Stake returned.','ok'); await loadBal();
+  }catch(e){toast('Error: '+e.message,'err');}
+};
+
+// ── Lobby ──
+function startHoopLobby(){
+  if(hoopLobbyUnsub) hoopLobbyUnsub();
+  const q=query(collection(db,'hoop_games'),where('status','in',['waiting','active']));
+  hoopLobbyUnsub=onSnapshot(q,snap=>{
+    const gs=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    hoopActiveGid=null;
+    gs.forEach(g=>{if(g.player1?.uid===me.uid||g.player2?.uid===me.uid) hoopActiveGid=g.id;});
+    const banner=document.getElementById('hoopActiveBanner');
+    if(hoopActiveGid){
+      const ag=gs.find(x=>x.id===hoopActiveGid);
+      if(ag&&ag.status==='active'){
+        document.getElementById('hoopBannerText').innerHTML=`Hoop game live — stake: <strong>${parseFloat(ag.stake).toFixed(3)} XRP</strong>`;
+        document.getElementById('btnHoopResume').onclick=()=>openHoopModal(hoopActiveGid,false);
+        banner.classList.add('show');
+      } else banner.classList.remove('show');
+    } else banner.classList.remove('show');
+    gs.forEach(g=>{
+      if(g.status==='active'&&g.player1?.uid===me.uid&&!hoopOpen) openHoopModal(g.id,false);
+    });
+    const lobby=document.getElementById('hoopLobby');
+    if(!gs.length){
+      lobby.innerHTML='<div class="lobby-empty"><span class="lobby-empty-icon">🏀</span>No hoop games right now.<br/>Be the first to create one above.</div>';
+      return;
+    }
+    lobby.innerHTML=gs.map(g=>{
+      const isMe=g.player1?.uid===me.uid||g.player2?.uid===me.uid;
+      const isP1=g.player1?.uid===me.uid;
+      const stake=parseFloat(g.stake||0);
+      const name=g.player1?.displayName||'Unknown';
+      const ph=g.player1?.photoURL;
+      const av=ph?`<img class="game-avatar" src="${ph}" alt=""/>`:`<div class="game-avatar-ph">${name.charAt(0).toUpperCase()}</div>`;
+      let badge,actions;
+      if(g.status==='waiting'){
+        if(isP1){badge=`<span class="sbadge badge-mine">Your game</span>`;
+          actions=`<button class="btn-cancel" onclick="cancelHoopGame('${g.id}',${stake})">Cancel & Refund</button>`;}
+        else{badge=`<span class="sbadge badge-wait">Open</span>`;
+          actions=`<button class="btn-join" onclick="joinHoopGame('${g.id}',${stake})">Join — ${stake.toFixed(3)} XRP</button>`;}
+      }else{
+        badge=`<span class="sbadge badge-act">In Progress</span>`;
+        if(isMe) actions=`<button class="btn-play" onclick="openHoopModal('${g.id}',false)">View</button>`;
+        else actions=`<span style="font-family:var(--mono);font-size:10px;color:var(--ink-light)">Closed</span>`;
+      }
+      return `<div class="game-card ${isMe?(g.status==='active'?'active-game':'my-game'):''}">
+        ${av}<div class="game-info"><div class="game-creator">${name}</div>
+        <div class="game-meta">${badge} &nbsp;·&nbsp; ${stake.toFixed(3)} XRP stake &nbsp;·&nbsp; Pot: ${(stake*2).toFixed(3)} XRP</div></div>
+        <div class="game-stake-box"><div class="game-stake-val">${stake.toFixed(3)}</div><div class="game-stake-label">XRP each</div></div>
+        <div class="game-actions">${actions}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+// ── Open modal ──
+window.openHoopModal=async function(gid,autoShoot){
+  if(hoopOpen&&hoopGid===gid) return;
+  hoopGid=gid; hoopOpen=true;
+  document.getElementById('hoopResult').style.display='none';
+  document.getElementById('btnCloseHoop').style.display='none';
+  document.getElementById('hoopStatus').textContent='';
+  document.getElementById('hoopRolling').classList.remove('show');
+  document.getElementById('hoopScore1').textContent='0';
+  document.getElementById('hoopScore2').textContent='0';
+  document.getElementById('hoopShotCount').textContent='0/20';
+  initHoopWebGL();
+  const sn=await getDoc(doc(db,'hoop_games',gid));
+  if(!sn.exists()){toast('Game not found','err');hoopOpen=false;return;}
+  const g=sn.data();
+  const isP1=g.player1?.uid===me.uid;
+  document.getElementById('hoopp1').textContent=isP1?(me.displayName||'You'):(g.player2?.displayName||'Opponent');
+  document.getElementById('hoopp2').textContent=isP1?(g.player2?.displayName||'Opponent'):(g.player1?.displayName||'You');
+  document.getElementById('hoopSub').textContent='Stake: '+parseFloat(g.stake).toFixed(3)+' XRP each · Winner takes '+(parseFloat(g.stake)*2*0.97).toFixed(3)+' XRP';
+  document.getElementById('hoopModal').classList.add('open');
+  if(g.status==='complete'&&g.p1Results){
+    await runHoopAnimation(g,isP1);
+    showHoopResult(g,isP1);
+    document.getElementById('btnCloseHoop').style.display='inline-flex';
+    return;
+  }
+  if(autoShoot){
+    startHoopGame(gid,isP1);
+  }else{
+    document.getElementById('hoopRolling').classList.add('show');
+    document.getElementById('hoopRollLbl').textContent='Waiting for opponent to join...';
+    if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+    hoopGameUnsub=onSnapshot(doc(db,'hoop_games',gid),snap=>{
+      if(!snap.exists()) return;
+      const gd=snap.data();
+      if(gd.status==='complete'&&gd.p1Results){
+        document.getElementById('hoopRolling').classList.remove('show');
+        if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+        runHoopAnimation(gd,isP1).then(()=>{
+          showHoopResult(gd,isP1);
+          document.getElementById('btnCloseHoop').style.display='inline-flex';
+          loadBal();
+        });
+      }else if(gd.status==='active'&&gd.player2?.uid){
+        document.getElementById('hoopRollLbl').textContent='Opponent joined! Starting...';
+        if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+        startHoopGame(gid,isP1);
+      }
+    });
+  }
+};
+
+window.closeHoop=function(){
+  document.getElementById('hoopModal').classList.remove('open');
+  if(hoopGameUnsub){hoopGameUnsub();hoopGameUnsub=null;}
+  hoopGid=null; hoopOpen=false; loadBal();
+};
+document.getElementById('hoopModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('hoopModal')&&document.getElementById('hoopResult').style.display!=='none') closeHoop();
+});
+
+// ── Call worker → play animation → show result ──
+async function startHoopGame(gid,isP1){
+  document.getElementById('hoopRolling').classList.remove('show');
+  let result=null;
+  try{
+    const tk=await getToken();
+    const r=await fetch(WORKER_URL+'/api/hoop',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({idToken:tk,gameId:gid})});
+    const data=await r.json();
+    if(!data.ok){
+      document.getElementById('hoopStatus').textContent='Error: '+(data.error||'Failed');
+      document.getElementById('btnCloseHoop').style.display='inline-flex'; return;
+    }
+    result=data.result;
+  }catch(e){
+    document.getElementById('hoopStatus').textContent='Error: '+e.message;
+    document.getElementById('btnCloseHoop').style.display='inline-flex'; return;
+  }
+  await runHoopAnimation(result,isP1);
+  showHoopResult({p1Results:result.p1Results,p2Results:result.p2Results,
+    winner:result.winner,winnings:result.winnings,houseCut:result.houseCut},isP1);
+  document.getElementById('btnCloseHoop').style.display='inline-flex';
+  loadBal();
+}
+
+// ── Play animations: both scenes simultaneously like barrel ──
+async function runHoopAnimation(result,isP1){
+  if(!hgl1||!hgl2) return;
+  const myR  = isP1 ? result.p1Results : result.p2Results;
+  const oppR = isP1 ? result.p2Results : result.p1Results;
+  const total = myR.length;
+
+  // Countdown on both simultaneously
+  await Promise.all([hgl1.countdown(), hgl2.countdown()]);
+
+  // Play all shots simultaneously — each scene's RAF loop is independent
+  let myScore=0, oppScore=0;
+  const myPromise = (async()=>{
+    for(let i=0;i<total;i++){
+      hgl1.setStatus('SHOT '+(i+1)+'/'+total+'  •  '+myScore+' pts');
+      await doShotScene(hgl1, myR[i]);
+      if(myR[i]) myScore++;
+      hgl1.setStatus(myR[i]?'🏀  '+myScore+' pts':'·  '+myScore+' pts');
+      document.getElementById('hoopScore1').textContent=myScore;
+      document.getElementById('hoopShotCount').textContent=(i+1)+'/'+total;
+      await new Promise(r=>setTimeout(r,280));
+    }
+    hgl1.setStatus('DONE! '+myScore+'/'+total+' 🏀');
+    return myScore;
+  })();
+  const oppPromise = (async()=>{
+    for(let i=0;i<total;i++){
+      hgl2.setStatus('SHOT '+(i+1)+'/'+total+'  •  '+oppScore+' pts');
+      await doShotScene(hgl2, oppR[i]);
+      if(oppR[i]) oppScore++;
+      hgl2.setStatus(oppR[i]?'🏀  '+oppScore+' pts':'·  '+oppScore+' pts');
+      document.getElementById('hoopScore2').textContent=oppScore;
+      await new Promise(r=>setTimeout(r,280));
+    }
+    hgl2.setStatus('DONE! '+oppScore+'/'+total+' 🏀');
+    return oppScore;
+  })();
+  await Promise.all([myPromise, oppPromise]);
+}
+
+// Trigger a shot on a specific scene instance
+// Each scene has its own doShot scoped inside buildHoopScene
+// We can't call it directly — instead we use the runShots API one shot at a time
+// Since each scene's physics/RAF is isolated, they truly run in parallel
+async function doShotScene(scene, scored){
+  // runShots plays shots sequentially inside its own scene
+  // We just need to trigger one shot — use a 1-element array
+  await scene.runShots([scored]);
+}
+
+function showHoopResult(g,isP1){
+  const myR  = isP1 ? g.p1Results : g.p2Results;
+  const oppR = isP1 ? g.p2Results : g.p1Results;
+  const myScore =(myR||[]).filter(Boolean).length;
+  const oppScore=(oppR||[]).filter(Boolean).length;
+  document.getElementById('hoopScore1').textContent=myScore;
+  document.getElementById('hoopScore2').textContent=oppScore;
+  const iWin=(isP1&&g.winner==='player1')||(!isP1&&g.winner==='player2');
+  const el=document.getElementById('hoopResult');
+  el.className='hoop-result '+(iWin?'win':'lose');
+  document.getElementById('hoopResTit').className='res-title '+(iWin?'win':'lose');
+  document.getElementById('hoopResTit').textContent=iWin?'🏆 You Win!':'😔 You Lose';
+  document.getElementById('hoopResDet').textContent=iWin
+    ?'You scored '+myScore+'/20 vs '+oppScore+'! Won '+parseFloat(g.winnings||0).toFixed(3)+' XRP!'
+    :'You scored '+myScore+'/20 vs '+oppScore+'. Better luck next time!';
+  el.style.display='block';
+  if(iWin&&hgl1) setTimeout(()=>hgl1.spawnWin(),400);
+}
 
 </script>
 </body>
