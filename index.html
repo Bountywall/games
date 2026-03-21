@@ -2366,16 +2366,14 @@ function showBarrelResult(gd, isP1, result){
 function buildHoopScene(targetCanvas, statusElemId) {
   const THREE = window.THREE;
   if (!THREE || !targetCanvas) return null;
-
-  const FW = targetCanvas.parentElement ? (targetCanvas.parentElement.offsetWidth||380) : 380;
-  const FH = Math.round(FW * 0.56);
-  targetCanvas.width = FW; targetCanvas.height = FH;
+  const W = targetCanvas.parentElement ? (targetCanvas.parentElement.offsetWidth||360) : 360;
+  const H = Math.round(W * 0.56);
+  targetCanvas.width = W; targetCanvas.height = H;
 
 const renderer=new THREE.WebGLRenderer({canvas:targetCanvas,antialias:true});
-renderer.setSize(FW,FH);
+renderer.setSize(W,H);
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-  renderer.setPixelRatio(1);
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.15;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
@@ -2729,6 +2727,7 @@ function makeXMRCoin(){
 // ── BIG MESSAGE ──
 function showBigMessage(text,color,duration=900){
   const el=document.getElementById('bigMsg');
+  if(!el) return;
   el.textContent=text; el.style.color=color;
   el.style.textShadow=`0 0 40px ${color},0 0 80px ${color}`;
   el.style.transition='none'; el.style.opacity='0';
@@ -2852,8 +2851,8 @@ scene.add(new THREE.Points(pGeo,
 const fw=new Fireworks();
 
 // ── GAME STATE ──
-let t=0, phase='idle', shake=0;
-function setStatus(s){ const _el=document.getElementById(statusElemId); if(_el) _el.textContent=s; }
+let t=0, phase='idle', round=0, scores=[0,0], shake=0;
+function setStatus(s){ const el=document.getElementById(statusElemId); if(el) el.textContent=s; }
 
 // ── BALL PHYSICS ──
 const B={
@@ -3141,41 +3140,86 @@ async function doShot(willScore){
   resetBall();
 }
 
-  // Start the RAF loop for this scene
-  animate();
+function animate(){
+  if(!_running) return;
+  requestAnimationFrame(animate);
+  t+=0.016;
 
-  // ── Public API ──
+  // Camera shake
+  if(shake>0){
+    camera.position.x=(Math.random()-0.5)*shake*0.055;
+    camera.position.y=1.6+(Math.random()-0.5)*shake*0.025;
+    shake*=0.78; if(shake<0.012){shake=0;camera.position.x=0;camera.position.y=1.6;}
+  }
+
+  // Lights decay
+  if(flashL.intensity>0)   flashL.intensity*=0.87;
+  if(hoopFlash.intensity>0) hoopFlash.intensity*=0.88;
+  if(missFlash.intensity>0) missFlash.intensity*=0.87;
+  if(bbFlash.intensity>0)   bbFlash.intensity*=0.86;
+
+  // Pulsing rim accent
+  rimAccent.intensity=0.8+Math.sin(t*2.2)*0.3;
+
+  if(physActive) stepBall();
+  stepNet();
+
+  if(phase==='idle'){
+    ball.position.y=BALL_START.y+Math.sin(t*1.4)*0.03;
+    ball.quaternion.premultiply(_idleQ);
+  }
+
+  // Particles
+  if(fw.active||fw.particles.length||fw.confetti.length||fw.coins.length){
+    fw.update();
+    let pi=0;
+    for(const p of fw.particles){
+      if(pi>=MAX_P) break;
+      const a=Math.max(0,p.life);
+      pPos[pi*3]=p.x;pPos[pi*3+1]=p.y;pPos[pi*3+2]=p.z;
+      pCol[pi*3]=p.r*a;pCol[pi*3+1]=p.g*a;pCol[pi*3+2]=p.b*a;
+      pi++;
+    }
+    for(let i=pi;i<MAX_P;i++){pPos[i*3]=0;pPos[i*3+1]=-999;pPos[i*3+2]=0;}
+    pGeo.attributes.position.needsUpdate=true;
+    pGeo.attributes.color.needsUpdate=true;
+  }
+
+  renderer.render(scene,camera);
+}
+
+  let _running = false;
+  function startScene(){ if(!_running){ _running=true; animate(); } }
+  function stopScene(){ _running=false; }
+
   async function runShots(results) {
     phase = 'playing';
-    let score = 0;
+    setStatus('GET READY...');
+    await new Promise(r=>setTimeout(r,500));
+    for(const n of [3,2,1]){ setStatus('⚡ '+n); await new Promise(r=>setTimeout(r,850)); }
+    setStatus('🏀 SHOOT!'); await new Promise(r=>setTimeout(r,200));
+    let score=0;
     for(let i=0;i<results.length;i++){
       setStatus('SHOT '+(i+1)+'/'+results.length+'  •  '+score+' pts');
       await doShot(results[i]);
       if(results[i]) score++;
-      setStatus(results[i]
-        ? '🏀  '+score+' pts  •  '+(i+1)+'/'+results.length
-        : '·  '+score+' pts  •  '+(i+1)+'/'+results.length);
-      await sleep(280);
+      setStatus(results[i]?'🏀  '+score+' pts':'·  '+score+' pts');
+      await new Promise(r=>setTimeout(r,280));
     }
     setStatus('DONE! '+score+'/'+results.length+' 🏀');
-    phase = 'idle';
+    phase='idle';
     return score;
   }
 
-  async function countdown() {
-    setStatus('GET READY...');
-    await sleep(500);
-    for(const n of [3,2,1]){ setStatus('⚡ '+n); await sleep(850); }
-    setStatus('🏀 SHOOT!'); await sleep(200);
-  }
-
   return {
-    countdown,
     runShots,
     setStatus,
-    spawnWin(){ fw.spawn(); }
+    spawnWin(){ fw.spawn(); },
+    start(){ startScene(); },
+    stop(){ stopScene(); }
   };
 }
+
 
 let hgl1=null, hgl2=null;
 let hoopLobbyUnsub=null, hoopGameUnsub=null;
@@ -3189,6 +3233,8 @@ function initHoopWebGL(){
   if(!c1||!c2) return;
   hgl1=buildHoopScene(c1,'hoopStatus1');
   hgl2=buildHoopScene(c2,'hoopStatus2');
+  if(hgl1) hgl1.start();
+  if(hgl2) hgl2.start();
 }
 
 // ── Create ──
