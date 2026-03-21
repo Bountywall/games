@@ -3350,6 +3350,7 @@ function startHoopLobby(){
 // ── Open modal ──
 window.openHoopModal=async function(gid,autoShoot){
   if(hoopOpen&&hoopGid===gid) return;
+  if(hoopOpen) { hoopOpen=false; } // reset stale state from previous game
   hoopGid=gid; hoopOpen=true;
   document.getElementById('hoopResult').style.display='none';
   document.getElementById('btnCloseHoop').style.display='none';
@@ -3359,6 +3360,11 @@ window.openHoopModal=async function(gid,autoShoot){
   document.getElementById('hoopScore2').textContent='0';
   document.getElementById('hoopShotCount').textContent='0/20';
   initHoopWebGL();
+  if(!hgl1||!hgl2){
+    document.getElementById('hoopStatus').textContent='3D engine failed to load. Try refreshing.';
+    document.getElementById('btnCloseHoop').style.display='inline-flex';
+    return;
+  }
   const sn=await getDoc(doc(db,'hoop_games',gid));
   if(!sn.exists()){toast('Game not found','err');hoopOpen=false;return;}
   const g=sn.data();
