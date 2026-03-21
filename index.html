@@ -3231,8 +3231,8 @@ function initHoopWebGL(){
   const c1=document.getElementById('hoopCanvas1');
   const c2=document.getElementById('hoopCanvas2');
   if(!c1||!c2) return;
-  hgl1=buildHoopScene(c1,'hoopStatus1');
-  hgl2=buildHoopScene(c2,'hoopStatus2');
+  if(!hgl1) hgl1=buildHoopScene(c1,'hoopStatus1');
+  if(!hgl2) hgl2=buildHoopScene(c2,'hoopStatus2');
   if(hgl1) hgl1.start();
   if(hgl2) hgl2.start();
 }
@@ -3350,7 +3350,7 @@ function startHoopLobby(){
 // ── Open modal ──
 window.openHoopModal=async function(gid,autoShoot){
   if(hoopOpen&&hoopGid===gid) return;
-  if(hoopOpen) { hoopOpen=false; } // reset stale state from previous game
+  if(hoopOpen) { hoopOpen=false; }
   hoopGid=gid; hoopOpen=true;
   document.getElementById('hoopResult').style.display='none';
   document.getElementById('btnCloseHoop').style.display='none';
@@ -3359,12 +3359,18 @@ window.openHoopModal=async function(gid,autoShoot){
   document.getElementById('hoopScore1').textContent='0';
   document.getElementById('hoopScore2').textContent='0';
   document.getElementById('hoopShotCount').textContent='0/20';
+
+  // Open modal FIRST so canvases are in the DOM before WebGL init
+  document.getElementById('hoopModal').classList.add('open');
+  // Give browser one frame to render the modal before reading canvas size
+  await new Promise(r=>requestAnimationFrame(r));
   initHoopWebGL();
   if(!hgl1||!hgl2){
     document.getElementById('hoopStatus').textContent='3D engine failed to load. Try refreshing.';
     document.getElementById('btnCloseHoop').style.display='inline-flex';
     return;
   }
+
   const sn=await getDoc(doc(db,'hoop_games',gid));
   if(!sn.exists()){toast('Game not found','err');hoopOpen=false;return;}
   const g=sn.data();
@@ -3372,7 +3378,7 @@ window.openHoopModal=async function(gid,autoShoot){
   document.getElementById('hoopp1').textContent=isP1?(me.displayName||'You'):(g.player2?.displayName||'Opponent');
   document.getElementById('hoopp2').textContent=isP1?(g.player2?.displayName||'Opponent'):(g.player1?.displayName||'You');
   document.getElementById('hoopSub').textContent='Stake: '+parseFloat(g.stake).toFixed(3)+' XRP each · Winner takes '+(parseFloat(g.stake)*2*0.97).toFixed(3)+' XRP';
-  document.getElementById('hoopModal').classList.add('open');
+
   if(g.status==='complete'&&g.p1Results){
     await runHoopAnimation(g,isP1);
     showHoopResult(g,isP1);
