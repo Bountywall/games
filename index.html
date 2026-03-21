@@ -2372,7 +2372,7 @@ function buildHoopScene(targetCanvas, statusElemId) {
   targetCanvas.width = modalW; targetCanvas.height = modalH;
 
   const renderer=new THREE.WebGLRenderer({canvas:targetCanvas,antialias:true});
-  renderer.setSize(W,H);
+  renderer.setSize(modalW,modalH);
   renderer.shadowMap.enabled=true;
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -2384,7 +2384,7 @@ function buildHoopScene(targetCanvas, statusElemId) {
   scene.fog=new THREE.FogExp2(0x4a7aaa,0.045);
 
   // ── CAMERA — close and dramatic ──
-  const camera=new THREE.PerspectiveCamera(70,W/H,0.1,60);
+  const camera=new THREE.PerspectiveCamera(70,modalW/modalH,0.1,60);
   camera.position.set(0,1.6,-5.5);
   camera.lookAt(0,2.5,-8.6);
 
